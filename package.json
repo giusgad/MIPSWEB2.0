@@ -1,0 +1,31 @@
+{
+  "name": "mipsweb-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch:less": "less-watch-compiler src/less dist/css",
+    "watch:ts": "npx tsc --watch",
+    "watch": "concurrently \"npm run watch:less\" \"npm run watch:ts\"",
+    "build:ts": "npx tsc",
+    "build:less": "lessc src/less/styles.less dist/css/styles.css",
+    "build": "npm run build:ts && npm run build:less"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattiamendicino/mipsweb-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mattiamendicino/mipsweb-2/issues"
+  },
+  "homepage": "https://github.com/mattiamendicino/mipsweb-2#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "less": "^4.2.0",
+    "less-watch-compiler": "^1.16.3",
+    "typescript": "^5.5.4"
+  }
+}
