@@ -1,5 +1,4 @@
 declare const ejs: any;
-
 import { Icons } from './icons.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
