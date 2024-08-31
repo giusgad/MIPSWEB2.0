@@ -22,5 +22,3 @@ async function render(templateName: string, data: any) {
     if (!template) throw new Error(`No template found in "templates/${templateName}.ejs"`);
     return ejs.render(template, data);
 }
-
-console.log("ok");
