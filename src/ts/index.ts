@@ -1,5 +1,7 @@
 declare const ejs: any;
 
+import { Icons } from './icons.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     await renderElementById('app', null);
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function renderElementById(id: string, data: any) {
     const element = document.getElementById(id);
     if (!element) throw new Error(`No element found: ${id}`);
+    data = { ...data, Icons };
     element.innerHTML = await render(id, data);
 }
 

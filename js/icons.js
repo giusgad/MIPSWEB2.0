@@ -1,4 +1,3 @@
-"use strict";
 var Icons = /** @class */ (function () {
     function Icons() {
     }
@@ -43,3 +42,4 @@ var Icons = /** @class */ (function () {
     Icons.defs = "\n    <defs>\n        <linearGradient id=\"gradient\" gradientUnits=\"userSpaceOnUse\" x1=\"0\" y1=\"0\" x2=\"1024\" y2=\"1024\">\n            <stop offset=\"0\" stop-color=\"rgb(162, 132, 94)\"/>\n            <stop offset=\"1\" stop-color=\"rgb(0, 122, 255)\"/>\n        </linearGradient>\n    </defs>\n    ";
     return Icons;
 }());
+export { Icons };
