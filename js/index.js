@@ -38,36 +38,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, render('app')];
+            case 0: return [4 /*yield*/, renderElementById('app', null)];
             case 1:
                 _a.sent();
+                document.body.style.opacity = '1';
+                Array.from(document.getElementsByClassName('icon')).forEach(function (icon) {
+                    icon.style.opacity = '1';
+                });
                 return [2 /*return*/];
         }
     });
 }); });
-function render(templateName) {
+function renderElementById(id, data) {
     return __awaiter(this, void 0, void 0, function () {
-        var element, template;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var element, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    element = document.getElementById(templateName);
-                    if (!element) return [3 /*break*/, 2];
-                    return [4 /*yield*/, fetch("templates/".concat(templateName, ".ejs")).then(function (res) { return res.text(); })];
+                    element = document.getElementById(id);
+                    if (!element)
+                        throw new Error("No element found: ".concat(id));
+                    _a = element;
+                    return [4 /*yield*/, render(id, data)];
                 case 1:
-                    template = _a.sent();
-                    if (template) {
-                        element.innerHTML = ejs.render(template);
-                    }
-                    else {
-                        console.error("No template found: templates/".concat(templateName, ".ejs"));
-                    }
-                    return [3 /*break*/, 3];
-                case 2:
-                    console.error("No element found: ".concat(templateName));
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+                    _a.innerHTML = _b.sent();
+                    return [2 /*return*/];
             }
         });
     });
 }
+function render(templateName, data) {
+    return __awaiter(this, void 0, void 0, function () {
+        var template;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fetch("templates/".concat(templateName, ".ejs")).then(function (res) { return res.text(); })];
+                case 1:
+                    template = _a.sent();
+                    if (!template)
+                        throw new Error("No template found in \"templates/".concat(templateName, ".ejs\""));
+                    return [2 /*return*/, ejs.render(template, data)];
+            }
+        });
+    });
+}
+console.log("ok");

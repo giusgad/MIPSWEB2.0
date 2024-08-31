@@ -2,13 +2,13 @@
   "name": "mipsweb-2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "js/index.js",
   "scripts": {
-    "watch:less": "less-watch-compiler src/less dist/css",
+    "watch:less": "less-watch-compiler src/less css",
     "watch:ts": "npx tsc --watch",
     "watch": "concurrently \"npm run watch:less\" \"npm run watch:ts\"",
     "build:ts": "npx tsc",
-    "build:less": "lessc src/less/styles.less dist/css/styles.css",
+    "build:less": "lessc src/less/styles.less css/styles.css",
     "build": "npm run build:ts && npm run build:less"
   },
   "repository": {

@@ -3,10 +3,10 @@
     "target": "ES5",
     "module": "ES6",
     "strict": true,
-    "outDir": "./dist",
+    "outDir": "./js",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "Node"
   },
-  "include": ["src/**/*"]
+  "include": ["src/ts/*"]
 }
