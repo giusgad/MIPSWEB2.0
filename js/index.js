@@ -82,4 +82,3 @@ function render(templateName, data) {
         });
     });
 }
-console.log("ok");
