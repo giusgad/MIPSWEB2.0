@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "ES6",  // Torna a ES6
+    "module": "ES6",
     "strict": true,
     "outDir": "./dist",
     "esModuleInterop": true,
