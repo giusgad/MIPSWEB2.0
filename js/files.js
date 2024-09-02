@@ -86,7 +86,37 @@ window.closeFile = function (fileId) {
     });
 };
 window.importFile = function () {
-    console.log("Import file");
+    var _this = this;
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.asm';
+    input.addEventListener('change', function () {
+        var file = input.files[0];
+        var reader = new FileReader();
+        reader.onload = function () { return __awaiter(_this, void 0, void 0, function () {
+            var files, fileName, fileId, fileToAdd;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        files = getFiles();
+                        fileName = generateUniqueName(file.name.split(".")[0], files);
+                        fileId = files.length > 0 ? Math.max.apply(Math, files.map(function (file) { return file.id; })) + 1 : 0;
+                        fileToAdd = {
+                            id: fileId,
+                            name: fileName,
+                            type: "asm",
+                            content: reader.result
+                        };
+                        return [4 /*yield*/, addFile(fileToAdd, files)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        }); };
+        reader.readAsText(file);
+    });
+    input.click();
 };
 window.changeFileTab = changeFileTab;
 function changeFileTab(fileId) {

@@ -5,7 +5,10 @@
     <div class="file-tab <%if(fileId === file.id){%>active<%}%>" onclick="changeFileTab('<%=file.id%>');">
         <div class="file-name"><%=file.name%></div>
         <div class="buttons">
-            <div class="button" onclick="event.stopPropagation();closeFile('<%=file.id%>')">
+            <div class="button" onclick="event.stopPropagation();">
+                <div class="icon"><%-Icons.render('ellipsis')%></div>
+            </div>
+            <div class="button hover-red" onclick="event.stopPropagation();closeFile('<%=file.id%>')">
                 <div class="icon"><%-Icons.render('x')%></div>
             </div>
         </div>

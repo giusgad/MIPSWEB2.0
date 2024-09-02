@@ -35,7 +35,27 @@ export type file = {
 };
 
 (window as any).importFile = function() {
-    console.log("Import file");
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.asm';
+    input.addEventListener('change', () => {
+        const file = input.files![0];
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const files = getFiles();
+            const fileName = generateUniqueName(file.name.split(".")[0], files);
+            const fileId = files.length > 0 ? Math.max(...files.map(file => file.id)) + 1 : 0;
+            const fileToAdd: file = {
+                id: fileId,
+                name: fileName,
+                type: "asm",
+                content: reader.result as string
+            };
+            await addFile(fileToAdd, files);
+        };
+        reader.readAsText(file);
+    });
+    input.click();
 };
 
 (window as any).changeFileTab = changeFileTab;

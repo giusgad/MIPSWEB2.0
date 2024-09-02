@@ -52,9 +52,9 @@ body {
   bottom: 0;
 }
 .icon {
-  height: 32px;
-  width: 32px;
-  padding: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,10 +73,10 @@ body {
   height: 100%;
 }
 .app-name {
-  color: rgba(162, 132, 94, 0.8);
   font-size: 16px;
   font-weight: bold;
   height: 100%;
+  color: #6b81a5;
 }
 .flex {
   display: flex;
@@ -220,12 +220,13 @@ body {
 }
 .files-tabs .file-tab .buttons .button {
   border: 1px solid rgba(142, 142, 147, 0);
+  margin: 0;
 }
 .files-tabs .file-tab .buttons .button:hover {
   background-color: rgba(142, 142, 147, 0);
 }
-.files-tabs .file-tab .buttons .button:hover svg {
-  fill: #ff3b30;
+.files-tabs .file-tab .buttons .button.hover-red:hover svg {
+  fill: rgba(255, 59, 48, 0.75);
   transition: fill 0.5s;
 }
 #files {
