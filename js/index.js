@@ -45,36 +45,67 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+import { getFiles, getSelectedFileId } from "./files.js";
 import { Icons } from './icons.js';
+import { reloadEditors } from "./editor.js";
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
+    var files, fileId;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, renderElementById('app', null)];
+            case 0:
+                if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
+                    console.error('Required libraries (EJS or ACE) failed to load');
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, renderElementById('app', null)];
             case 1:
                 _a.sent();
+                files = getFiles();
+                if (!(files.length > 0)) return [3 /*break*/, 3];
+                fileId = getSelectedFileId();
+                if (!fileId) {
+                    fileId = files[0].id;
+                }
+                return [4 /*yield*/, renderElementById('files', { files: files, fileId: fileId })];
+            case 2:
+                _a.sent();
+                reloadEditors(files, fileId);
+                return [3 /*break*/, 4];
+            case 3:
+                localStorage.removeItem('selectedFileId');
+                _a.label = 4;
+            case 4: return [4 /*yield*/, renderElementById('registers', null)];
+            case 5:
+                _a.sent();
+                return [4 /*yield*/, renderElementById('memory', null)];
+            case 6:
+                _a.sent();
                 document.body.style.opacity = '1';
-                Array.from(document.getElementsByClassName('icon')).forEach(function (icon) {
-                    icon.style.opacity = '1';
-                });
                 return [2 /*return*/];
         }
     });
 }); });
-function renderElementById(id, data) {
+export function renderElementById(id, data) {
     return __awaiter(this, void 0, void 0, function () {
-        var element, _a;
+        var element, _a, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
+                    _b.trys.push([0, 2, , 3]);
                     element = document.getElementById(id);
                     if (!element)
-                        throw new Error("No element found: ".concat(id));
+                        throw new Error("No element found by Id: ".concat(id));
                     data = __assign(__assign({}, data), { Icons: Icons });
                     _a = element;
                     return [4 /*yield*/, render(id, data)];
                 case 1:
                     _a.innerHTML = _b.sent();
-                    return [2 /*return*/];
+                    return [3 /*break*/, 3];
+                case 2:
+                    error_1 = _b.sent();
+                    console.error(error_1);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
             }
         });
     });
@@ -84,13 +115,19 @@ function render(templateName, data) {
         var template;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("templates/".concat(templateName, ".ejs")).then(function (res) { return res.text(); })];
+                case 0: return [4 /*yield*/, fetch("templates/".concat(templateName, ".ejs")).then(function (res) {
+                        if (!res.ok) {
+                            throw new Error("No template found: \"templates/".concat(templateName, ".ejs\""));
+                        }
+                        return res.text();
+                    })];
                 case 1:
                     template = _a.sent();
-                    if (!template)
-                        throw new Error("No template found in \"templates/".concat(templateName, ".ejs\""));
                     return [2 /*return*/, ejs.render(template, data)];
             }
         });
     });
 }
+window.settings = function () {
+    console.log("Settings");
+};

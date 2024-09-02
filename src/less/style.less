@@ -4,7 +4,7 @@ body {
   opacity: 0;
   margin: 0;
   background-color: @light-gray-5;
-  color: @dark-gray-1;
+  color: @dark-gray-2;
   font-family: 'Prompt', sans-serif;
   font-size: 14px;
 }
@@ -12,6 +12,12 @@ body {
 * {
   transition: opacity 0.5s;
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 .spinner-bg {
@@ -63,14 +69,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0;
+
   svg {
     width: 100%;
     height: 100%;
   }
 }
 
-.logo {
+.app-logo {
   height: @space-5 + @space-3;
   width: @space-5 + @space-3;
   padding: @space-3;
@@ -80,7 +86,8 @@ body {
   }
 }
 
-.name {
+.app-name {
+  color: rgba(@brown, 0.8);
   font-size: 16px;
   font-weight: bold;
   height: 100%;
@@ -142,7 +149,6 @@ body {
     transition: all 0.5s;
     border: 1px solid rgba(@gray, 0.25);
     height: @space-4 + @space-3 + @space-2;
-    min-width: @space-6 + @space-5;
     &:last-child {
       margin: 0;
     }
@@ -153,11 +159,13 @@ body {
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      padding-right: @space-3;
+      padding: @space-2;
+      padding-right: @space-2;
       pointer-events: none;
       text-wrap: nowrap;
+      min-width: @space-6 + @space-4;
       &.no-icon {
-        padding-left: @space-3;
+        padding-left: @space-2;
       }
     }
     &:hover {
@@ -176,17 +184,152 @@ body {
   }
 }
 
+.toolbar-1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: @space-5 + @space-4;
+  background-color: @light-gray-4;
+  border-bottom: solid 1px @light-gray-5;
+}
+
+.toolbar-2 {
+  position: absolute;
+  top: @space-5 + @space-4;
+  left: 0;
+  right: 0;
+  height: @space-5 + @space-4;
+  background-color: @light-gray-4;
+  border-bottom: solid 1px @light-gray-5;
+}
+
+.files-tabs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: @space-5 + @space-4;
+  background-color: @light-gray-4;
+  border-bottom: solid 1px @light-gray-5;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  .file-tab {
+    height: 100%;
+    border-bottom: @space-1 solid @light-gray-4;
+    user-select: none;
+    display: flex;
+    padding-left: @space-4;
+    .file-name {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    &:hover {
+      background-color: rgba(@blue, 0.05);
+    }
+    &.active {
+      border-bottom: @space-1 solid rgba(@blue, 0.5);
+    }
+    .buttons {
+      .button {
+        border: 1px solid rgba(@gray, 0);
+        &:hover {
+          background-color: rgba(@gray, 0);
+          svg {
+            fill: @red;
+            transition: fill 0.5s;
+          }
+        }
+      }
+    }
+  }
+}
+
+#files {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80%;
+  height: @space-5 + @space-4;
+  z-index: 1;
+  transition: all 0.5s;
+}
+
+#files-editors {
+  position: absolute;
+  top: @space-7 + @space-4;
+  left: 0;
+  width: 80%;
+  bottom: 0;
+  z-index: 1;
+  transition: all 0.5s;
+  .file-editor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
 #app {
   position: absolute;
   top:0;
   left:0;
   right:0;
   bottom:0;
+  .content {
+    position: absolute;
+    top: @space-6 + @space-5;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    &.assembled {
+      #editor {
+        width: 40%;
+      }
+      #registers {
+        left: 40%;
+      }
+    }
+  }
 }
 
-.toolbar {
-  width: 100%;
-  height: @space-5 + @space-4;
-  background-color: @light-gray-4;
-  border-bottom: solid 1px @light-gray-5;
+#registers {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20%;
+  height: 100%;
+  z-index: 1;
+  transition: all 0.5s;
 }
+
+#memory {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  transition: all 0.5s;
+}
+
+@media only screen and (max-width: 512px) {
+  .buttons {
+    .button {
+      .text {
+        display: none;
+      }
+    }
+  }
+}
+
+@media only screen and (min-width: 513px) and (max-width: 1024px) {
+
+}
+

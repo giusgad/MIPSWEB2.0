@@ -16,6 +16,10 @@ export class Icons {
             path: 'M224 0L0 0 0 512l384 0 0-352-160 0L224 0zm32 0l0 128 128 0L256 0zM216 232l0 102.1 31-31 17-17L297.9 320l-17 17-72 72-17 17-17-17-72-72-17-17L120 286.1l17 17 31 31L168 232l0-24 48 0 0 24z',
             viewBox: '0 0 384 512'
         },
+        x: {
+            path: 'M326.6 166.6L349.3 144 304 98.7l-22.6 22.6L192 210.7l-89.4-89.4L80 98.7 34.7 144l22.6 22.6L146.7 256 57.4 345.4 34.7 368 80 413.3l22.6-22.6L192 301.3l89.4 89.4L304 413.3 349.3 368l-22.6-22.6L237.3 256l89.4-89.4z',
+            viewBox: '0 0 384 512'
+        },
         default: {
             path: 'M32 32l96 0 0 64L64 96l0 64L0 160 0 64 0 32l32 0zM0 192l64 0 0 128L0 320 0 192zm384 0l64 0 0 128-64 0 0-128zm64-32l-64 0 0-64-64 0 0-64 96 0 32 0 0 32 0 96zm0 192l0 96 0 32-32 0-96 0 0-64 64 0 0-64 64 0zM64 352l0 64 64 0 0 64-96 0L0 480l0-32 0-96 64 0zM288 480l-128 0 0-64 128 0 0 64zM160 96l0-64 128 0 0 64L160 96z',
             viewBox: '0 0 448 512'
@@ -31,7 +35,7 @@ export class Icons {
     </defs>
     `;
 
-    public static render(name: string, attributes: { [key: string]: string } = { fill: 'rgb(99, 99, 102)' }): string {
+    public static render(name: string, attributes: { [key: string]: string } = { fill: 'rgb(72, 72, 74)' }): string {
         let icon = this.icons[name];
         if (!icon) {
             console.error(`Icon "${name}" not found`);

@@ -6,10 +6,7 @@
   "scripts": {
     "watch:less": "less-watch-compiler src/less css",
     "watch:ts": "npx tsc --watch",
-    "watch": "concurrently \"npm run watch:less\" \"npm run watch:ts\"",
-    "build:ts": "npx tsc",
-    "build:less": "lessc src/less/styles.less css/styles.css",
-    "build": "npm run build:ts && npm run build:less"
+    "watch": "concurrently \"npm run watch:less\" \"npm run watch:ts\""
   },
   "repository": {
     "type": "git",
@@ -23,6 +20,7 @@
   },
   "homepage": "https://github.com/mattiamendicino/mipsweb-2#readme",
   "devDependencies": {
+    "@types/ace": "^0.0.52",
     "@types/node": "^22.5.1",
     "concurrently": "^8.2.2",
     "ejs": "^3.1.10",
