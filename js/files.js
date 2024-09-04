@@ -34,8 +34,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { renderElementById } from "./index.js";
+import { getVMState, updateInterface } from "./app.js";
 import { addFileEditor, removeFileEditor, showEditor } from "./editor.js";
+import { render } from "./index.js";
 window.newFile = function () {
     return __awaiter(this, void 0, void 0, function () {
         var files, fileName, fileId, fileToAdd;
@@ -55,32 +56,6 @@ window.newFile = function () {
                 case 1:
                     _a.sent();
                     return [2 /*return*/];
-            }
-        });
-    });
-};
-window.closeFile = function (fileId) {
-    return __awaiter(this, void 0, void 0, function () {
-        var files;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    files = getFiles();
-                    setFiles(files.filter(function (file) { return file.id !== Number(fileId); }));
-                    removeFileEditor(Number(fileId));
-                    files = getFiles();
-                    if (!(files.length > 0)) return [3 /*break*/, 2];
-                    return [4 /*yield*/, changeFileTab("".concat(files[files.length - 1].id))];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 2:
-                    localStorage.removeItem('selectedFileId');
-                    return [4 /*yield*/, renderElementById('files', {})];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
             }
         });
     });
@@ -119,38 +94,68 @@ window.importFile = function () {
     input.click();
 };
 window.changeFileTab = changeFileTab;
-function changeFileTab(fileId) {
+function changeFileTab(sFileId) {
     return __awaiter(this, void 0, void 0, function () {
+        var fileId;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    setSelectedFileId(Number(fileId));
-                    return [4 /*yield*/, renderElementById('files', { files: getFiles(), fileId: Number(fileId) })];
+                    fileId = Number(sFileId);
+                    setSelectedFileId(fileId);
+                    showEditor(fileId);
+                    return [4 /*yield*/, updateInterface("edit")];
                 case 1:
                     _a.sent();
-                    showEditor(Number(fileId));
                     return [2 /*return*/];
             }
         });
     });
 }
-export function updateFile(fileId, content) {
-    var files = getFiles();
-    var file = files.find(function (file) { return file.id === fileId; });
-    if (file) {
-        file.content = content;
-        setFiles(files);
-    }
-}
+window.closeFile = function (sFileId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var fileId, files, state, selectedFile;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    fileId = Number(sFileId);
+                    files = getFiles();
+                    setFiles(files.filter(function (file) { return file.id !== fileId; }));
+                    removeFileEditor(fileId);
+                    files = getFiles();
+                    if (!(files.length > 0)) return [3 /*break*/, 2];
+                    return [4 /*yield*/, changeFileTab("".concat(files[files.length - 1].id))];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 2:
+                    localStorage.removeItem('selectedFileId');
+                    state = getVMState();
+                    selectedFile = getSelectedFile();
+                    return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+};
 function addFile(file, files) {
     return __awaiter(this, void 0, void 0, function () {
+        var state, selectedFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     files.push(file);
                     setFiles(files);
-                    return [4 /*yield*/, changeFileTab((file.id).toString())];
+                    setSelectedFileId(file.id);
+                    state = getVMState();
+                    selectedFile = getSelectedFile();
+                    return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
                 case 1:
+                    _a.sent();
+                    return [4 /*yield*/, updateInterface("edit")];
+                case 2:
                     _a.sent();
                     addFileEditor(file);
                     return [2 /*return*/];
@@ -162,11 +167,37 @@ export function getFiles() {
     var files = localStorage.getItem("files");
     return files ? JSON.parse(files) : [];
 }
-function setFiles(files) {
+export function setFiles(files) {
     localStorage.setItem("files", JSON.stringify(files));
 }
+export function getFile(fileId) {
+    for (var _i = 0, _a = getFiles(); _i < _a.length; _i++) {
+        var file = _a[_i];
+        if (file.id === fileId)
+            return file;
+    }
+    return null;
+}
 export function setSelectedFileId(fileId) {
-    localStorage.setItem("selectedFileId", fileId.toString());
+    var file = getFile(fileId);
+    if (file) {
+        localStorage.setItem("selectedFileId", file.id.toString());
+    }
+}
+export function getSelectedFile() {
+    var fileId = getSelectedFileId();
+    if (fileId !== null) {
+        var files = getFiles();
+        if (files.length > 0) {
+            for (var _i = 0, _a = getFiles(); _i < _a.length; _i++) {
+                var file = _a[_i];
+                if (file.id === fileId)
+                    return file;
+            }
+        }
+    }
+    localStorage.removeItem('selectedFileId');
+    return null;
 }
 export function getSelectedFileId() {
     var fileId = localStorage.getItem("selectedFileId");
@@ -180,4 +211,12 @@ function generateUniqueName(name, files) {
         i++;
     }
     return newName;
+}
+export function updateFile(fileId, content) {
+    var files = getFiles();
+    var file = files.find(function (file) { return file.id === fileId; });
+    if (file) {
+        file.content = content;
+        setFiles(files);
+    }
 }

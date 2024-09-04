@@ -1,10 +1,13 @@
-import {getFiles, getSelectedFileId} from "./files.js";
-import { Icons } from './icons.js';
+import {Icons} from "./icons.js";
+import {getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId} from "./files.js";
+import {getVMState, updateInterface} from "./app.js";
 import {reloadEditors} from "./editor.js";
 
 declare const ejs: any;
+(window as any).ejs = ejs;
 declare const ace: any;
 
+document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
 
     if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
@@ -12,53 +15,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    await renderElementById('app', null);
-
+    const state = getVMState();
     const files = getFiles();
-    if (files.length > 0) {
-        let fileId = getSelectedFileId();
-        if (!fileId) {
-            fileId = files[0].id;
+    let selectedFileId = getSelectedFileId();
+    if (selectedFileId === null) {
+        if (files.length > 0) {
+            setSelectedFileId(files[0].id);
         }
-        await renderElementById('files', {files, fileId: fileId});
-        reloadEditors(files, fileId);
-    } else {
-        localStorage.removeItem('selectedFileId');
     }
+    let selectedFile = getSelectedFile();
+    if ((selectedFileId !== null) && (!selectedFile)) {
+        setSelectedFileId(files[0].id);
+        selectedFileId = getSelectedFileId();
+        selectedFile = getSelectedFile();
+    }
+    await render('app', 'app.ejs', {state, files, selectedFile});
+    reloadEditors(files, selectedFileId);
 
-    await renderElementById('registers', null);
-    await renderElementById('memory', null);
-
-    document.body.style.opacity = '1';
+    document.body.classList.remove('wait');
 });
 
-
-
-
-
-
-export async function renderElementById(id: string, data: any) {
+export async function render(id: string, templatePath: string, data: any) {
     try {
         const element = document.getElementById(id);
         if (!element) throw new Error(`No element found by Id: ${id}`);
-        data = { ...data, Icons };
-        element.innerHTML = await render(id, data);
+        element.innerHTML = await renderTemplate(templatePath, data);
     } catch (error) {
         console.error(error);
     }
 }
 
-async function render(templateName: string, data: any) {
-    const template = await fetch(`templates/${templateName}.ejs`).then(res => {
+(window as any).renderTemplate = renderTemplate;
+async function renderTemplate(templatePath: string, data: any) {
+    const template = await fetch(`templates/${templatePath}`).then(res => {
         if (!res.ok) {
-            throw new Error(`No template found: "templates/${templateName}.ejs"`);
+            throw new Error(`No template found: "templates/${templatePath}"`);
         }
         return res.text();
     });
-
-    return ejs.render(template, data);
+    data = { ...data, Icons };
+    return ejs.render(template, data, { async: true });
 }
 
-(window as any).settings = function() {
+(window as any).settings = async function() {
     console.log("Settings");
 };

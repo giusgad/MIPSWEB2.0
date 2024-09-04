@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45,93 +46,56 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { Icons } from "./icons.js";
-import { getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId } from "./files.js";
-import { getVMState } from "./app.js";
-import { reloadEditors } from "./editor.js";
-window.ejs = ejs;
-document.body.classList.add('wait');
+Object.defineProperty(exports, "__esModule", { value: true });
+var icons_js_1 = require("./icons.js");
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
-    var state, files, selectedFileId, selectedFile;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
-                    console.error('Required libraries (EJS or ACE) failed to load');
-                    return [2 /*return*/];
-                }
-                state = getVMState();
-                files = getFiles();
-                selectedFileId = getSelectedFileId();
-                if (selectedFileId === null) {
-                    if (files.length > 0) {
-                        setSelectedFileId(files[0].id);
-                    }
-                }
-                selectedFile = getSelectedFile();
-                if ((selectedFileId !== null) && (!selectedFile)) {
-                    setSelectedFileId(files[0].id);
-                    selectedFileId = getSelectedFileId();
-                    selectedFile = getSelectedFile();
-                }
-                return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
+            case 0: return [4 /*yield*/, renderElementById('app', null)];
             case 1:
                 _a.sent();
-                reloadEditors(files, selectedFileId);
-                document.body.classList.remove('wait');
+                document.body.style.opacity = '1';
+                Array.from(document.getElementsByClassName('icon')).forEach(function (icon) {
+                    icon.style.opacity = '1';
+                });
                 return [2 /*return*/];
         }
     });
 }); });
-export function render(id, templatePath, data) {
+function renderElementById(id, data) {
     return __awaiter(this, void 0, void 0, function () {
-        var element, _a, error_1;
+        var element, _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    _b.trys.push([0, 2, , 3]);
                     element = document.getElementById(id);
                     if (!element)
-                        throw new Error("No element found by Id: ".concat(id));
+                        throw new Error("No element found: ".concat(id));
+                    data = __assign(__assign({}, data), { Icons: icons_js_1.Icons });
                     _a = element;
-                    return [4 /*yield*/, renderTemplate(templatePath, data)];
+                    return [4 /*yield*/, render(id, data)];
                 case 1:
                     _a.innerHTML = _b.sent();
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_1 = _b.sent();
-                    console.error(error_1);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+                    return [2 /*return*/];
             }
         });
     });
 }
-window.renderTemplate = renderTemplate;
-function renderTemplate(templatePath, data) {
+function render(templateName, data) {
     return __awaiter(this, void 0, void 0, function () {
         var template;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("templates/".concat(templatePath)).then(function (res) {
-                        if (!res.ok) {
-                            throw new Error("No template found: \"templates/".concat(templatePath, "\""));
-                        }
-                        return res.text();
-                    })];
+                case 0: return [4 /*yield*/, fetch("templates/".concat(templateName, ".ejs")).then(function (res) { return res.text(); })];
                 case 1:
                     template = _a.sent();
-                    data = __assign(__assign({}, data), { Icons: Icons });
-                    return [2 /*return*/, ejs.render(template, data, { async: true })];
+                    if (!template)
+                        throw new Error("No template found in \"templates/".concat(templateName, ".ejs\""));
+                    return [2 /*return*/, ejs.render(template, data)];
             }
         });
     });
 }
 window.settings = function () {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            console.log("Settings");
-            return [2 /*return*/];
-        });
-    });
+    console.log("Settings");
 };

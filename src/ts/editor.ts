@@ -43,7 +43,9 @@ export function removeFileEditor(fileId: number) {
     filesEditors = filesEditors.filter(fileEditor => fileEditor.fileId !== fileId);
 }
 
-export function reloadEditors(files: file[], fileId: number) {
+export function reloadEditors(files: file[], fileId: number | null) {
+    document.getElementById('files-editors')!.innerHTML = '';
+    filesEditors = [];
     addFilesEditors(files);
     showEditor(fileId);
 }
@@ -55,17 +57,19 @@ export function addFilesEditors(files: file[]) {
 }
 
 
-export function showEditor(fileId: number) {
-    for (const fileEditor of filesEditors) {
-        const id = String(fileEditor.fileId);
-        const editorElement = document.getElementById(`file-editor-${id}`);
-        if (editorElement) {
-            const isActive = id == fileId.toString();
-            editorElement.style.display = isActive ? 'block' : 'none';
-            if (isActive) {
-                fileEditor.aceEditor.focus();
+export function showEditor(fileId: number | null) {
+    if (fileId !== null) {
+        for (const fileEditor of filesEditors) {
+            const id = String(fileEditor.fileId);
+            const editorElement = document.getElementById(`file-editor-${id}`);
+            if (editorElement) {
+                const isActive = id == fileId.toString();
+                editorElement.style.display = isActive ? 'block' : 'none';
+                if (isActive) {
+                    fileEditor.aceEditor.focus();
+                }
+                fileEditor.aceEditor.clearSelection();
             }
-            fileEditor.aceEditor.clearSelection();
         }
     }
 }

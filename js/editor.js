@@ -29,6 +29,8 @@ export function removeFileEditor(fileId) {
     filesEditors = filesEditors.filter(function (fileEditor) { return fileEditor.fileId !== fileId; });
 }
 export function reloadEditors(files, fileId) {
+    document.getElementById('files-editors').innerHTML = '';
+    filesEditors = [];
     addFilesEditors(files);
     showEditor(fileId);
 }
@@ -39,17 +41,19 @@ export function addFilesEditors(files) {
     }
 }
 export function showEditor(fileId) {
-    for (var _i = 0, filesEditors_1 = filesEditors; _i < filesEditors_1.length; _i++) {
-        var fileEditor = filesEditors_1[_i];
-        var id = String(fileEditor.fileId);
-        var editorElement = document.getElementById("file-editor-".concat(id));
-        if (editorElement) {
-            var isActive = id == fileId.toString();
-            editorElement.style.display = isActive ? 'block' : 'none';
-            if (isActive) {
-                fileEditor.aceEditor.focus();
+    if (fileId !== null) {
+        for (var _i = 0, filesEditors_1 = filesEditors; _i < filesEditors_1.length; _i++) {
+            var fileEditor = filesEditors_1[_i];
+            var id = String(fileEditor.fileId);
+            var editorElement = document.getElementById("file-editor-".concat(id));
+            if (editorElement) {
+                var isActive = id == fileId.toString();
+                editorElement.style.display = isActive ? 'block' : 'none';
+                if (isActive) {
+                    fileEditor.aceEditor.focus();
+                }
+                fileEditor.aceEditor.clearSelection();
             }
-            fileEditor.aceEditor.clearSelection();
         }
     }
 }

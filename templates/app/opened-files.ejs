@@ -1,0 +1,29 @@
+<% if (files.length > 0) { %>
+    <% if (state == "edit") { %>
+
+        <div class="files-tabs">
+            <%files.forEach((file) => {%>
+                <div class="file-tab <%if((selectedFile) && (selectedFile.id === file.id)){%>active<%}%>" onclick="changeFileTab('<%=file.id%>');">
+                    <div class="file-name"><%=file.name%></div>
+                    <div class="buttons">
+                        <div class="button" onclick="event.stopPropagation();">
+                            <div class="icon"><%-Icons.render('ellipsis')%></div>
+                        </div>
+                        <div class="button" onclick="event.stopPropagation();closeFile('<%=file.id%>')">
+                            <div class="icon"><%-Icons.render('x')%></div>
+                        </div>
+                    </div>
+                </div>
+            <%});%>
+        </div>
+
+    <% } else if (state == "execute") { %>
+
+        <div class="files-tabs">
+            <div class="file-tab no-hover">
+                <div class="file-name"><%=selectedFile.name%></div>
+            </div>
+        </div>
+
+    <% } %>
+<% } %>

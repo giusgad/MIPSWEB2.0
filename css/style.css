@@ -1,5 +1,4 @@
 body {
-  opacity: 0;
   margin: 0;
   background-color: #f2f2f7;
   color: #48484a;
@@ -25,8 +24,8 @@ body {
   pointer-events: none;
 }
 .spinner-bg .spinner {
-  border: 2px solid #007aff;
-  border-top-color: rgba(0, 122, 255, 0.25);
+  border: 2px solid #6b81a5;
+  border-top-color: rgba(150, 132, 111, 0.25);
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -52,23 +51,20 @@ body {
   bottom: 0;
 }
 .icon {
-  width: 24px;
-  height: 24px;
-  padding: 4px;
+  width: 16px;
+  height: 16px;
+  margin: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+.icon.app-logo {
+  width: 24px;
+  height: 24px;
+  margin: 8px;
+}
 .icon svg {
-  width: 100%;
-  height: 100%;
-}
-.app-logo {
-  height: 40px;
-  width: 40px;
-  padding: 8px;
-}
-.app-logo svg {
+  transition: opacity 0.5s;
   width: 100%;
   height: 100%;
 }
@@ -77,6 +73,7 @@ body {
   font-weight: bold;
   height: 100%;
   color: #6b81a5;
+  line-height: 16px;
 }
 .flex {
   display: flex;
@@ -122,137 +119,33 @@ body {
 .buttons {
   display: flex;
   padding: 8px;
-  overflow: scroll;
 }
 .buttons .button {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 8px;
+  border: 1px solid rgba(142, 142, 147, 0.25);
   border-radius: 4px;
   user-select: none;
+  margin-right: 8px;
   transition: all 0.5s;
-  border: 1px solid rgba(142, 142, 147, 0.25);
-  height: 28px;
 }
-.buttons .button:last-child {
-  margin: 0;
-}
-.buttons .button .icon {
-  pointer-events: none;
-}
-.buttons .button .text {
+.buttons .button .label {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 4px;
-  padding-right: 4px;
   pointer-events: none;
   text-wrap: nowrap;
-  min-width: 80px;
+  padding: 0 4px;
 }
-.buttons .button .text.no-icon {
-  padding-left: 4px;
+.buttons .button:last-child {
+  margin: 0;
 }
 .buttons .button:hover {
   background-color: rgba(142, 142, 147, 0.125);
 }
 .buttons .button:active {
   background-color: rgba(142, 142, 147, 0.25);
-}
-.buttons.vertical {
-  flex-direction: column;
-}
-.buttons.vertical .button {
-  margin-right: 0;
-  margin-bottom: 8px;
-}
-.toolbar-1 {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background-color: #e5e5ea;
-  border-bottom: solid 1px #f2f2f7;
-}
-.toolbar-2 {
-  position: absolute;
-  top: 48px;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background-color: #e5e5ea;
-  border-bottom: solid 1px #f2f2f7;
-}
-.files-tabs {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background-color: #e5e5ea;
-  border-bottom: solid 1px #f2f2f7;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-.files-tabs .file-tab {
-  height: 100%;
-  border-bottom: 2px solid #e5e5ea;
-  user-select: none;
-  display: flex;
-  padding-left: 16px;
-}
-.files-tabs .file-tab .file-name {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.files-tabs .file-tab:hover {
-  background-color: rgba(0, 122, 255, 0.05);
-}
-.files-tabs .file-tab.active {
-  border-bottom: 2px solid rgba(0, 122, 255, 0.5);
-}
-.files-tabs .file-tab .buttons .button {
-  border: 1px solid rgba(142, 142, 147, 0);
-  margin: 0;
-}
-.files-tabs .file-tab .buttons .button:hover {
-  background-color: rgba(142, 142, 147, 0);
-}
-.files-tabs .file-tab .buttons .button.hover-red:hover svg {
-  fill: rgba(255, 59, 48, 0.75);
-  transition: fill 0.5s;
-}
-#files {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 80%;
-  height: 48px;
-  z-index: 1;
-  transition: all 0.5s;
-}
-#files-editors {
-  position: absolute;
-  top: 144px;
-  left: 0;
-  width: 80%;
-  bottom: 0;
-  z-index: 1;
-  transition: all 0.5s;
-}
-#files-editors .file-editor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 #app {
   position: absolute;
@@ -261,38 +154,125 @@ body {
   right: 0;
   bottom: 0;
 }
-#app .content {
-  position: absolute;
-  top: 96px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-#app .content.assembled #editor {
-  width: 40%;
-}
-#app .content.assembled #registers {
-  left: 40%;
-}
-#registers {
+#app .header {
   position: absolute;
   top: 0;
+  left: 0;
   right: 0;
-  width: 20%;
-  height: 100%;
+  height: 48px;
+  background-color: #e5e5ea;
+  border-bottom: solid 1px #f2f2f7;
+}
+#app .toolbar {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background-color: #e5e5ea;
+  border-bottom: solid 1px #f2f2f7;
+}
+#files-editors {
+  position: absolute;
+  top: 144px;
+  left: 0;
+  width: 80%;
+  bottom: 0;
+  z-index: 0;
+  transition: width 0.5s;
+}
+#files-editors.execute {
+  width: 40%;
+}
+#files-editors .file-editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+#opened-files {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  width: 80%;
+  height: 48px;
   z-index: 1;
   transition: all 0.5s;
 }
-#memory {
+#opened-files.execute {
+  width: 40%;
+}
+#opened-files .files-tabs {
   position: absolute;
   top: 0;
+  left: 0;
   right: 0;
-  width: 40%;
+  bottom: 0;
+  background-color: #e5e5ea;
+  border-bottom: solid 1px #f2f2f7;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+#opened-files .files-tabs .file-tab {
   height: 100%;
+  border-bottom: 2px solid #e5e5ea;
+  user-select: none;
+  display: flex;
+  padding-left: 16px;
+}
+#opened-files .files-tabs .file-tab .file-name {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#opened-files .files-tabs .file-tab:hover {
+  background-color: rgba(0, 122, 255, 0.05);
+}
+#opened-files .files-tabs .file-tab.active {
+  border-bottom: 2px solid rgba(0, 122, 255, 0.5);
+}
+#opened-files .files-tabs .file-tab .buttons .button {
+  margin: 0;
+  border: unset;
+}
+#opened-files .files-tabs .file-tab .buttons .button svg {
+  opacity: 0.5;
+}
+#opened-files .files-tabs .file-tab .buttons .button:hover {
+  background-color: unset;
+}
+#opened-files .files-tabs .file-tab .buttons .button:hover svg {
+  opacity: 1;
+}
+#opened-files .files-tabs .file-tab .buttons .button:active {
+  background-color: unset;
+}
+#opened-files .files-tabs .file-tab.no-hover:hover {
+  background-color: unset;
+}
+#registers {
+  position: absolute;
+  top: 96px;
+  left: 80%;
+  width: 20%;
+  bottom: 0;
+  z-index: 1;
   transition: all 0.5s;
 }
-@media only screen and (max-width: 512px) {
-  .buttons .button .text {
-    display: none;
-  }
+#registers.execute {
+  left: 40%;
+}
+#memory {
+  position: absolute;
+  top: 96px;
+  right: 0;
+  width: 40%;
+  bottom: 0;
+  z-index: 0;
+  transition: all 0.5s;
 }

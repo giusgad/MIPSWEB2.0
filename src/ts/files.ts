@@ -1,5 +1,6 @@
-import {renderElementById} from "./index.js";
+import {getVMState, updateInterface} from "./app.js";
 import {addFileEditor, removeFileEditor, showEditor} from "./editor.js";
+import {render} from "./index.js";
 
 export type file = {
     id: number,
@@ -19,19 +20,6 @@ export type file = {
         content: ""
     };
     await addFile(fileToAdd, files);
-};
-
-(window as any).closeFile = async function(fileId: string) {
-    let files = getFiles();
-    setFiles(files.filter(file => file.id !== Number(fileId)));
-    removeFileEditor(Number(fileId));
-    files = getFiles();
-    if (files.length > 0) {
-        await changeFileTab(`${files[files.length - 1].id}`);
-    } else {
-        localStorage.removeItem('selectedFileId');
-        await renderElementById('files', {});
-    }
 };
 
 (window as any).importFile = function() {
@@ -59,25 +47,37 @@ export type file = {
 };
 
 (window as any).changeFileTab = changeFileTab;
-async function changeFileTab(fileId: string) {
-    setSelectedFileId(Number(fileId));
-    await renderElementById('files', {files: getFiles(), fileId: Number(fileId)});
-    showEditor(Number(fileId));
+async function changeFileTab(sFileId: string) {
+    const fileId = Number(sFileId);
+    setSelectedFileId(fileId);
+    showEditor(fileId);
+    await updateInterface("edit");
 }
 
-export function updateFile(fileId: number, content: string) {
-    const files = getFiles();
-    const file = files.find(file => file.id === fileId);
-    if (file) {
-        file.content = content;
-        setFiles(files);
+(window as any).closeFile = async function(sFileId: string) {
+    const fileId = Number(sFileId);
+    let files = getFiles();
+    setFiles(files.filter(file => file.id !== fileId));
+    removeFileEditor(fileId);
+    files = getFiles();
+    if (files.length > 0) {
+        await changeFileTab(`${files[files.length - 1].id}`);
+    } else {
+        localStorage.removeItem('selectedFileId');
+        const state = getVMState();
+        const selectedFile = getSelectedFile();
+        await render('app', 'app.ejs', {state, files, selectedFile});
     }
-}
+};
 
 async function addFile(file: file, files: file[]) {
     files.push(file);
     setFiles(files);
-    await changeFileTab((file.id).toString());
+    setSelectedFileId(file.id);
+    const state = getVMState();
+    const selectedFile = getSelectedFile();
+    await render('app', 'app.ejs', {state, files, selectedFile});
+    await updateInterface("edit");
     addFileEditor(file);
 }
 
@@ -86,12 +86,36 @@ export function getFiles(): file[] {
     return files ? JSON.parse(files) : [];
 }
 
-function setFiles(files: file[]) {
+export function setFiles(files: file[]) {
     localStorage.setItem("files", JSON.stringify(files));
 }
 
+export function getFile(fileId: number) {
+    for (const file of getFiles()) {
+        if (file.id === fileId) return file;
+    }
+    return null;
+}
+
 export function setSelectedFileId(fileId: number) {
-    localStorage.setItem("selectedFileId", fileId.toString());
+    const file = getFile(fileId);
+    if (file) {
+        localStorage.setItem("selectedFileId", file.id.toString());
+    }
+}
+
+export function getSelectedFile(): file | null {
+    const fileId = getSelectedFileId();
+    if (fileId !== null) {
+        const files = getFiles();
+        if (files.length > 0) {
+            for (const file of getFiles()) {
+                if (file.id === fileId) return file;
+            }
+        }
+    }
+    localStorage.removeItem('selectedFileId');
+    return null;
 }
 
 export function getSelectedFileId(): number | null {
@@ -107,4 +131,13 @@ function generateUniqueName(name: string, files: file[]): string {
         i++;
     }
     return newName;
+}
+
+export function updateFile(fileId: number, content: string) {
+    const files = getFiles();
+    const file = files.find(file => file.id === fileId);
+    if (file) {
+        file.content = content;
+        setFiles(files);
+    }
 }
