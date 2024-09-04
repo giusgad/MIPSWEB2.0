@@ -77,8 +77,8 @@ async function addFile(file: file, files: file[]) {
     const state = getVMState();
     const selectedFile = getSelectedFile();
     await render('app', 'app.ejs', {state, files, selectedFile});
-    await updateInterface("edit");
     addFileEditor(file);
+    await updateInterface("edit");
 }
 
 export function getFiles(): file[] {

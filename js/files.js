@@ -154,10 +154,10 @@ function addFile(file, files) {
                     return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
                 case 1:
                     _a.sent();
+                    addFileEditor(file);
                     return [4 /*yield*/, updateInterface("edit")];
                 case 2:
                     _a.sent();
-                    addFileEditor(file);
                     return [2 /*return*/];
             }
         });
