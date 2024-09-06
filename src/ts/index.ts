@@ -1,38 +1,14 @@
 import {Icons} from "./icons.js";
-import {getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId} from "./files.js";
-import {getVMState, updateInterface} from "./app.js";
-import {reloadEditors} from "./editor.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
 declare const ace: any;
 
-document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
-
     if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
         console.error('Required libraries (EJS or ACE) failed to load');
         return;
     }
-
-    const state = getVMState();
-    const files = getFiles();
-    let selectedFileId = getSelectedFileId();
-    if (selectedFileId === null) {
-        if (files.length > 0) {
-            setSelectedFileId(files[0].id);
-        }
-    }
-    let selectedFile = getSelectedFile();
-    if ((selectedFileId !== null) && (!selectedFile)) {
-        setSelectedFileId(files[0].id);
-        selectedFileId = getSelectedFileId();
-        selectedFile = getSelectedFile();
-    }
-    await render('app', 'app.ejs', {state, files, selectedFile});
-    reloadEditors(files, selectedFileId);
-
-    document.body.classList.remove('wait');
 });
 
 export async function render(id: string, templatePath: string, data: any) {
@@ -57,6 +33,20 @@ async function renderTemplate(templatePath: string, data: any) {
     return ejs.render(template, data, { async: true });
 }
 
-(window as any).settings = async function() {
-    console.log("Settings");
-};
+export function addClass(className: string, id: string) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.add(className);
+    } else {
+        console.error(`Element with id "${id}" not found.`);
+    }
+}
+
+export function removeClass(className: string, id: string) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.remove(className);
+    } else {
+        console.error(`Element with id "${id}" not found.`);
+    }
+}

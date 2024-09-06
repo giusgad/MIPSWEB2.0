@@ -1,4 +1,5 @@
-import {file, updateFile} from "./files.js"
+import {file, getSelectedFileId, updateFile} from "./files.js"
+import {vm} from "./app.js";
 
 export type fileEditor = {
     fileId: number,
@@ -69,6 +70,63 @@ export function showEditor(fileId: number | null) {
                     fileEditor.aceEditor.focus();
                 }
                 fileEditor.aceEditor.clearSelection();
+            }
+        }
+    }
+}
+
+export function updateEditor(): void {
+    const selectedFileId = getSelectedFileId();
+    if (selectedFileId !== null) {
+        const fileEditor = filesEditors.find(editor => editor.fileId === selectedFileId);
+        if (fileEditor) {
+            const VMState = vm.getState();
+            const aceEditor: AceAjax.Editor = fileEditor.aceEditor;
+            const cursors = document.getElementsByClassName("ace_hidden-cursors");
+            if (VMState === "edit") {
+
+                aceEditor.setOptions({
+                    readOnly: false,
+                    highlightActiveLine: true,
+                    highlightGutterLine: true
+                });
+                for (let i = 0; i < cursors.length; i++) {
+                    (cursors[i] as HTMLElement).style.display = "block";
+                }
+                let markers = aceEditor.session.getMarkers(false);
+                for (let i in markers) {
+                    if (markers[i].clazz === "next-instruction") {
+                        aceEditor.session.removeMarker(markers[i].id);
+                    }
+                }
+                aceEditor.session.clearBreakpoints();
+                aceEditor.focus();
+
+            } else if (VMState === "execute") {
+
+                aceEditor.setOptions({
+                    readOnly: true,
+                    highlightActiveLine: false,
+                    highlightGutterLine: false
+                });
+                for (let i = 0; i < cursors.length; i++) {
+                    (cursors[i] as HTMLElement).style.display = "none";
+                }
+                const nextInstructionLine = vm.getNextInstructionLineNumber();
+                let markers = aceEditor.session.getMarkers(false);
+                for (let i in markers) {
+                    if (markers[i].clazz === "next-instruction") {
+                        aceEditor.session.removeMarker(markers[i].id);
+                    }
+                }
+                aceEditor.session.clearBreakpoints();
+                if (nextInstructionLine) {
+                    let Range = ace.require('ace/range').Range,
+                        range = new Range(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
+                    aceEditor.session.addMarker(range, "next-instruction", "fullLine", false);
+                    aceEditor.session.setBreakpoint(nextInstructionLine-1, "breakpoint");
+                }
+
             }
         }
     }

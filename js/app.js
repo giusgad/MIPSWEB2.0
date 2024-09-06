@@ -34,19 +34,46 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { getFiles, getSelectedFile } from "./files.js";
-import { render } from "./index.js";
-var state = "edit";
-export function getVMState() {
-    return state;
-}
-export function updateInterface(newState) {
+import { getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId } from "./files.js";
+import { addClass, removeClass, render } from "./index.js";
+import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
+import { reloadEditors, updateEditor } from "./editor.js";
+export var vm = new VirtualMachine();
+document.body.classList.add('wait');
+document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
+    var files, selectedFileId, selectedFile;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                files = getFiles();
+                selectedFileId = getSelectedFileId();
+                if (selectedFileId === null) {
+                    if (files.length > 0) {
+                        setSelectedFileId(files[0].id);
+                    }
+                }
+                selectedFile = getSelectedFile();
+                if ((selectedFileId !== null) && (!selectedFile)) {
+                    setSelectedFileId(files[0].id);
+                    selectedFileId = getSelectedFileId();
+                    selectedFile = getSelectedFile();
+                }
+                return [4 /*yield*/, render('app', 'app.ejs', { state: "edit", files: files, selectedFile: selectedFile })];
+            case 1:
+                _a.sent();
+                reloadEditors(files, selectedFileId);
+                document.body.classList.remove('wait');
+                return [2 /*return*/];
+        }
+    });
+}); });
+export function updateInterface() {
     return __awaiter(this, void 0, void 0, function () {
-        var files, selectedFile;
+        var state, files, selectedFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    state = newState;
+                    state = vm.getState();
                     files = getFiles();
                     selectedFile = getSelectedFile();
                     if (!(state === "execute")) return [3 /*break*/, 5];
@@ -89,31 +116,22 @@ export function updateInterface(newState) {
         });
     });
 }
-function addClass(className, id) {
-    var element = document.getElementById(id);
-    if (element) {
-        element.classList.add(className);
-    }
-    else {
-        console.error("Element with id \"".concat(id, "\" not found."));
-    }
-}
-function removeClass(className, id) {
-    var element = document.getElementById(id);
-    if (element) {
-        element.classList.remove(className);
-    }
-    else {
-        console.error("Element with id \"".concat(id, "\" not found."));
-    }
-}
 window.assembleClick = function () {
     return __awaiter(this, void 0, void 0, function () {
+        var file;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, updateInterface("execute")];
+                case 0:
+                    file = getSelectedFile();
+                    if (!file) return [3 /*break*/, 2];
+                    if (!file.content) return [3 /*break*/, 2];
+                    vm.assemble(file.content);
+                    return [4 /*yield*/, updateInterface()];
                 case 1:
                     _a.sent();
+                    _a.label = 2;
+                case 2:
+                    updateEditor();
                     return [2 /*return*/];
             }
         });
@@ -123,9 +141,12 @@ window.stopClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, updateInterface("edit")];
+                case 0:
+                    vm.stop();
+                    return [4 /*yield*/, updateInterface()];
                 case 1:
                     _a.sent();
+                    updateEditor();
                     return [2 /*return*/];
             }
         });
@@ -135,6 +156,7 @@ window.stepClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             console.log("Step click");
+            updateEditor();
             return [2 /*return*/];
         });
     });
@@ -143,6 +165,15 @@ window.runClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             console.log("Run click");
+            updateEditor();
+            return [2 /*return*/];
+        });
+    });
+};
+window.settings = function () {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            console.log("Settings");
             return [2 /*return*/];
         });
     });

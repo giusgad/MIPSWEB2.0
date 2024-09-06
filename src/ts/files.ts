@@ -1,6 +1,6 @@
-import {getVMState, updateInterface} from "./app.js";
+import {vm, updateInterface} from "./app.js";
 import {addFileEditor, removeFileEditor, showEditor} from "./editor.js";
-import {render} from "./index.js";
+import {removeClass, render} from "./index.js";
 
 export type file = {
     id: number,
@@ -51,7 +51,7 @@ async function changeFileTab(sFileId: string) {
     const fileId = Number(sFileId);
     setSelectedFileId(fileId);
     showEditor(fileId);
-    await updateInterface("edit");
+    await updateInterface();
 }
 
 (window as any).closeFile = async function(sFileId: string) {
@@ -64,7 +64,7 @@ async function changeFileTab(sFileId: string) {
         await changeFileTab(`${files[files.length - 1].id}`);
     } else {
         localStorage.removeItem('selectedFileId');
-        const state = getVMState();
+        const state = vm.getState();
         const selectedFile = getSelectedFile();
         await render('app', 'app.ejs', {state, files, selectedFile});
     }
@@ -74,11 +74,9 @@ async function addFile(file: file, files: file[]) {
     files.push(file);
     setFiles(files);
     setSelectedFileId(file.id);
-    const state = getVMState();
-    const selectedFile = getSelectedFile();
-    await render('app', 'app.ejs', {state, files, selectedFile});
+    await render('app', 'app.ejs', {state: "edit", files, selectedFile: file});
+    removeClass('execute', 'files-editors');
     addFileEditor(file);
-    await updateInterface("edit");
 }
 
 export function getFiles(): file[] {

@@ -46,41 +46,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Icons } from "./icons.js";
-import { getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId } from "./files.js";
-import { getVMState } from "./app.js";
-import { reloadEditors } from "./editor.js";
 window.ejs = ejs;
-document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
-    var state, files, selectedFileId, selectedFile;
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
-                    console.error('Required libraries (EJS or ACE) failed to load');
-                    return [2 /*return*/];
-                }
-                state = getVMState();
-                files = getFiles();
-                selectedFileId = getSelectedFileId();
-                if (selectedFileId === null) {
-                    if (files.length > 0) {
-                        setSelectedFileId(files[0].id);
-                    }
-                }
-                selectedFile = getSelectedFile();
-                if ((selectedFileId !== null) && (!selectedFile)) {
-                    setSelectedFileId(files[0].id);
-                    selectedFileId = getSelectedFileId();
-                    selectedFile = getSelectedFile();
-                }
-                return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
-            case 1:
-                _a.sent();
-                reloadEditors(files, selectedFileId);
-                document.body.classList.remove('wait');
-                return [2 /*return*/];
+        if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
+            console.error('Required libraries (EJS or ACE) failed to load');
+            return [2 /*return*/];
         }
+        return [2 /*return*/];
     });
 }); });
 export function render(id, templatePath, data) {
@@ -127,11 +100,21 @@ function renderTemplate(templatePath, data) {
         });
     });
 }
-window.settings = function () {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            console.log("Settings");
-            return [2 /*return*/];
-        });
-    });
-};
+export function addClass(className, id) {
+    var element = document.getElementById(id);
+    if (element) {
+        element.classList.add(className);
+    }
+    else {
+        console.error("Element with id \"".concat(id, "\" not found."));
+    }
+}
+export function removeClass(className, id) {
+    var element = document.getElementById(id);
+    if (element) {
+        element.classList.remove(className);
+    }
+    else {
+        console.error("Element with id \"".concat(id, "\" not found."));
+    }
+}

@@ -1,4 +1,5 @@
-import { updateFile } from "./files.js";
+import { getSelectedFileId, updateFile } from "./files.js";
+import { vm } from "./app.js";
 export var filesEditors = [];
 export function addFileEditor(file) {
     var fileEditorElement = document.createElement('div');
@@ -53,6 +54,58 @@ export function showEditor(fileId) {
                     fileEditor.aceEditor.focus();
                 }
                 fileEditor.aceEditor.clearSelection();
+            }
+        }
+    }
+}
+export function updateEditor() {
+    var selectedFileId = getSelectedFileId();
+    if (selectedFileId !== null) {
+        var fileEditor = filesEditors.find(function (editor) { return editor.fileId === selectedFileId; });
+        if (fileEditor) {
+            var VMState = vm.getState();
+            var aceEditor = fileEditor.aceEditor;
+            var cursors = document.getElementsByClassName("ace_hidden-cursors");
+            if (VMState === "edit") {
+                aceEditor.setOptions({
+                    readOnly: false,
+                    highlightActiveLine: true,
+                    highlightGutterLine: true
+                });
+                for (var i = 0; i < cursors.length; i++) {
+                    cursors[i].style.display = "block";
+                }
+                var markers = aceEditor.session.getMarkers(false);
+                for (var i in markers) {
+                    if (markers[i].clazz === "next-instruction") {
+                        aceEditor.session.removeMarker(markers[i].id);
+                    }
+                }
+                aceEditor.session.clearBreakpoints();
+                aceEditor.focus();
+            }
+            else if (VMState === "execute") {
+                aceEditor.setOptions({
+                    readOnly: true,
+                    highlightActiveLine: false,
+                    highlightGutterLine: false
+                });
+                for (var i = 0; i < cursors.length; i++) {
+                    cursors[i].style.display = "none";
+                }
+                var nextInstructionLine = vm.getNextInstructionLineNumber();
+                var markers = aceEditor.session.getMarkers(false);
+                for (var i in markers) {
+                    if (markers[i].clazz === "next-instruction") {
+                        aceEditor.session.removeMarker(markers[i].id);
+                    }
+                }
+                aceEditor.session.clearBreakpoints();
+                if (nextInstructionLine) {
+                    var Range_1 = ace.require('ace/range').Range, range = new Range_1(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
+                    aceEditor.session.addMarker(range, "next-instruction", "fullLine", false);
+                    aceEditor.session.setBreakpoint(nextInstructionLine - 1, "breakpoint");
+                }
             }
         }
     }

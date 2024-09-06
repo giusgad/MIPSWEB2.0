@@ -9,7 +9,6 @@ body {
 }
 
 * {
-  transition: opacity 0.5s;
   box-sizing: border-box;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -195,7 +194,6 @@ body {
   width: 80%;
   bottom: 0;
   z-index: 0;
-  transition: width 0.5s;
   &.execute {
     width: 40%;
   }
@@ -205,6 +203,13 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
+    .next-instruction {
+      position: absolute;
+      background-color: rgba(@blue, 0.125);
+    }
+    .breakpoint {
+      background-color: rgba(@blue, 0.5);
+    }
   }
 }
 
@@ -215,7 +220,6 @@ body {
   width: 80%;
   height: @opened-files-height;
   z-index: 1;
-  transition: all 0.5s;
   &.execute {
     width: 40%;
   }
@@ -238,6 +242,7 @@ body {
       user-select: none;
       display: flex;
       padding-left: @space-4;
+      transition: all 0.5s;
       .file-name {
         height: 100%;
         display: flex;
@@ -284,7 +289,6 @@ body {
   width: 20%;
   bottom: 0;
   z-index: 1;
-  transition: all 0.5s;
   &.execute {
     left: 40%;
   }
@@ -297,7 +301,6 @@ body {
   width: 40%;
   bottom: 0;
   z-index: 0;
-  transition: all 0.5s;
 }
 
 @media only screen and (min-width: 513px) and (max-width: 1024px) {

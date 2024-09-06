@@ -1,14 +1,34 @@
-import {getFiles, getSelectedFile} from "./files.js";
-import {render} from "./index.js";
+import {getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId} from "./files.js";
+import {addClass, removeClass, render} from "./index.js";
+import {VirtualMachine} from "./virtual-machine/VirtualMachine.js";
+import {reloadEditors, updateEditor} from "./editor.js";
 
-let state = "edit";
+export const vm = new VirtualMachine();
 
-export function getVMState() {
-    return state;
-}
+document.body.classList.add('wait');
+document.addEventListener('DOMContentLoaded', async () => {
 
-export async function updateInterface(newState: string) {
-    state = newState;
+    const files = getFiles();
+    let selectedFileId = getSelectedFileId();
+    if (selectedFileId === null) {
+        if (files.length > 0) {
+            setSelectedFileId(files[0].id);
+        }
+    }
+    let selectedFile = getSelectedFile();
+    if ((selectedFileId !== null) && (!selectedFile)) {
+        setSelectedFileId(files[0].id);
+        selectedFileId = getSelectedFileId();
+        selectedFile = getSelectedFile();
+    }
+    await render('app', 'app.ejs', {state: "edit", files, selectedFile});
+    reloadEditors(files, selectedFileId);
+
+    document.body.classList.remove('wait');
+});
+
+export async function updateInterface() {
+    const state = vm.getState();
     const files = getFiles();
     const selectedFile = getSelectedFile();
 
@@ -34,37 +54,33 @@ export async function updateInterface(newState: string) {
     }
 }
 
-function addClass(className: string, id: string) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.add(className);
-    } else {
-        console.error(`Element with id "${id}" not found.`);
-    }
-}
-
-function removeClass(className: string, id: string) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.classList.remove(className);
-    } else {
-        console.error(`Element with id "${id}" not found.`);
-    }
-}
-
-
 (window as any).assembleClick = async function() {
-    await updateInterface("execute");
+    const file = getSelectedFile();
+    if (file) {
+        if (file.content) {
+            vm.assemble(file.content);
+            await updateInterface();
+        }
+    }
+    updateEditor();
 };
 
 (window as any).stopClick = async function() {
-    await updateInterface("edit");
+    vm.stop();
+    await updateInterface();
+    updateEditor();
 };
 
 (window as any).stepClick = async function() {
     console.log("Step click");
+    updateEditor();
 };
 
 (window as any).runClick = async function() {
     console.log("Run click");
+    updateEditor();
+};
+
+(window as any).settings = async function() {
+    console.log("Settings");
 };

@@ -34,9 +34,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { getVMState, updateInterface } from "./app.js";
+import { vm, updateInterface } from "./app.js";
 import { addFileEditor, removeFileEditor, showEditor } from "./editor.js";
-import { render } from "./index.js";
+import { removeClass, render } from "./index.js";
 window.newFile = function () {
     return __awaiter(this, void 0, void 0, function () {
         var files, fileName, fileId, fileToAdd;
@@ -103,7 +103,7 @@ function changeFileTab(sFileId) {
                     fileId = Number(sFileId);
                     setSelectedFileId(fileId);
                     showEditor(fileId);
-                    return [4 /*yield*/, updateInterface("edit")];
+                    return [4 /*yield*/, updateInterface()];
                 case 1:
                     _a.sent();
                     return [2 /*return*/];
@@ -129,7 +129,7 @@ window.closeFile = function (sFileId) {
                     return [3 /*break*/, 4];
                 case 2:
                     localStorage.removeItem('selectedFileId');
-                    state = getVMState();
+                    state = vm.getState();
                     selectedFile = getSelectedFile();
                     return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
                 case 3:
@@ -142,22 +142,17 @@ window.closeFile = function (sFileId) {
 };
 function addFile(file, files) {
     return __awaiter(this, void 0, void 0, function () {
-        var state, selectedFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     files.push(file);
                     setFiles(files);
                     setSelectedFileId(file.id);
-                    state = getVMState();
-                    selectedFile = getSelectedFile();
-                    return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
+                    return [4 /*yield*/, render('app', 'app.ejs', { state: "edit", files: files, selectedFile: file })];
                 case 1:
                     _a.sent();
+                    removeClass('execute', 'files-editors');
                     addFileEditor(file);
-                    return [4 /*yield*/, updateInterface("edit")];
-                case 2:
-                    _a.sent();
                     return [2 /*return*/];
             }
         });
