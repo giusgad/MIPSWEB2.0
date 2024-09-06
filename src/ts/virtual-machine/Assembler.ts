@@ -18,7 +18,7 @@ export class Assembler {
             if (line.trim().length > 0) {
                 const assembledInstruction = this.assembleLine(i+1, lines[i], memory, registers);
                 if (assembledInstruction) {
-                    //console.log(assembledInstruction);
+                    console.log(assembledInstruction);
                     assembledInstructions.push(assembledInstruction);
                 }
             }

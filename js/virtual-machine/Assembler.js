@@ -9,7 +9,7 @@ var Assembler = /** @class */ (function () {
             if (line.trim().length > 0) {
                 var assembledInstruction = this.assembleLine(i + 1, lines[i], memory, registers);
                 if (assembledInstruction) {
-                    //console.log(assembledInstruction);
+                    console.log(assembledInstruction);
                     assembledInstructions.push(assembledInstruction);
                 }
             }
