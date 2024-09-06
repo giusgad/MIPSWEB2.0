@@ -86,9 +86,9 @@ function renderTemplate(templatePath, data) {
         var template;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("templates/".concat(templatePath)).then(function (res) {
+                case 0: return [4 /*yield*/, fetch("src/templates/".concat(templatePath)).then(function (res) {
                         if (!res.ok) {
-                            throw new Error("No template found: \"templates/".concat(templatePath, "\""));
+                            throw new Error("No template found: \"src/templates/".concat(templatePath, "\""));
                         }
                         return res.text();
                     })];

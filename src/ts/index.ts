@@ -23,9 +23,9 @@ export async function render(id: string, templatePath: string, data: any) {
 
 (window as any).renderTemplate = renderTemplate;
 async function renderTemplate(templatePath: string, data: any) {
-    const template = await fetch(`templates/${templatePath}`).then(res => {
+    const template = await fetch(`src/templates/${templatePath}`).then(res => {
         if (!res.ok) {
-            throw new Error(`No template found: "templates/${templatePath}"`);
+            throw new Error(`No template found: "src/templates/${templatePath}"`);
         }
         return res.text();
     });
