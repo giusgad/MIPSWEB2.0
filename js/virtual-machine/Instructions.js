@@ -1,12 +1,3 @@
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 var Instructions = /** @class */ (function () {
     function Instructions() {
     }
@@ -29,27 +20,23 @@ var Instructions = /** @class */ (function () {
             copy.funct = instruction.funct;
         }
         if (instruction.run) {
-            copy.run = function (registers) {
-                var args = [];
-                for (var _i = 1; _i < arguments.length; _i++) {
-                    args[_i - 1] = arguments[_i];
-                }
-                instruction.run.apply(instruction, __spreadArray([registers], args, false));
+            copy.run = function () {
+                instruction.run();
             };
         }
         return copy;
     };
     Instructions.instructions = new Map([
         ["add", { format: 'R', type: "ALU", opcode: 0x00, funct: 0x20,
-                run: function (registers, rs, rt, rd) {
+                run: function () {
                 }
             }],
         ["sub", { format: 'R', type: "ALU", opcode: 0x00, funct: 0x22,
-                run: function (registers, rs, rt, rd) {
+                run: function () {
                 }
             }],
         ["addi", { format: 'I', type: "ALU", opcode: 0x08,
-                run: function (registers, rs, rt, immediate) {
+                run: function () {
                 }
             }],
         ["addu", {}],

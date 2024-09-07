@@ -112,7 +112,6 @@ export function updateEditor(): void {
                 for (let i = 0; i < cursors.length; i++) {
                     (cursors[i] as HTMLElement).style.display = "none";
                 }
-                const nextInstructionLine = vm.getNextInstructionLineNumber();
                 let markers = aceEditor.session.getMarkers(false);
                 for (let i in markers) {
                     if (markers[i].clazz === "next-instruction") {
@@ -120,6 +119,7 @@ export function updateEditor(): void {
                     }
                 }
                 aceEditor.session.clearBreakpoints();
+                const nextInstructionLine = vm.getNextInstructionLineNumber();
                 if (nextInstructionLine) {
                     let Range = ace.require('ace/range').Range,
                         range = new Range(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);

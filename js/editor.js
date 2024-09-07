@@ -93,7 +93,6 @@ export function updateEditor() {
                 for (var i = 0; i < cursors.length; i++) {
                     cursors[i].style.display = "none";
                 }
-                var nextInstructionLine = vm.getNextInstructionLineNumber();
                 var markers = aceEditor.session.getMarkers(false);
                 for (var i in markers) {
                     if (markers[i].clazz === "next-instruction") {
@@ -101,6 +100,7 @@ export function updateEditor() {
                     }
                 }
                 aceEditor.session.clearBreakpoints();
+                var nextInstructionLine = vm.getNextInstructionLineNumber();
                 if (nextInstructionLine) {
                     var Range_1 = ace.require('ace/range').Range, range = new Range_1(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
                     aceEditor.session.addMarker(range, "next-instruction", "fullLine", false);

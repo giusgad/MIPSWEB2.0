@@ -5,8 +5,6 @@ export class VirtualMachine {
 
     private state: "edit" | "execute";
     private cpu: CPU;
-    private assembledInstructions?: assembledInstruction[];
-    private nextInstructionLineNumber?: number;
 
     constructor() {
         this.cpu = new CPU();
@@ -18,15 +16,12 @@ export class VirtualMachine {
     }
 
     getNextInstructionLineNumber() {
-        return this.nextInstructionLineNumber;
+        return undefined;
     }
 
     assemble(program: string) {
         const assembler = new Assembler();
-        this.assembledInstructions = assembler.assemble(program, this.cpu.getMemory(), this.cpu.getRegisters());
-        if (this.assembledInstructions.length > 0) {
-            this.nextInstructionLineNumber = this.assembledInstructions[0].lineNumber;
-        }
+        assembler.assemble(program, this.cpu);
         this.state = "execute";
     }
 

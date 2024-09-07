@@ -9,14 +9,11 @@ var VirtualMachine = /** @class */ (function () {
         return this.state;
     };
     VirtualMachine.prototype.getNextInstructionLineNumber = function () {
-        return this.nextInstructionLineNumber;
+        return undefined;
     };
     VirtualMachine.prototype.assemble = function (program) {
         var assembler = new Assembler();
-        this.assembledInstructions = assembler.assemble(program, this.cpu.getMemory(), this.cpu.getRegisters());
-        if (this.assembledInstructions.length > 0) {
-            this.nextInstructionLineNumber = this.assembledInstructions[0].lineNumber;
-        }
+        assembler.assemble(program, this.cpu);
         this.state = "execute";
     };
     VirtualMachine.prototype.stop = function () {

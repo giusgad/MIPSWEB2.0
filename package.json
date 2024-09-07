@@ -1,5 +1,5 @@
 {
-  "name": "mipsweb-2",
+  "name": "mipsweb",
   "version": "1.0.0",
   "description": "",
   "main": "js/index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mattiamendicino/mipsweb-2.git"
+    "url": "git+https://github.com/mattiamendicino/mipsweb.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mattiamendicino/mipsweb-2/issues"
+    "url": "https://github.com/mattiamendicino/mipsweb/issues"
   },
-  "homepage": "https://github.com/mattiamendicino/mipsweb-2#readme",
+  "homepage": "https://github.com/mattiamendicino/mipsweb#readme",
   "devDependencies": {
     "@types/ace": "^0.0.52",
     "@types/node": "^22.5.1",
