@@ -125,12 +125,9 @@ window.stopClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    vm.stop();
-                    return [4 /*yield*/, updateInterface()];
+                case 0: return [4 /*yield*/, stopExecution()];
                 case 1:
                     _a.sent();
-                    updateEditor();
                     return [2 /*return*/];
             }
         });
@@ -174,6 +171,21 @@ window.settings = function () {
         });
     });
 };
+export function stopExecution() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    vm.stop();
+                    return [4 /*yield*/, updateInterface()];
+                case 1:
+                    _a.sent();
+                    updateEditor();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 export function getContext() {
     var state = vm.getState();
     var nextInstructionLineNumber = vm.getNextInstructionLineNumber();

@@ -1,4 +1,4 @@
-import {vm, updateInterface} from "./app.js";
+import {vm, updateInterface, stopExecution} from "./app.js";
 import {addFileEditor, removeFileEditor, showEditor} from "./editor.js";
 import {removeClass, render} from "./index.js";
 
@@ -10,6 +10,7 @@ export type file = {
 };
 
 (window as any).newFile = async function() {
+    await stopExecution();
     const files = getFiles();
     const fileName = generateUniqueName("untitled", files);
     const fileId = files.length > 0 ? Math.max(...files.map(file => file.id)) + 1 : 0;
@@ -22,7 +23,8 @@ export type file = {
     await addFile(fileToAdd, files);
 };
 
-(window as any).importFile = function() {
+(window as any).importFile = async function () {
+    await stopExecution();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.asm';
@@ -48,6 +50,7 @@ export type file = {
 
 (window as any).changeFileTab = changeFileTab;
 async function changeFileTab(sFileId: string) {
+    await stopExecution();
     const fileId = Number(sFileId);
     setSelectedFileId(fileId);
     showEditor(fileId);
@@ -55,6 +58,7 @@ async function changeFileTab(sFileId: string) {
 }
 
 (window as any).closeFile = async function(sFileId: string) {
+    await stopExecution();
     const fileId = Number(sFileId);
     let files = getFiles();
     setFiles(files.filter(file => file.id !== fileId));

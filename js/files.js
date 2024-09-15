@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { vm, updateInterface } from "./app.js";
+import { vm, updateInterface, stopExecution } from "./app.js";
 import { addFileEditor, removeFileEditor, showEditor } from "./editor.js";
 import { removeClass, render } from "./index.js";
 window.newFile = function () {
@@ -42,7 +42,9 @@ window.newFile = function () {
         var files, fileName, fileId, fileToAdd;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
+                case 0: return [4 /*yield*/, stopExecution()];
+                case 1:
+                    _a.sent();
                     files = getFiles();
                     fileName = generateUniqueName("untitled", files);
                     fileId = files.length > 0 ? Math.max.apply(Math, files.map(function (file) { return file.id; })) + 1 : 0;
@@ -53,7 +55,7 @@ window.newFile = function () {
                         content: ""
                     };
                     return [4 /*yield*/, addFile(fileToAdd, files)];
-                case 1:
+                case 2:
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -61,37 +63,48 @@ window.newFile = function () {
     });
 };
 window.importFile = function () {
-    var _this = this;
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.asm';
-    input.addEventListener('change', function () {
-        var file = input.files[0];
-        var reader = new FileReader();
-        reader.onload = function () { return __awaiter(_this, void 0, void 0, function () {
-            var files, fileName, fileId, fileToAdd;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        files = getFiles();
-                        fileName = generateUniqueName(file.name.split(".")[0], files);
-                        fileId = files.length > 0 ? Math.max.apply(Math, files.map(function (file) { return file.id; })) + 1 : 0;
-                        fileToAdd = {
-                            id: fileId,
-                            name: fileName,
-                            type: "asm",
-                            content: reader.result
-                        };
-                        return [4 /*yield*/, addFile(fileToAdd, files)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        }); };
-        reader.readAsText(file);
+    return __awaiter(this, void 0, void 0, function () {
+        var input;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, stopExecution()];
+                case 1:
+                    _a.sent();
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.asm';
+                    input.addEventListener('change', function () {
+                        var file = input.files[0];
+                        var reader = new FileReader();
+                        reader.onload = function () { return __awaiter(_this, void 0, void 0, function () {
+                            var files, fileName, fileId, fileToAdd;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        files = getFiles();
+                                        fileName = generateUniqueName(file.name.split(".")[0], files);
+                                        fileId = files.length > 0 ? Math.max.apply(Math, files.map(function (file) { return file.id; })) + 1 : 0;
+                                        fileToAdd = {
+                                            id: fileId,
+                                            name: fileName,
+                                            type: "asm",
+                                            content: reader.result
+                                        };
+                                        return [4 /*yield*/, addFile(fileToAdd, files)];
+                                    case 1:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); };
+                        reader.readAsText(file);
+                    });
+                    input.click();
+                    return [2 /*return*/];
+            }
+        });
     });
-    input.click();
 };
 window.changeFileTab = changeFileTab;
 function changeFileTab(sFileId) {
@@ -99,12 +112,14 @@ function changeFileTab(sFileId) {
         var fileId;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
+                case 0: return [4 /*yield*/, stopExecution()];
+                case 1:
+                    _a.sent();
                     fileId = Number(sFileId);
                     setSelectedFileId(fileId);
                     showEditor(fileId);
                     return [4 /*yield*/, updateInterface()];
-                case 1:
+                case 2:
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -116,26 +131,28 @@ window.closeFile = function (sFileId) {
         var fileId, files, state, selectedFile;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
+                case 0: return [4 /*yield*/, stopExecution()];
+                case 1:
+                    _a.sent();
                     fileId = Number(sFileId);
                     files = getFiles();
                     setFiles(files.filter(function (file) { return file.id !== fileId; }));
                     removeFileEditor(fileId);
                     files = getFiles();
-                    if (!(files.length > 0)) return [3 /*break*/, 2];
+                    if (!(files.length > 0)) return [3 /*break*/, 3];
                     return [4 /*yield*/, changeFileTab("".concat(files[files.length - 1].id))];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 4];
                 case 2:
+                    _a.sent();
+                    return [3 /*break*/, 5];
+                case 3:
                     localStorage.removeItem('selectedFileId');
                     state = vm.getState();
                     selectedFile = getSelectedFile();
                     return [4 /*yield*/, render('app', 'app.ejs')];
-                case 3:
+                case 4:
                     _a.sent();
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+                    _a.label = 5;
+                case 5: return [2 /*return*/];
             }
         });
     });

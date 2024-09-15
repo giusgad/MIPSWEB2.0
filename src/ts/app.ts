@@ -53,9 +53,7 @@ export async function updateInterface() {
 };
 
 (window as any).stopClick = async function() {
-    vm.stop();
-    await updateInterface();
-    updateEditor();
+    await stopExecution();
 };
 
 (window as any).stepClick = async function() {
@@ -73,6 +71,12 @@ export async function updateInterface() {
 (window as any).settings = async function() {
     console.log("Settings");
 };
+
+export async function stopExecution() {
+    vm.stop();
+    await updateInterface();
+    updateEditor();
+}
 
 export function getContext() {
     const state = vm.getState();
