@@ -66,7 +66,7 @@ async function changeFileTab(sFileId: string) {
         localStorage.removeItem('selectedFileId');
         const state = vm.getState();
         const selectedFile = getSelectedFile();
-        await render('app', 'app.ejs', {state, files, selectedFile});
+        await render('app', 'app.ejs');
     }
 };
 
@@ -74,7 +74,7 @@ async function addFile(file: file, files: file[]) {
     files.push(file);
     setFiles(files);
     setSelectedFileId(file.id);
-    await render('app', 'app.ejs', {state: "edit", files, selectedFile: file});
+    await render('app', 'app.ejs');
     removeClass('execute', 'files-editors');
     addFileEditor(file);
 }

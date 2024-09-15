@@ -21,6 +21,8 @@ var Assembler = /** @class */ (function () {
         this.startDataSegmentAddress = 0x10010000;
         this.currentTextSegmentAddress = this.startTextSegmentAddress;
         this.currentDataSegmentAddress = this.startDataSegmentAddress;
+        this.assembledLines = [];
+        this.currentLineNumber = undefined;
     }
     Assembler.prototype.assemble = function (program, cpu) {
         var lines = program.split('\n');
@@ -32,6 +34,7 @@ var Assembler = /** @class */ (function () {
         }
     };
     Assembler.prototype.assembleLine = function (lineNumber, line, cpu) {
+        this.currentLineNumber = lineNumber;
         var parts = line.split('#')[0].trim().replace(/,/g, '').split(/\s+/);
         if (parts.length === 0 || parts[0] === '') {
             return undefined;
@@ -47,72 +50,44 @@ var Assembler = /** @class */ (function () {
         }
     };
     Assembler.prototype.assembleInstruction = function (parts, memory, registers) {
-        var instruction = Instructions.get(parts[0]);
+        var instruction = Instructions.getByName(parts[0]);
         if (instruction) {
-            switch (instruction.format) {
-                case 'R':
-                    if (parts.length !== 4)
-                        throw new Error("");
-                    this.assembleR(parts, instruction, registers, memory);
-                    return;
-                case 'I':
-                    if (parts.length !== 4)
-                        throw new Error("");
-                    this.assembleI(parts, instruction, registers, memory);
-                    return;
-                case 'J':
-                    if (parts.length !== 2)
-                        throw new Error("");
-                    this.assembleJ(parts, instruction, memory);
-                    return;
-                default:
-                    console.error('Unrecognized instruction', parts.join(' '));
-                    return;
+            var format = Instructions.getFormat(instruction.format);
+            if (format) {
+                var source = parts.join(' ');
+                var assembledInstruction = format.assemble(parts, instruction, registers);
+                this.storeInstruction(source, assembledInstruction.basic, assembledInstruction.code, memory);
             }
         }
         else {
-            console.error('Unrecognized instruction', parts.join(' '));
+            console.error('Unrecognized instruction: \n', parts.join(' '));
         }
     };
-    Assembler.prototype.assembleR = function (parts, instruction, registers, memory) {
-        if (!registers.getByName(parts[1]))
-            throw new Error("");
-        var rd = registers.getByName(parts[1]);
-        if (!registers.getByName(parts[2]))
-            throw new Error("");
-        var rs = registers.getByName(parts[2]);
-        if (!registers.getByName(parts[3]))
-            throw new Error("");
-        var rt = registers.getByName(parts[3]);
-        var binary = (instruction.opcode << 26) | (rs.number << 21) | (rt.number << 16) | (rd.number << 11) | (0x00 << 6) | instruction.funct;
-        this.storeInstruction(binary, memory);
-    };
-    Assembler.prototype.assembleI = function (parts, instruction, registers, memory) {
-        if (!registers.getByName(parts[1]))
-            throw new Error("");
-        var rt = registers.getByName(parts[1]);
-        if (!registers.getByName(parts[2]))
-            throw new Error("");
-        var rs = registers.getByName(parts[2]);
-        var immediate = Number(parts[3]);
-        var binary = (instruction.opcode << 26) | (rs.number << 21) | (rt.number << 16) | immediate;
-        this.storeInstruction(binary, memory);
-    };
-    Assembler.prototype.assembleJ = function (parts, instruction, memory) {
-        var address = Number(parts[1]);
-        var binary = (instruction.opcode << 26) | address;
-        this.storeInstruction(binary, memory);
-    };
-    Assembler.prototype.assembleData = function (parts, memory, registers) {
-        console.log("Data: ", parts);
-    };
-    Assembler.prototype.storeInstruction = function (instruction, memory) {
-        memory.store(this.currentTextSegmentAddress, instruction);
+    Assembler.prototype.storeInstruction = function (source, basic, code, memory) {
+        memory.store(this.currentTextSegmentAddress, code);
+        this.addAssembledLine(this.currentLineNumber, source, basic, code, this.currentTextSegmentAddress);
         this.currentTextSegmentAddress += 4;
     };
-    Assembler.prototype.storeData = function (data, memory) {
+    Assembler.prototype.assembleData = function (parts, memory, registers) {
+        console.error("Data to assemble: \n", parts.join(' '));
+    };
+    Assembler.prototype.storeData = function (source, data, memory) {
         memory.store(this.currentDataSegmentAddress, data);
         this.currentDataSegmentAddress += 4;
+    };
+    Assembler.prototype.addAssembledLine = function (currentLineNumber, source, basic, code, address) {
+        if (currentLineNumber !== undefined) {
+            this.assembledLines.push({
+                lineNumber: currentLineNumber,
+                source: source,
+                basic: basic,
+                code: '0x' + code.toString(16).padStart(8, '0'),
+                address: '0x' + address.toString(16).padStart(8, '0')
+            });
+        }
+    };
+    Assembler.prototype.getAssembledLines = function () {
+        return this.assembledLines;
     };
     Assembler.directives = new Map([
         [".data", new DataDirective()],

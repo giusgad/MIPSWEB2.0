@@ -8,46 +8,33 @@ export const vm = new VirtualMachine();
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
 
-    const files = getFiles();
-    let selectedFileId = getSelectedFileId();
-    if (selectedFileId === null) {
-        if (files.length > 0) {
-            setSelectedFileId(files[0].id);
-        }
-    }
-    let selectedFile = getSelectedFile();
-    if ((selectedFileId !== null) && (!selectedFile)) {
-        setSelectedFileId(files[0].id);
-        selectedFileId = getSelectedFileId();
-        selectedFile = getSelectedFile();
-    }
-    await render('app', 'app.ejs', {state: "edit", files, selectedFile});
-    reloadEditors(files, selectedFileId);
+    await render('app', 'app.ejs');
+    reloadEditors(getFiles(), getSelectedFileId());
 
     document.body.classList.remove('wait');
 });
 
 export async function updateInterface() {
-    const state = vm.getState();
-    const files = getFiles();
-    const selectedFile = getSelectedFile();
+
+    const ctx = getContext();
+    const state = ctx.state;
 
     if (state === "execute") {
 
-        await render('vm-buttons', '/app/vm-buttons.ejs', {state, files});
-        await render('opened-files', '/app/opened-files.ejs', {state, files, selectedFile});
-        await render('registers', '/app/registers.ejs', {state, files});
-        await render('memory', '/app/memory.ejs', {state, files});
+        await render('vm-buttons', '/app/vm-buttons.ejs', ctx);
+        await render('opened-files', '/app/opened-files.ejs', ctx);
+        await render('registers', '/app/registers.ejs', ctx);
+        await render('memory', '/app/memory.ejs', ctx);
         addClass('execute', 'files-editors');
         addClass('execute', 'opened-files');
         addClass('execute', 'registers');
 
     } else if (state === "edit") {
 
-        await render('vm-buttons', '/app/vm-buttons.ejs', {state, files});
-        await render('opened-files', '/app/opened-files.ejs', {state, files, selectedFile});
-        await render('registers', '/app/registers.ejs', {state, files});
-        await render('memory', '/app/memory.ejs', {state, files});
+        await render('vm-buttons', '/app/vm-buttons.ejs', ctx);
+        await render('opened-files', '/app/opened-files.ejs', ctx);
+        await render('registers', '/app/registers.ejs', ctx);
+        await render('memory', '/app/memory.ejs', ctx);
         removeClass('execute', 'files-editors');
         removeClass('execute', 'opened-files');
         removeClass('execute', 'registers');
@@ -72,15 +59,43 @@ export async function updateInterface() {
 };
 
 (window as any).stepClick = async function() {
-    console.log("Step click");
+    vm.step();
+    await updateInterface();
     updateEditor();
 };
 
 (window as any).runClick = async function() {
-    console.log("Run click");
+    vm.run();
+    await updateInterface();
     updateEditor();
 };
 
 (window as any).settings = async function() {
     console.log("Settings");
 };
+
+export function getContext() {
+    const state = vm.getState();
+    const nextInstructionLineNumber = vm.getNextInstructionLineNumber();
+    const files = getFiles();
+    let selectedFileId = getSelectedFileId();
+    if (selectedFileId === null) {
+        if (files.length > 0) {
+            setSelectedFileId(files[0].id);
+        }
+    }
+    let selectedFile = getSelectedFile();
+    if ((selectedFileId !== null) && (!selectedFile)) {
+        setSelectedFileId(files[0].id);
+        selectedFile = getSelectedFile();
+    }
+    const registers = vm.getRegisters();
+    const ctx = {
+        state,
+        files,
+        selectedFile,
+        registers,
+        nextInstructionLineNumber
+    };
+    return ctx;
+}

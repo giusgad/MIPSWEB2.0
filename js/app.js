@@ -41,27 +41,12 @@ import { reloadEditors, updateEditor } from "./editor.js";
 export var vm = new VirtualMachine();
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
-    var files, selectedFileId, selectedFile;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                files = getFiles();
-                selectedFileId = getSelectedFileId();
-                if (selectedFileId === null) {
-                    if (files.length > 0) {
-                        setSelectedFileId(files[0].id);
-                    }
-                }
-                selectedFile = getSelectedFile();
-                if ((selectedFileId !== null) && (!selectedFile)) {
-                    setSelectedFileId(files[0].id);
-                    selectedFileId = getSelectedFileId();
-                    selectedFile = getSelectedFile();
-                }
-                return [4 /*yield*/, render('app', 'app.ejs', { state: "edit", files: files, selectedFile: selectedFile })];
+            case 0: return [4 /*yield*/, render('app', 'app.ejs')];
             case 1:
                 _a.sent();
-                reloadEditors(files, selectedFileId);
+                reloadEditors(getFiles(), getSelectedFileId());
                 document.body.classList.remove('wait');
                 return [2 /*return*/];
         }
@@ -69,24 +54,23 @@ document.addEventListener('DOMContentLoaded', function () { return __awaiter(voi
 }); });
 export function updateInterface() {
     return __awaiter(this, void 0, void 0, function () {
-        var state, files, selectedFile;
+        var ctx, state;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    state = vm.getState();
-                    files = getFiles();
-                    selectedFile = getSelectedFile();
+                    ctx = getContext();
+                    state = ctx.state;
                     if (!(state === "execute")) return [3 /*break*/, 5];
-                    return [4 /*yield*/, render('vm-buttons', '/app/vm-buttons.ejs', { state: state, files: files })];
+                    return [4 /*yield*/, render('vm-buttons', '/app/vm-buttons.ejs', ctx)];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, render('opened-files', '/app/opened-files.ejs', { state: state, files: files, selectedFile: selectedFile })];
+                    return [4 /*yield*/, render('opened-files', '/app/opened-files.ejs', ctx)];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, render('registers', '/app/registers.ejs', { state: state, files: files })];
+                    return [4 /*yield*/, render('registers', '/app/registers.ejs', ctx)];
                 case 3:
                     _a.sent();
-                    return [4 /*yield*/, render('memory', '/app/memory.ejs', { state: state, files: files })];
+                    return [4 /*yield*/, render('memory', '/app/memory.ejs', ctx)];
                 case 4:
                     _a.sent();
                     addClass('execute', 'files-editors');
@@ -95,16 +79,16 @@ export function updateInterface() {
                     return [3 /*break*/, 10];
                 case 5:
                     if (!(state === "edit")) return [3 /*break*/, 10];
-                    return [4 /*yield*/, render('vm-buttons', '/app/vm-buttons.ejs', { state: state, files: files })];
+                    return [4 /*yield*/, render('vm-buttons', '/app/vm-buttons.ejs', ctx)];
                 case 6:
                     _a.sent();
-                    return [4 /*yield*/, render('opened-files', '/app/opened-files.ejs', { state: state, files: files, selectedFile: selectedFile })];
+                    return [4 /*yield*/, render('opened-files', '/app/opened-files.ejs', ctx)];
                 case 7:
                     _a.sent();
-                    return [4 /*yield*/, render('registers', '/app/registers.ejs', { state: state, files: files })];
+                    return [4 /*yield*/, render('registers', '/app/registers.ejs', ctx)];
                 case 8:
                     _a.sent();
-                    return [4 /*yield*/, render('memory', '/app/memory.ejs', { state: state, files: files })];
+                    return [4 /*yield*/, render('memory', '/app/memory.ejs', ctx)];
                 case 9:
                     _a.sent();
                     removeClass('execute', 'files-editors');
@@ -155,18 +139,30 @@ window.stopClick = function () {
 window.stepClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            console.log("Step click");
-            updateEditor();
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    vm.step();
+                    return [4 /*yield*/, updateInterface()];
+                case 1:
+                    _a.sent();
+                    updateEditor();
+                    return [2 /*return*/];
+            }
         });
     });
 };
 window.runClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            console.log("Run click");
-            updateEditor();
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    vm.run();
+                    return [4 /*yield*/, updateInterface()];
+                case 1:
+                    _a.sent();
+                    updateEditor();
+                    return [2 /*return*/];
+            }
         });
     });
 };
@@ -178,3 +174,28 @@ window.settings = function () {
         });
     });
 };
+export function getContext() {
+    var state = vm.getState();
+    var nextInstructionLineNumber = vm.getNextInstructionLineNumber();
+    var files = getFiles();
+    var selectedFileId = getSelectedFileId();
+    if (selectedFileId === null) {
+        if (files.length > 0) {
+            setSelectedFileId(files[0].id);
+        }
+    }
+    var selectedFile = getSelectedFile();
+    if ((selectedFileId !== null) && (!selectedFile)) {
+        setSelectedFileId(files[0].id);
+        selectedFile = getSelectedFile();
+    }
+    var registers = vm.getRegisters();
+    var ctx = {
+        state: state,
+        files: files,
+        selectedFile: selectedFile,
+        registers: registers,
+        nextInstructionLineNumber: nextInstructionLineNumber
+    };
+    return ctx;
+}

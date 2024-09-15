@@ -1,4 +1,5 @@
 import {Icons} from "./icons.js";
+import {getContext} from "./app.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -11,25 +12,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-export async function render(id: string, templatePath: string, data: any) {
+export async function render(id: string, templatePath: string, ctx = getContext()) {
     try {
         const element = document.getElementById(id);
         if (!element) throw new Error(`No element found by Id: ${id}`);
-        element.innerHTML = await renderTemplate(templatePath, data);
+        element.innerHTML = await renderTemplate(templatePath, ctx);
     } catch (error) {
         console.error(error);
     }
 }
 
 (window as any).renderTemplate = renderTemplate;
-async function renderTemplate(templatePath: string, data: any) {
+async function renderTemplate(templatePath: string, ctx = getContext()) {
     const template = await fetch(`src/templates/${templatePath}`).then(res => {
         if (!res.ok) {
             throw new Error(`No template found: "src/templates/${templatePath}"`);
         }
         return res.text();
     });
-    data = { ...data, Icons };
+    const data = { ...ctx, Icons };
     return ejs.render(template, data, { async: true });
 }
 

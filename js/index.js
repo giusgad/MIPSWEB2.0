@@ -46,6 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Icons } from "./icons.js";
+import { getContext } from "./app.js";
 window.ejs = ejs;
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -56,9 +57,10 @@ document.addEventListener('DOMContentLoaded', function () { return __awaiter(voi
         return [2 /*return*/];
     });
 }); });
-export function render(id, templatePath, data) {
-    return __awaiter(this, void 0, void 0, function () {
+export function render(id_1, templatePath_1) {
+    return __awaiter(this, arguments, void 0, function (id, templatePath, ctx) {
         var element, _a, error_1;
+        if (ctx === void 0) { ctx = getContext(); }
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -67,7 +69,7 @@ export function render(id, templatePath, data) {
                     if (!element)
                         throw new Error("No element found by Id: ".concat(id));
                     _a = element;
-                    return [4 /*yield*/, renderTemplate(templatePath, data)];
+                    return [4 /*yield*/, renderTemplate(templatePath, ctx)];
                 case 1:
                     _a.innerHTML = _b.sent();
                     return [3 /*break*/, 3];
@@ -81,9 +83,10 @@ export function render(id, templatePath, data) {
     });
 }
 window.renderTemplate = renderTemplate;
-function renderTemplate(templatePath, data) {
-    return __awaiter(this, void 0, void 0, function () {
-        var template;
+function renderTemplate(templatePath_1) {
+    return __awaiter(this, arguments, void 0, function (templatePath, ctx) {
+        var template, data;
+        if (ctx === void 0) { ctx = getContext(); }
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, fetch("src/templates/".concat(templatePath)).then(function (res) {
@@ -94,7 +97,7 @@ function renderTemplate(templatePath, data) {
                     })];
                 case 1:
                     template = _a.sent();
-                    data = __assign(__assign({}, data), { Icons: Icons });
+                    data = __assign(__assign({}, ctx), { Icons: Icons });
                     return [2 /*return*/, ejs.render(template, data, { async: true })];
             }
         });

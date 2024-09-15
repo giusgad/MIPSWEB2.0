@@ -1,5 +1,23 @@
 <% if (files.length > 0) { %>
 
-
+<div class="component">
+    <div class="title">Registers</div>
+    <div class="table">
+        <div class="cols-names">
+            <div class="col col-name number">Number</div>
+            <div class="col col-name name">Name</div>
+            <div class="col col-name value">Value</div>
+        </div>
+        <div class="rows">
+            <%registers.forEach((register) => {%>
+                <div class="row">
+                    <div class="col number"><%=register.number%></div>
+                    <div class="col name"><%=register.name%></div>
+                    <div class="col value"><%=register.value%></div>
+                </div>
+            <%});%>
+        </div>
+    </div>
+</div>
 
 <% } %>

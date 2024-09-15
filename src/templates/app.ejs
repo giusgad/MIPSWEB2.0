@@ -1,17 +1,26 @@
+<%
+    const ctx = {
+        state,
+        files,
+        selectedFile,
+        registers
+    };
+%>
+
 <div class="header flex justify-between align-center">
     <div class="flex align-center">
         <div class="icon app-logo"><%-Icons.render('microchip', { fill: 'url(#gradient)' })%></div>
         <div class="app-name">MIPSWEB</div>
     </div>
-    <div id="header-buttons"><%-await renderTemplate('/app/header-buttons.ejs', {state})%></div>
+    <div id="header-buttons"><%-await renderTemplate('/app/header-buttons.ejs', ctx)%></div>
 </div>
 
 <div class="toolbar flex justify-between align-center">
-    <div id="files-buttons"><%-await renderTemplate('/app/files-buttons.ejs', {state})%></div>
-    <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', {state, files})%></div>
+    <div id="files-buttons"><%-await renderTemplate('/app/files-buttons.ejs', ctx)%></div>
+    <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', ctx)%></div>
 </div>
 
-<div id="opened-files"><%-await renderTemplate('/app/opened-files.ejs', {state, files, selectedFile})%></div>
+<div id="opened-files"><%-await renderTemplate('/app/opened-files.ejs', ctx)%></div>
 
-<div id="registers"><%-await renderTemplate('/app/registers.ejs', {state, files})%></div>
-<div id="memory"><%-await renderTemplate('/app/memory.ejs', {state, files})%></div>
+<div id="registers"><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
+<div id="memory"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>

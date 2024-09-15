@@ -1,13 +1,14 @@
 import {Memory, word} from "./Memory.js";
 import {CPU} from "./CPU.js";
-import {instruction, Instructions} from "./Instructions.js";
-import {register, Registers} from "./Registers.js"
+import {Instructions} from "./Instructions.js";
+import {Registers} from "./Registers.js"
 
-export type assembledInstruction =  {
+export type assembledLine =  {
     lineNumber: number,
-    instruction: string,
-    binary?: word,
-    address?: word
+    source: string,
+    basic: string,
+    code: string,
+    address: string
 }
 
 export interface directive {
@@ -33,6 +34,8 @@ export class Assembler {
     private startDataSegmentAddress: word = 0x10010000;
     private currentTextSegmentAddress: number = this.startTextSegmentAddress;
     private currentDataSegmentAddress: number = this.startDataSegmentAddress;
+    private assembledLines: assembledLine[] = [];
+    private currentLineNumber?: number = undefined;
 
     private static directives: Map<string, directive> = new Map<string, directive>([
         [".data", new DataDirective()],
@@ -50,6 +53,8 @@ export class Assembler {
     }
 
     private assembleLine(lineNumber: number, line: string, cpu: CPU) {
+
+        this.currentLineNumber = lineNumber;
 
         const parts = line.split('#')[0].trim().replace(/,/g, '').split(/\s+/);
         if (parts.length === 0 || parts[0] === '') {
@@ -69,88 +74,55 @@ export class Assembler {
 
     public assembleInstruction(parts: string[], memory: Memory, registers: Registers) {
 
-        const instruction = Instructions.get(parts[0]);
+        const instruction = Instructions.getByName(parts[0]);
 
         if (instruction) {
 
-            switch(instruction.format) {
-                case 'R':
-                    if (parts.length !== 4) throw new Error(``);
-                    this.assembleR(parts, instruction, registers, memory);
-                    return;
-                case 'I':
-                    if (parts.length !== 4) throw new Error(``);
-                    this.assembleI(parts, instruction, registers, memory);
-                    return;
-                case 'J':
-                    if (parts.length !== 2) throw new Error(``);
-                    this.assembleJ(parts, instruction, memory);
-                    return;
-                default:
-                    console.error('Unrecognized instruction', parts.join(' '));
-                    return;
+            const format = Instructions.getFormat(instruction.format!);
+            if (format) {
+                const source: string = parts.join(' ');
+                const assembledInstruction = format.assemble(parts, instruction, registers);
+                this.storeInstruction(source, assembledInstruction.basic, assembledInstruction.code, memory);
             }
 
         } else {
-            console.error('Unrecognized instruction', parts.join(' '));
+            console.error('Unrecognized instruction: \n', parts.join(' '));
         }
 
     }
 
+    private storeInstruction(source: string, basic: string, code: word, memory: Memory) {
+        memory.store(this.currentTextSegmentAddress, code);
 
-    private assembleR(parts: string[], instruction: instruction, registers: Registers, memory: Memory) {
+        this.addAssembledLine(this.currentLineNumber, source, basic, code, this.currentTextSegmentAddress);
 
-        if (!registers.getByName(parts[1])) throw new Error(``);
-        const rd: register = registers.getByName(parts[1])!;
-
-        if (!registers.getByName(parts[2])) throw new Error(``);
-        const rs: register = registers.getByName(parts[2])!;
-
-        if (!registers.getByName(parts[3])) throw new Error(``);
-        const rt: register = registers.getByName(parts[3])!;
-
-        const binary: word = (instruction.opcode! << 26) | (rs.number! << 21) | (rt.number! << 16) | (rd.number! << 11) | (0x00 << 6) | instruction.funct!;
-        this.storeInstruction(binary, memory);
-    }
-
-    private assembleI(parts: string[], instruction: instruction, registers: Registers, memory: Memory) {
-
-        if (!registers.getByName(parts[1])) throw new Error(``);
-        const rt: register = registers.getByName(parts[1])!;
-
-        if (!registers.getByName(parts[2])) throw new Error(``);
-        const rs: register = registers.getByName(parts[2])!;
-
-        const immediate: word = Number(parts[3]);
-
-        const binary: word = (instruction.opcode! << 26) | (rs.number! << 21) | (rt.number! << 16) | immediate;
-        this.storeInstruction(binary, memory);
-
-    }
-
-    private assembleJ(parts: string[], instruction: instruction, memory: Memory) {
-
-        const address: word = Number(parts[1]);
-
-        const binary: word = (instruction.opcode! << 26) | address;
-        this.storeInstruction(binary, memory);
-
+        this.currentTextSegmentAddress += 4;
     }
 
     public assembleData(parts: string[], memory: Memory, registers: Registers) {
 
-        console.log("Data: ", parts);
+        console.error("Data to assemble: \n", parts.join(' '));
 
     }
 
-    private storeInstruction(instruction: word, memory: Memory) {
-        memory.store(this.currentTextSegmentAddress, instruction);
-        this.currentTextSegmentAddress += 4;
-    }
-
-    private storeData(data: word, memory: Memory) {
+    private storeData(source: string, data: word, memory: Memory) {
         memory.store(this.currentDataSegmentAddress, data);
         this.currentDataSegmentAddress += 4;
     }
 
+    addAssembledLine(currentLineNumber: number | undefined, source: string, basic: string, code: word, address: word) {
+        if (currentLineNumber !== undefined) {
+            this.assembledLines.push({
+                lineNumber: currentLineNumber,
+                source: source,
+                basic: basic,
+                code: '0x' + code.toString(16).padStart(8, '0'),
+                address: '0x' + address.toString(16).padStart(8, '0')
+            });
+        }
+    }
+
+    getAssembledLines() {
+        return this.assembledLines;
+    }
 }

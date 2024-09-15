@@ -131,7 +131,7 @@ window.closeFile = function (sFileId) {
                     localStorage.removeItem('selectedFileId');
                     state = vm.getState();
                     selectedFile = getSelectedFile();
-                    return [4 /*yield*/, render('app', 'app.ejs', { state: state, files: files, selectedFile: selectedFile })];
+                    return [4 /*yield*/, render('app', 'app.ejs')];
                 case 3:
                     _a.sent();
                     _a.label = 4;
@@ -148,7 +148,7 @@ function addFile(file, files) {
                     files.push(file);
                     setFiles(files);
                     setSelectedFileId(file.id);
-                    return [4 /*yield*/, render('app', 'app.ejs', { state: "edit", files: files, selectedFile: file })];
+                    return [4 /*yield*/, render('app', 'app.ejs')];
                 case 1:
                     _a.sent();
                     removeClass('execute', 'files-editors');
