@@ -1,4 +1,5 @@
 import { I_Format, J_Format, R_Format } from "./InstructionsFormats.js";
+import { instructionsSet } from "./instructionsSet.js";
 var Instructions = /** @class */ (function () {
     function Instructions() {
     }
@@ -16,10 +17,13 @@ var Instructions = /** @class */ (function () {
         return copy;
     };
     Instructions.getByName = function (name) {
-        var instruction = this.instructions.get(name);
-        if (!instruction)
+        var _a;
+        if ((_a = instructionsSet.get(name)) === null || _a === void 0 ? void 0 : _a.run) {
+            return this.copyInstruction(instructionsSet.get(name));
+        }
+        else {
             return undefined;
-        return this.copyInstruction(instruction);
+        }
     };
     Instructions.get = function (code) {
         var _this = this;
@@ -29,7 +33,7 @@ var Instructions = /** @class */ (function () {
             funct = this.getBits(code, 5, 0);
         }
         var foundInstruction = undefined;
-        this.instructions.forEach(function (instruction) {
+        instructionsSet.forEach(function (instruction) {
             if (foundInstruction)
                 return;
             if (instruction.opcode === opcode) {
@@ -57,52 +61,6 @@ var Instructions = /** @class */ (function () {
         ['R', new R_Format()],
         ['I', new I_Format()],
         ['J', new J_Format()]
-    ]);
-    Instructions.instructions = new Map([
-        ["add", { format: 'R', type: "ALU", opcode: 0x00, funct: 0x20,
-                run: function (registers, params) {
-                    // ADD rd, rs, rt
-                    // rd <- rs + rt
-                    var rd = params.rd;
-                    var rs = params.rs;
-                    var rt = params.rt;
-                    registers[rd].value = registers[rs].value + registers[rt].value;
-                }
-            }],
-        ["sub", { format: 'R', type: "ALU", opcode: 0x00, funct: 0x22,
-                run: function (registers, params) {
-                    // SUB rd, rs, rt
-                    // rd <- rs - rt
-                    var rd = params.rd;
-                    var rs = params.rs;
-                    var rt = params.rt;
-                    registers[rd].value = registers[rs].value - registers[rt].value;
-                }
-            }],
-        ["addi", { format: 'I', type: "ALU", opcode: 0x08,
-                run: function (registers, params) {
-                    // ADDI rt, rs, immediate
-                    // rt <- rs + immediate
-                    var rt = params.rt;
-                    var rs = params.rs;
-                    var immediate = params.immediate;
-                    registers[rt].value = registers[rs].value + immediate;
-                }
-            }],
-        ["addu", {}],
-        ["subu", {}],
-        ["addui", {}],
-        ["mult", {}],
-        ["multu", {}],
-        ["mfhi", {}],
-        ["mflo", {}],
-        ["div", {}],
-        ["move", {}],
-        ["mul", {}],
-        ["div", {}],
-        ["lw", {}],
-        ["sw", {}],
-        ["la", {}],
     ]);
     return Instructions;
 }());

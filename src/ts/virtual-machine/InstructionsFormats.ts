@@ -1,6 +1,6 @@
 import {word} from "./Memory.js";
-import {Registers} from "./Registers.js";
-import {instruction} from "./Instructions.js";
+import {register, Registers} from "./Registers.js";
+import {instruction} from "./instructionsSet.js";
 
 export type params = {
     rs?: word;
@@ -8,6 +8,9 @@ export type params = {
     rd?: word;
     immediate?: word;
     address?: word;
+    pc?: register,
+    hi?: register,
+    lo?: register
 };
 
 export interface Format {
@@ -17,13 +20,24 @@ export interface Format {
 
 export class R_Format implements Format {
     assemble(parts: string[], instruction: instruction, registers: Registers): { code: word, basic: string } {
-        if (parts.length !== 4) throw new Error("Invalid R-type instruction format");
 
-        const rd = registers.getByName(parts[1]);
-        const rs = registers.getByName(parts[2]);
-        const rt = registers.getByName(parts[3]);
+        let rd: register | undefined = registers.getByName("$zero");
+        let rs: register | undefined = registers.getByName("$zero");
+        let rt: register | undefined = registers.getByName("$zero");
 
-        if (!rd || !rs || !rt) throw new Error("Invalid register name");
+        if ((parts[0] === "mult") || (parts[0] === "div")) {
+            rs = registers.getByName(parts[1]);
+            rt = registers.getByName(parts[2]);
+        } else if ((parts[0] === "mflo") || (parts[0] === "mfhi")) {
+            rd = registers.getByName(parts[1]);
+        } else {
+            rd = registers.getByName(parts[1]);
+            rs = registers.getByName(parts[2]);
+            rt = registers.getByName(parts[3]);
+        }
+
+        if (!rd || !rs || !rt) throw new Error("Invalid register name for instruction");
+
 
         const code = (instruction.opcode! << 26) |
             (rs.number! << 21) |
@@ -51,7 +65,6 @@ export class R_Format implements Format {
 
 export class I_Format implements Format {
     assemble(parts: string[], instruction: instruction, registers: Registers): { code: word, basic: string } {
-        if (parts.length !== 4) throw new Error("Invalid I-type instruction format");
 
         const rt = registers.getByName(parts[1]);
         const rs = registers.getByName(parts[2]);
@@ -83,7 +96,6 @@ export class I_Format implements Format {
 
 export class J_Format implements Format {
     assemble(parts: string[], instruction: instruction, registers: Registers): { code: word, basic: string } {
-        if (parts.length !== 2) throw new Error("Invalid J-type instruction format");
 
         const address = Number(parts[1]);
         if (isNaN(address)) throw new Error("Invalid address");

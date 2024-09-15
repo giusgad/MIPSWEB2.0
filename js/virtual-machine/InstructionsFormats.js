@@ -2,13 +2,23 @@ var R_Format = /** @class */ (function () {
     function R_Format() {
     }
     R_Format.prototype.assemble = function (parts, instruction, registers) {
-        if (parts.length !== 4)
-            throw new Error("Invalid R-type instruction format");
-        var rd = registers.getByName(parts[1]);
-        var rs = registers.getByName(parts[2]);
-        var rt = registers.getByName(parts[3]);
+        var rd = registers.getByName("$zero");
+        var rs = registers.getByName("$zero");
+        var rt = registers.getByName("$zero");
+        if ((parts[0] === "mult") || (parts[0] === "div")) {
+            rs = registers.getByName(parts[1]);
+            rt = registers.getByName(parts[2]);
+        }
+        else if ((parts[0] === "mflo") || (parts[0] === "mfhi")) {
+            rd = registers.getByName(parts[1]);
+        }
+        else {
+            rd = registers.getByName(parts[1]);
+            rs = registers.getByName(parts[2]);
+            rt = registers.getByName(parts[3]);
+        }
         if (!rd || !rs || !rt)
-            throw new Error("Invalid register name");
+            throw new Error("Invalid register name for instruction");
         var code = (instruction.opcode << 26) |
             (rs.number << 21) |
             (rt.number << 16) |
@@ -34,8 +44,6 @@ var I_Format = /** @class */ (function () {
     function I_Format() {
     }
     I_Format.prototype.assemble = function (parts, instruction, registers) {
-        if (parts.length !== 4)
-            throw new Error("Invalid I-type instruction format");
         var rt = registers.getByName(parts[1]);
         var rs = registers.getByName(parts[2]);
         var immediate = Number(parts[3]);
@@ -64,8 +72,6 @@ var J_Format = /** @class */ (function () {
     function J_Format() {
     }
     J_Format.prototype.assemble = function (parts, instruction, registers) {
-        if (parts.length !== 2)
-            throw new Error("Invalid J-type instruction format");
         var address = Number(parts[1]);
         if (isNaN(address))
             throw new Error("Invalid address");

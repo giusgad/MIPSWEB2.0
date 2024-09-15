@@ -1,6 +1,7 @@
 import {Memory, word} from "./Memory.js";
 import {register, Registers} from "./Registers.js";
-import {instruction, Instructions} from "./Instructions.js";
+import {Instructions} from "./Instructions.js";
+import {instruction} from "./instructionsSet.js";
 
 export class CPU {
 
@@ -20,6 +21,18 @@ export class CPU {
         return this.registers;
     }
 
+    getPc() {
+        return this.registers.pc;
+    }
+
+    getHi() {
+        return this.registers.hi;
+    }
+
+    getLo() {
+        return this.registers.lo;
+    }
+
     clear() {
         this.registers.clear();
         this.memory.clear();
@@ -36,8 +49,9 @@ export class CPU {
             if (instruction) {
                 const formatHandler = Instructions.getFormat(instruction.format!);
                 if (formatHandler) {
-                    const params = formatHandler.disassemble(code, instruction);
-                    instruction.run!(this.registers.registers!, params);
+                    let params = formatHandler.disassemble(code, instruction);
+                    params = { ...params, pc: pc, hi: this.getHi(), lo: this.getLo() }
+                    instruction.run!(this.getRegisters().registers!, params);
                     pc.value += 4;
                 } else {
                     console.error('Unrecognized instruction format:', instruction.format);
