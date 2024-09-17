@@ -51,3 +51,15 @@ export function removeClass(className: string, id: string) {
         console.error(`Element with id "${id}" not found.`);
     }
 }
+
+(window as any).convert = convert;
+function convert(format: string, value: number) {
+    if (format === "hex") {
+        return convertToHex(value);
+    }
+    return value;
+}
+
+function convertToHex(value: number) {
+    return '0x' + value.toString(16).padStart(8, '0');
+}

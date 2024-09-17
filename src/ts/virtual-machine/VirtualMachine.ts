@@ -71,6 +71,12 @@ export class VirtualMachine {
         }
     }
 
+    getMemory() {
+        const cpuMemory = this.cpu.getMemory();
+        const memory = cpuMemory.get();
+        return memory;
+    }
+
     getNextInstructionLineNumber() {
         return this.nextInstructionLineNumber;
     }

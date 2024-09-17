@@ -355,6 +355,19 @@ body {
 #registers .table .col.value {
   width: 50%;
 }
+#memory .table {
+  position: absolute;
+  top: 48px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+#memory .table .col.address {
+  width: 50%;
+}
+#memory .table .col.value {
+  width: 50%;
+}
 @media only screen and (max-width: 513px) {
   .buttons .button .label {
     display: none;

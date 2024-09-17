@@ -389,6 +389,27 @@ body {
   }
 }
 
+#memory {
+  .table{
+    position: absolute;
+    top: @opened-files-height;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    .rows {
+      //background-color: @light-gray-3;
+    }
+    .col {
+      &.address {
+        width: 50%;
+      }
+      &.value {
+        width: 50%;
+      }
+    }
+  }
+}
+
 @media only screen and (max-width: 513px) {
   .buttons {
     .button {

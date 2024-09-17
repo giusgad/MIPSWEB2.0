@@ -2,6 +2,20 @@
 
 <div class="component">
     <div class="title">Memory</div>
+    <div class="table">
+        <div class="cols-names">
+            <div class="col col-name address">Address</div>
+            <div class="col col-name value">Value</div>
+        </div>
+        <div class="rows">
+            <%memory.forEach((cell) => {%>
+            <div class="row">
+                <div class="col address"><%=convert(settings.tables.memory.columns.address.format, cell.address)%></div>
+                <div class="col value"><%=convert(settings.tables.memory.columns.value.format, cell.value)%></div>
+            </div>
+            <%});%>
+        </div>
+    </div>
 </div>
 
 <% } %>

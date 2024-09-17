@@ -75,6 +75,11 @@ var VirtualMachine = /** @class */ (function () {
             return undefined;
         }
     };
+    VirtualMachine.prototype.getMemory = function () {
+        var cpuMemory = this.cpu.getMemory();
+        var memory = cpuMemory.get();
+        return memory;
+    };
     VirtualMachine.prototype.getNextInstructionLineNumber = function () {
         return this.nextInstructionLineNumber;
     };

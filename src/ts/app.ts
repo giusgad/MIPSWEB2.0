@@ -5,6 +5,24 @@ import {reloadEditors, updateEditor} from "./editor.js";
 
 export const vm = new VirtualMachine();
 
+const settings = {
+    tables: {
+        registers: {
+            columns: {
+                number: { format: 'decimal' },
+                name: { format: 'text' },
+                value: { format: 'decimal' }
+            }
+        },
+        memory: {
+            columns: {
+                address: { format: 'decimal' },
+                value: { format: 'basic' }
+            }
+        }
+    }
+};
+
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -68,7 +86,7 @@ export async function updateInterface() {
     updateEditor();
 };
 
-(window as any).settings = async function() {
+(window as any).settingsClick = async function() {
     console.log("Settings");
 };
 
@@ -94,12 +112,18 @@ export function getContext() {
         selectedFile = getSelectedFile();
     }
     const registers = vm.getRegisters();
+    const memory = Array.from(vm.getMemory().entries()).map(([address, value]) => ({
+        address,
+        value
+    }));
     const ctx = {
         state,
         files,
         selectedFile,
         registers,
-        nextInstructionLineNumber
+        memory,
+        nextInstructionLineNumber,
+        settings
     };
     return ctx;
 }

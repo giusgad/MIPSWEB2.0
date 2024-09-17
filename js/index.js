@@ -121,3 +121,13 @@ export function removeClass(className, id) {
         console.error("Element with id \"".concat(id, "\" not found."));
     }
 }
+window.convert = convert;
+function convert(format, value) {
+    if (format === "hex") {
+        return convertToHex(value);
+    }
+    return value;
+}
+function convertToHex(value) {
+    return '0x' + value.toString(16).padStart(8, '0');
+}

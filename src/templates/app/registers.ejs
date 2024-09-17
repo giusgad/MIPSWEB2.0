@@ -13,7 +13,7 @@
                 <div class="row">
                     <div class="col number"><%=register.number%></div>
                     <div class="col name"><%=register.name%></div>
-                    <div class="col value"><%=register.value%></div>
+                    <div class="col value"><%=convert(settings.tables.registers.columns.value.format, register.value)%></div>
                 </div>
             <%});%>
         </div>

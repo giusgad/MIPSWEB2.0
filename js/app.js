@@ -39,6 +39,23 @@ import { addClass, removeClass, render } from "./index.js";
 import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
 import { reloadEditors, updateEditor } from "./editor.js";
 export var vm = new VirtualMachine();
+var settings = {
+    tables: {
+        registers: {
+            columns: {
+                number: { format: 'decimal' },
+                name: { format: 'text' },
+                value: { format: 'decimal' }
+            }
+        },
+        memory: {
+            columns: {
+                address: { format: 'decimal' },
+                value: { format: 'basic' }
+            }
+        }
+    }
+};
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -163,7 +180,7 @@ window.runClick = function () {
         });
     });
 };
-window.settings = function () {
+window.settingsClick = function () {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             console.log("Settings");
@@ -202,12 +219,21 @@ export function getContext() {
         selectedFile = getSelectedFile();
     }
     var registers = vm.getRegisters();
+    var memory = Array.from(vm.getMemory().entries()).map(function (_a) {
+        var address = _a[0], value = _a[1];
+        return ({
+            address: address,
+            value: value
+        });
+    });
     var ctx = {
         state: state,
         files: files,
         selectedFile: selectedFile,
         registers: registers,
-        nextInstructionLineNumber: nextInstructionLineNumber
+        memory: memory,
+        nextInstructionLineNumber: nextInstructionLineNumber,
+        settings: settings
     };
     return ctx;
 }
