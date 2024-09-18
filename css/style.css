@@ -115,6 +115,13 @@ body {
 .align-stretch {
   align-items: stretch;
 }
+.fullscreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 .buttons {
   display: flex;
   padding: 8px;
@@ -145,6 +152,14 @@ body {
 }
 .buttons .button:active {
   background-color: rgba(142, 142, 147, 0.25);
+}
+#welcome-page {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
 }
 #app {
   position: absolute;

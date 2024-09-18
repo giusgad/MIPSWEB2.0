@@ -27,3 +27,7 @@
 
 <div id="registers"><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
 <div id="memory"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
+
+<% if (files.length == 0) { %>
+<div id="welcome-page"><%-await renderTemplate('/app/welcome-page.ejs', ctx)%></div>
+<% } %>

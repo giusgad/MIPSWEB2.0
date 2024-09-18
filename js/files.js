@@ -34,9 +34,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { vm, updateInterface, stopExecution } from "./app.js";
+import { updateInterface, stopExecution } from "./app.js";
 import { addFileEditor, removeFileEditor, showEditor } from "./editor.js";
 import { removeClass, render } from "./index.js";
+export var samples = {
+    "sample": "\n.data\n\n\n\n.text\n\n    addi $t1, $zero, 1  # 0 + 1 = 1 -> $t1\n    addi $t2, $zero, 2  # 0 + 2 = 2 -> $t2\n    addi $t3, $zero, 3  # 0 + 3 = 3 -> $t3\n    addi $t4, $zero, 4  # 0 + 4 = 4 -> $t4\n    addi $t5, $zero, 5  # 0 + 5 = 5 -> $t5\n    sub  $t6, $t4, $t3  # 4 - 3 = 1  -> $t6\n    add  $t7, $t6, $t2  # 1 + 2 = 3  -> $t7\n    addi $s0, $t7, 7    # 3 + 7 = 10 -> $s0\n"
+};
 window.newFile = function () {
     return __awaiter(this, void 0, void 0, function () {
         var files, fileName, fileId, fileToAdd;
@@ -106,6 +109,28 @@ window.importFile = function () {
         });
     });
 };
+window.openSample = function (name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var files, fileId, fileToAdd;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    files = getFiles();
+                    fileId = files.length > 0 ? Math.max.apply(Math, files.map(function (file) { return file.id; })) + 1 : 0;
+                    fileToAdd = {
+                        id: fileId,
+                        name: name,
+                        type: "asm",
+                        content: samples[name]
+                    };
+                    return [4 /*yield*/, addFile(fileToAdd, files)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+};
 window.changeFileTab = changeFileTab;
 function changeFileTab(sFileId) {
     return __awaiter(this, void 0, void 0, function () {
@@ -128,7 +153,7 @@ function changeFileTab(sFileId) {
 }
 window.closeFile = function (sFileId) {
     return __awaiter(this, void 0, void 0, function () {
-        var fileId, files, state, selectedFile;
+        var fileId, files;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, stopExecution()];
@@ -146,8 +171,6 @@ window.closeFile = function (sFileId) {
                     return [3 /*break*/, 5];
                 case 3:
                     localStorage.removeItem('selectedFileId');
-                    state = vm.getState();
-                    selectedFile = getSelectedFile();
                     return [4 /*yield*/, render('app', 'app.ejs')];
                 case 4:
                     _a.sent();

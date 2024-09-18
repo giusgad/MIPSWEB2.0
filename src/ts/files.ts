@@ -1,4 +1,4 @@
-import {vm, updateInterface, stopExecution} from "./app.js";
+import {updateInterface, stopExecution} from "./app.js";
 import {addFileEditor, removeFileEditor, showEditor} from "./editor.js";
 import {removeClass, render} from "./index.js";
 
@@ -7,6 +7,26 @@ export type file = {
     name: string,
     type: string,
     content: string
+};
+
+export const samples: { [name: string]: string } = {
+    "sample":
+`
+.data
+
+
+
+.text
+
+    addi $t1, $zero, 1  # 0 + 1 = 1 -> $t1
+    addi $t2, $zero, 2  # 0 + 2 = 2 -> $t2
+    addi $t3, $zero, 3  # 0 + 3 = 3 -> $t3
+    addi $t4, $zero, 4  # 0 + 4 = 4 -> $t4
+    addi $t5, $zero, 5  # 0 + 5 = 5 -> $t5
+    sub  $t6, $t4, $t3  # 4 - 3 = 1  -> $t6
+    add  $t7, $t6, $t2  # 1 + 2 = 3  -> $t7
+    addi $s0, $t7, 7    # 3 + 7 = 10 -> $s0
+`
 };
 
 (window as any).newFile = async function() {
@@ -48,6 +68,18 @@ export type file = {
     input.click();
 };
 
+(window as any).openSample = async function(name: string) {
+    const files = getFiles();
+    const fileId = files.length > 0 ? Math.max(...files.map(file => file.id)) + 1 : 0;
+    const fileToAdd: file = {
+        id: fileId,
+        name: name,
+        type: "asm",
+        content: samples[name]
+    };
+    await addFile(fileToAdd, files);
+};
+
 (window as any).changeFileTab = changeFileTab;
 async function changeFileTab(sFileId: string) {
     await stopExecution();
@@ -68,8 +100,6 @@ async function changeFileTab(sFileId: string) {
         await changeFileTab(`${files[files.length - 1].id}`);
     } else {
         localStorage.removeItem('selectedFileId');
-        const state = vm.getState();
-        const selectedFile = getSelectedFile();
         await render('app', 'app.ejs');
     }
 };

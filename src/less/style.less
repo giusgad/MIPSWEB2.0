@@ -129,6 +129,14 @@ body {
   align-items: stretch;
 }
 
+.fullscreen {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+}
+
 .buttons {
   display: flex;
   padding: @space-3;
@@ -159,6 +167,15 @@ body {
       background-color: rgba(@gray, 0.25);
     }
   }
+}
+
+#welcome-page {
+  position: absolute;
+  top: @header-height + @toolbar-height;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
 }
 
 #app {
