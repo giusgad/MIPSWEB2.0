@@ -26,6 +26,12 @@ export const samples: { [name: string]: string } = {
     sub  $t6, $t4, $t3  # 4 - 3 = 1  -> $t6
     add  $t7, $t6, $t2  # 1 + 2 = 3  -> $t7
     addi $s0, $t7, 7    # 3 + 7 = 10 -> $s0
+    
+    mult $t7, $s0
+    mflo $s1            # 3 * 10 = 30 -> $s1
+    
+    div $s1, $t4
+    mflo $s2            # 30 / 4 = 7(2) -> $s2
 `
 };
 
