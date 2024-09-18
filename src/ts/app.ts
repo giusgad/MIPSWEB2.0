@@ -9,8 +9,6 @@ const settings = {
     tables: {
         registers: {
             columns: {
-                number: { format: 'decimal' },
-                name: { format: 'text' },
                 value: { format: 'decimal' }
             }
         },

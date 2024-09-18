@@ -44,7 +44,7 @@ export class CPU {
             const code = this.memory.fetch(pc.value);
             if (code === undefined) return;
 
-            let instruction: instruction | undefined = Instructions.get(code);
+            let instruction: instruction | undefined = Instructions.get(code)?.instruction;
 
             if (instruction) {
                 const formatHandler = Instructions.getFormat(instruction.format!);

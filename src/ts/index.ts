@@ -1,5 +1,6 @@
 import {Icons} from "./icons.js";
 import {getContext} from "./app.js";
+import {Instructions} from "./virtual-machine/Instructions.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -57,9 +58,16 @@ function convert(format: string, value: number) {
     if (format === "hex") {
         return convertToHex(value);
     }
+    if (format === "basic") {
+        return convertToBasic(value);
+    }
     return value;
 }
 
 function convertToHex(value: number) {
     return '0x' + value.toString(16).padStart(8, '0');
+}
+
+function convertToBasic(value: number) {
+    return Instructions.get(value)?.basic;
 }

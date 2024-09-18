@@ -14,6 +14,11 @@ var Instructions = /** @class */ (function () {
                 instruction.run(registers, params);
             };
         }
+        if (instruction.basic) {
+            copy.basic = function (params) {
+                return instruction.basic(params);
+            };
+        }
         return copy;
     };
     Instructions.getByName = function (name) {
@@ -49,7 +54,16 @@ var Instructions = /** @class */ (function () {
                 }
             }
         });
-        return foundInstruction;
+        if (foundInstruction) {
+            // @ts-ignore
+            var formatHandler = Instructions.getFormat(foundInstruction.format);
+            if (formatHandler) {
+                var params = formatHandler.disassemble(code, foundInstruction);
+                // @ts-ignore
+                var basic = foundInstruction.basic ? foundInstruction.basic(params) : "undefined basic instruction";
+                return { instruction: foundInstruction, basic: basic };
+            }
+        }
     };
     Instructions.getFormat = function (format) {
         return this.formats.get(format);

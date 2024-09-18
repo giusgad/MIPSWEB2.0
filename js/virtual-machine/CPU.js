@@ -37,12 +37,13 @@ var CPU = /** @class */ (function () {
         this.memory.clear();
     };
     CPU.prototype.step = function () {
+        var _a;
         var pc = this.registers.pc;
         if (pc) {
             var code = this.memory.fetch(pc.value);
             if (code === undefined)
                 return;
-            var instruction = Instructions.get(code);
+            var instruction = (_a = Instructions.get(code)) === null || _a === void 0 ? void 0 : _a.instruction;
             if (instruction) {
                 var formatHandler = Instructions.getFormat(instruction.format);
                 if (formatHandler) {

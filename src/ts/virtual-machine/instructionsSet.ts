@@ -8,6 +8,7 @@ export type instruction = {
     opcode?: word;
     funct?: word;
     run?: (registers: register[], params: params) => void;
+    basic?: (params: params) => string;
 }
 
 export const instructionsSet: Map<string, instruction> = new Map<string, instruction>([
@@ -25,7 +26,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             }
 
             registers[rd].value = result;
-        }
+        },
+        basic: (params) => `add $${params.rd}, $${params.rs}, $${params.rt}`
     }],
     ["sub", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x22,
@@ -41,7 +43,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             }
 
             registers[rd].value = result;
-        }
+        },
+        basic: (params) => `sub $${params.rd}, $${params.rs}, $${params.rt}`
     }],
     ["addi", {
         format: 'I', type: "ALU", opcode: 0x08,
@@ -57,7 +60,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             }
 
             registers[rt].value = result;
-        }
+        },
+        basic: (params) => `addi $${params.rt}, $${params.rs}, ${params.immediate}`
     }],
     ["addu", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x21,
@@ -67,7 +71,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             const rt = params.rt!;
 
             registers[rd].value = registers[rs].value + registers[rt].value;
-        }
+        },
+        basic: (params) => `addu $${params.rd}, $${params.rs}, $${params.rt}`
     }],
     ["subu", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x23,
@@ -77,7 +82,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             const rt = params.rt!;
 
             registers[rd].value = registers[rs].value - registers[rt].value;
-        }
+        },
+        basic: (params) => `subu $${params.rd}, $${params.rs}, $${params.rt}`
     }],
     ["addiu", {
         format: 'I', type: "ALU", opcode: 0x09,
@@ -87,7 +93,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             const immediate = params.immediate!;
 
             registers[rt].value = registers[rs].value + immediate;
-        }
+        },
+        basic: (params) => `addiu $${params.rt}, $${params.rs}, ${params.immediate}`
     }],
     ["mult", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x18,
@@ -105,7 +112,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
 
             lo.value = productLow;
             hi.value = productHigh;
-        }
+        },
+        basic: (params) => `mult $${params.rs}, $${params.rt}`
     }],
     ["multu", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x19,
@@ -123,7 +131,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
 
             lo.value = productLow;
             hi.value = productHigh;
-        }
+        },
+        basic: (params) => `multu $${params.rs}, $${params.rt}`
     }],
     ["mfhi", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x10,
@@ -132,7 +141,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             const hi = params.hi!;
 
             registers[rd].value = hi.value;
-        }
+        },
+        basic: (params) => `mfhi $${params.rd}`
     }],
     ["mflo", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x12,
@@ -141,7 +151,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
             const lo = params.lo!;
 
             registers[rd].value = lo.value;
-        }
+        },
+        basic: (params) => `mflo $${params.rd}`
     }],
     ["div", {
         format: 'R', type: "ALU", opcode: 0x00, funct: 0x1A,
@@ -165,7 +176,8 @@ export const instructionsSet: Map<string, instruction> = new Map<string, instruc
 
             lo.value = quotient;
             hi.value = remainder;
-        }
+        },
+        basic: (params) => `div $${params.rs}, $${params.rt}`
     }],
     ["lw", {}],
     ["sw", {}]

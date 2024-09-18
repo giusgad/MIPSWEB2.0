@@ -10,7 +10,8 @@ export var instructionsSet = new Map([
                     throw new Error("Integer Overflow");
                 }
                 registers[rd].value = result;
-            }
+            },
+            basic: function (params) { return "add $".concat(params.rd, ", $").concat(params.rs, ", $").concat(params.rt); }
         }],
     ["sub", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x22,
@@ -23,7 +24,8 @@ export var instructionsSet = new Map([
                     throw new Error("Integer Overflow");
                 }
                 registers[rd].value = result;
-            }
+            },
+            basic: function (params) { return "sub $".concat(params.rd, ", $").concat(params.rs, ", $").concat(params.rt); }
         }],
     ["addi", {
             format: 'I', type: "ALU", opcode: 0x08,
@@ -36,7 +38,8 @@ export var instructionsSet = new Map([
                     throw new Error("Integer Overflow");
                 }
                 registers[rt].value = result;
-            }
+            },
+            basic: function (params) { return "addi $".concat(params.rt, ", $").concat(params.rs, ", ").concat(params.immediate); }
         }],
     ["addu", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x21,
@@ -45,7 +48,8 @@ export var instructionsSet = new Map([
                 var rs = params.rs;
                 var rt = params.rt;
                 registers[rd].value = registers[rs].value + registers[rt].value;
-            }
+            },
+            basic: function (params) { return "addu $".concat(params.rd, ", $").concat(params.rs, ", $").concat(params.rt); }
         }],
     ["subu", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x23,
@@ -54,7 +58,8 @@ export var instructionsSet = new Map([
                 var rs = params.rs;
                 var rt = params.rt;
                 registers[rd].value = registers[rs].value - registers[rt].value;
-            }
+            },
+            basic: function (params) { return "subu $".concat(params.rd, ", $").concat(params.rs, ", $").concat(params.rt); }
         }],
     ["addiu", {
             format: 'I', type: "ALU", opcode: 0x09,
@@ -63,7 +68,8 @@ export var instructionsSet = new Map([
                 var rs = params.rs;
                 var immediate = params.immediate;
                 registers[rt].value = registers[rs].value + immediate;
-            }
+            },
+            basic: function (params) { return "addiu $".concat(params.rt, ", $").concat(params.rs, ", ").concat(params.immediate); }
         }],
     ["mult", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x18,
@@ -78,7 +84,8 @@ export var instructionsSet = new Map([
                 var productHigh = ((rsVal * rtVal) / 0x100000000) >>> 0;
                 lo.value = productLow;
                 hi.value = productHigh;
-            }
+            },
+            basic: function (params) { return "mult $".concat(params.rs, ", $").concat(params.rt); }
         }],
     ["multu", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x19,
@@ -93,7 +100,8 @@ export var instructionsSet = new Map([
                 var productHigh = ((rsVal * rtVal) / 0x100000000) >>> 0;
                 lo.value = productLow;
                 hi.value = productHigh;
-            }
+            },
+            basic: function (params) { return "multu $".concat(params.rs, ", $").concat(params.rt); }
         }],
     ["mfhi", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x10,
@@ -101,7 +109,8 @@ export var instructionsSet = new Map([
                 var rd = params.rd;
                 var hi = params.hi;
                 registers[rd].value = hi.value;
-            }
+            },
+            basic: function (params) { return "mfhi $".concat(params.rd); }
         }],
     ["mflo", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x12,
@@ -109,7 +118,8 @@ export var instructionsSet = new Map([
                 var rd = params.rd;
                 var lo = params.lo;
                 registers[rd].value = lo.value;
-            }
+            },
+            basic: function (params) { return "mflo $".concat(params.rd); }
         }],
     ["div", {
             format: 'R', type: "ALU", opcode: 0x00, funct: 0x1A,
@@ -129,7 +139,8 @@ export var instructionsSet = new Map([
                 var remainder = (rsVal % rtVal) | 0;
                 lo.value = quotient;
                 hi.value = remainder;
-            }
+            },
+            basic: function (params) { return "div $".concat(params.rs, ", $").concat(params.rt); }
         }],
     ["lw", {}],
     ["sw", {}]

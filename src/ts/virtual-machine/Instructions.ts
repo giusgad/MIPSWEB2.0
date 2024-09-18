@@ -22,6 +22,11 @@ export class Instructions {
                 instruction.run!(registers, params);
             };
         }
+        if (instruction.basic) {
+            copy.basic = (params: params): string => {
+                return instruction.basic!(params);
+            };
+        }
         return copy;
     }
 
@@ -33,7 +38,7 @@ export class Instructions {
         }
     }
 
-    static get(code: number): instruction | undefined {
+    static get(code: number): { instruction: instruction, basic: string } | undefined {
         const opcode = this.getBits(code, 31, 26);
 
         let funct: number | undefined = undefined;
@@ -59,7 +64,16 @@ export class Instructions {
             }
         });
 
-        return foundInstruction;
+        if (foundInstruction) {
+            // @ts-ignore
+            const formatHandler = Instructions.getFormat(foundInstruction.format);
+            if (formatHandler) {
+                let params = formatHandler.disassemble(code, foundInstruction);
+                // @ts-ignore
+                const basic = foundInstruction.basic ? foundInstruction.basic(params) : "undefined basic instruction";
+                return { instruction: foundInstruction, basic: basic };
+            }
+        }
     }
 
     static getFormat(format: string): Format | undefined {
