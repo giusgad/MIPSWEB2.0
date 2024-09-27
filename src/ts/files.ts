@@ -31,7 +31,8 @@ export const samples: { [name: string]: string } = {
     mflo $s1            # 3 * 10 = 30 -> $s1
     
     div $s1, $t4
-    mflo $s2            # 30 / 4 = 7(2) -> $s2
+    mflo $s2            # 30 / 4 = 7 -> $s2
+    mfhi $s3            # 30 % 4 = 2 -> $s3
 `
 };
 
