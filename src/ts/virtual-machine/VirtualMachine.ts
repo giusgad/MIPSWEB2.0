@@ -1,84 +1,93 @@
-import {assembledLine, Assembler} from "./Assembler.js";
 import {CPU} from "./CPU.js";
-import {word} from "./Memory";
+import {Assembler} from "./Assembler.js";
+
+export type AssembledLine =  {
+  lineNumber: number,
+  source: string,
+  basic: string,
+  code: string,
+  address: string
+}
 
 export class VirtualMachine {
 
-    private state: "edit" | "execute";
-    private cpu: CPU;
+  cpu: CPU;
 
-    private assembledLines?: assembledLine[];
-    private assembledLinesIndex: number = 0;
-    private nextInstructionLineNumber?: number;
+  assembler: Assembler;
+  assembledLines?: AssembledLine[];
+  assembledLinesIndex: number = 0;
+  nextInstructionLineNumber?: number;
 
-    constructor() {
-        this.cpu = new CPU();
-        this.state = "edit";
+  isRunning: boolean;
+  state: "edit" | "execute";
+
+  constructor(cpu: CPU) {
+    this.cpu = cpu;
+    this.assembler = new Assembler(cpu);
+    this.isRunning = false;
+    this.state = "edit";
+  }
+
+  assemble(program: string) {
+    this.assembledLines = this.assembler.assemble(program);
+    if (this.assembledLines.length > 0) {
+      this.nextInstructionLineNumber = this.assembledLines[this.assembledLinesIndex].lineNumber;
     }
+    this.state = "execute";
+  }
 
-    getState() {
-        return this.state;
+  run() {
+    this.isRunning = true;
+    while (this.isRunning && !this.cpu.isHalted()) {
+      this.step();
     }
+  }
 
-    assemble(program: string) {
-        const assembler = new Assembler();
-        assembler.assemble(program, this.cpu);
-        this.assembledLines = assembler.getAssembledLines();
-        if (this.assembledLines.length > 0) {
-            this.nextInstructionLineNumber = this.assembledLines[this.assembledLinesIndex].lineNumber;
-        }
-        this.state = "execute";
-    }
-
-    stop() {
-        this.assembledLines = [];
-        this.assembledLinesIndex = 0;
+  step() {
+    if (!this.cpu.isHalted()) {
+      this.cpu.execute();
+      this.assembledLinesIndex++;
+      if (this.assembledLinesIndex >= this.assembledLines!.length) {
         this.nextInstructionLineNumber = undefined;
-        this.cpu.clear();
-        this.state = "edit";
-    }
-
-    step() {
-        if (this.assembledLinesIndex >= this.assembledLines!.length) return;
-        this.cpu.step();
-        this.assembledLinesIndex++;
-        if (this.assembledLinesIndex >= this.assembledLines!.length) {
-            this.nextInstructionLineNumber = undefined;
-            return;
-        }
+      } else {
         this.nextInstructionLineNumber = this.assembledLines![this.assembledLinesIndex].lineNumber;
+      }
+    } else {
+      this.pause();
     }
+  }
 
-    run() {
-        while (this.assembledLinesIndex < this.assembledLines!.length) {
-            this.step();
-        }
+  pause() {
+    this.isRunning = false;
+  }
+
+  stop() {
+    this.pause();
+    this.cpu.reset();
+    this.nextInstructionLineNumber = undefined;
+    this.assembledLinesIndex = 0;
+    this.assembledLines = [];
+    this.state = "edit";
+  }
+
+  getRegisters() {
+    const registers = [];
+    for (const register of this.cpu.getRegisters()) {
+      registers.push({name: register.name, number: register.number, value: register.value});
     }
+    registers.push({name: "pc", value: this.cpu.pc});
+    registers.push({name: "hi", value: this.cpu.hi});
+    registers.push({name: "lo", value: this.cpu.lo});
+    return registers;
+  }
 
-    getRegisters(): ({ number?: word | undefined; name: string; value: word } | {})[] | undefined {
-        const cpuRegisters = this.cpu.getRegisters();
-        const registers = cpuRegisters?.registers;
-
-        if (registers) {
-            return [
-                ...registers.map(register => ({ ...register })),
-                { ...cpuRegisters.pc },
-                { ...cpuRegisters.hi },
-                { ...cpuRegisters.lo }
-            ];
-        } else {
-            return undefined;
-        }
-    }
-
-    getMemory() {
-        const cpuMemory = this.cpu.getMemory();
-        const memory = cpuMemory.get();
-        return memory;
-    }
-
-    getNextInstructionLineNumber() {
-        return this.nextInstructionLineNumber;
-    }
+  getMemory() {
+    return Array.from(this.cpu.getMemory().entries()).map(([address, value]) => ({
+      address,
+      value
+    }));
+  }
 
 }
+
+

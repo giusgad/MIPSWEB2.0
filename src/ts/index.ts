@@ -1,6 +1,7 @@
 import {Icons} from "./icons.js";
 import {getContext} from "./app.js";
-import {Instructions} from "./virtual-machine/Instructions.js";
+import {Utils} from "./virtual-machine/Utils.js";
+import {vm} from "./app.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -53,21 +54,22 @@ export function removeClass(className: string, id: string) {
     }
 }
 
+export function getFromLocalStorage(key: string): any {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : undefined;
+}
+
+export function setIntoLocalStorage(key: string, item: any) {
+    localStorage.setItem(key, JSON.stringify(item));
+}
+
 (window as any).convert = convert;
 function convert(format: string, value: number) {
     if (format === "hex") {
-        return convertToHex(value);
+        return Utils.convertToHex(value);
     }
     if (format === "basic") {
-        return convertToBasic(value);
+        return Utils.convertToBasic(value, vm.cpu);
     }
     return value;
-}
-
-function convertToHex(value: number) {
-    return '0x' + value.toString(16).padStart(8, '0');
-}
-
-function convertToBasic(value: number) {
-    return Instructions.get(value)?.basic;
 }

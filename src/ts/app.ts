@@ -1,9 +1,10 @@
 import {getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId} from "./files.js";
-import {addClass, removeClass, render} from "./index.js";
-import {VirtualMachine} from "./virtual-machine/VirtualMachine.js";
+import {addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage} from "./index.js";
 import {reloadEditors, updateEditor} from "./editor.js";
+import {VirtualMachine} from "./virtual-machine/VirtualMachine.js";
+import {CPU} from "./virtual-machine/CPU.js";
 
-export const vm = new VirtualMachine();
+export const vm = new VirtualMachine(new CPU);
 
 const settings = {
     tables: {
@@ -24,6 +25,9 @@ const settings = {
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
 
+    if (!getFromLocalStorage("settings")) {
+        setIntoLocalStorage("settings", settings);
+    }
     await render('app', 'app.ejs');
     reloadEditors(getFiles(), getSelectedFileId());
 
@@ -95,8 +99,8 @@ export async function stopExecution() {
 }
 
 export function getContext() {
-    const state = vm.getState();
-    const nextInstructionLineNumber = vm.getNextInstructionLineNumber();
+    const state = vm.state;
+    const nextInstructionLineNumber = vm.nextInstructionLineNumber;
     const files = getFiles();
     let selectedFileId = getSelectedFileId();
     if (selectedFileId === null) {
@@ -110,10 +114,7 @@ export function getContext() {
         selectedFile = getSelectedFile();
     }
     const registers = vm.getRegisters();
-    const memory = Array.from(vm.getMemory().entries()).map(([address, value]) => ({
-        address,
-        value
-    }));
+    const memory = vm.getMemory();
     const ctx = {
         state,
         files,
@@ -121,7 +122,7 @@ export function getContext() {
         registers,
         memory,
         nextInstructionLineNumber,
-        settings
+        settings: getFromLocalStorage("settings")
     };
     return ctx;
 }

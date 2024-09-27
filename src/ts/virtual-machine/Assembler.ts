@@ -1,128 +1,98 @@
-import {Memory, word} from "./Memory.js";
 import {CPU} from "./CPU.js";
-import {Instructions} from "./Instructions.js";
-import {Registers} from "./Registers.js"
+import {AssembledLine} from "./VirtualMachine.js";
 
-export type assembledLine =  {
-    lineNumber: number,
-    source: string,
-    basic: string,
-    code: string,
-    address: string
+export interface Directive {
+    assemble(parts: string[], assembler: Assembler): void;
 }
 
-export interface directive {
-    handle(parts: string[], memory: Memory, registers: Registers, assembler: Assembler): void;
-}
-
-class DataDirective implements directive {
-    handle(parts: string[], memory: Memory, registers: Registers, assembler: Assembler) {
-        assembler.assembleData(parts, memory, registers);
+class DataDirective implements Directive {
+    assemble(parts: string[], assembler: Assembler) {
+        assembler.assembleData(parts);
     }
 }
 
-class TextDirective implements directive {
-    handle(parts: string[], memory: Memory, registers: Registers, assembler: Assembler) {
-        assembler.assembleInstruction(parts, memory, registers);
+class TextDirective implements Directive {
+    assemble(parts: string[], assembler: Assembler) {
+        assembler.assembleInstruction(parts);
     }
 }
 
 export class Assembler {
 
-    private currentDirective?: directive;
-    private startTextSegmentAddress: word = 0x00400000;
-    private startDataSegmentAddress: word = 0x10010000;
-    private currentTextSegmentAddress: number = this.startTextSegmentAddress;
-    private currentDataSegmentAddress: number = this.startDataSegmentAddress;
-    private assembledLines: assembledLine[] = [];
-    private currentLineNumber?: number = undefined;
+    cpu: CPU;
 
-    private static directives: Map<string, directive> = new Map<string, directive>([
+    assembledLines: AssembledLine[] = [];
+
+    lineNumber?: number;
+
+    directives: Map<string, Directive> = new Map<string, Directive>([
         [".data", new DataDirective()],
         [".text", new TextDirective()]
     ]);
 
-    assemble(program: string, cpu: CPU) {
+    directive?: Directive = this.directives.get(".text");
+
+    constructor(cpu: CPU) {
+        this.cpu = cpu;
+    }
+
+    assemble(program: string): AssembledLine[] {
+        this.reset();
         const lines = program.split('\n');
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (line.trim().length > 0) {
-                this.assembleLine(i + 1, lines[i], cpu);
+                this.assembleLine(i + 1, lines[i]);
             }
         }
+        return this.assembledLines;
     }
 
-    private assembleLine(lineNumber: number, line: string, cpu: CPU) {
-
-        this.currentLineNumber = lineNumber;
-
+    assembleLine(lineNumber: number, line: string) {
+        this.lineNumber = lineNumber;
         const parts = line.split('#')[0].trim().replace(/,/g, '').split(/\s+/);
         if (parts.length === 0 || parts[0] === '') {
             return undefined;
         }
-
-        let directive = Assembler.directives.get(parts[0]);
+        let directive = this.directives.get(parts[0]);
         if (directive) {
-            this.currentDirective = directive;
+            this.directive = directive;
         } else {
-            if (this.currentDirective) {
-                this.currentDirective.handle(parts, cpu.getMemory(), cpu.getRegisters(), this);
+            if (this.directive) {
+                this.directive.assemble(parts, this);
             }
         }
+    }
+
+    assembleData(parts: string[]) {
 
     }
 
-    public assembleInstruction(parts: string[], memory: Memory, registers: Registers) {
-
-        const instruction = Instructions.getByName(parts[0]);
-
-        if (instruction) {
-
-            const format = Instructions.getFormat(instruction.format!);
-            if (format) {
-                const source: string = parts.join(' ');
-                const assembledInstruction = format.assemble(parts, instruction, registers);
-                this.storeInstruction(source, assembledInstruction.basic, assembledInstruction.code, memory);
+    assembleInstruction(parts: string[]) {
+        const instructionSymbol = parts[0];
+        const source = parts.join(' ');
+        const instruction = this.cpu.instructionsSet.getBySymbol(instructionSymbol);
+        if (!instruction) throw  new Error(`Instruction ${source} not found`);
+        const format = this.cpu.getFormat(instruction.format);
+        if (format) {
+            const assembledInstruction = format.assemble(parts, instruction, this.cpu);
+            if (this.lineNumber !== undefined) {
+                this.assembledLines.push({
+                    lineNumber: this.lineNumber,
+                    source: source,
+                    basic: assembledInstruction.basic,
+                    code: '0x' + assembledInstruction.code.toString(16).padStart(8, '0'),
+                    address: '0x' + this.cpu.textAddress.toString(16).padStart(8, '0')
+                });
             }
-
-        } else {
-            console.error('Unrecognized instruction: \n', parts.join(' '));
-        }
-
-    }
-
-    private storeInstruction(source: string, basic: string, code: word, memory: Memory) {
-        memory.store(this.currentTextSegmentAddress, code);
-
-        this.addAssembledLine(this.currentLineNumber, source, basic, code, this.currentTextSegmentAddress);
-
-        this.currentTextSegmentAddress += 4;
-    }
-
-    public assembleData(parts: string[], memory: Memory, registers: Registers) {
-
-        console.error("Data to assemble: \n", parts.join(' '));
-
-    }
-
-    private storeData(source: string, data: word, memory: Memory) {
-        memory.store(this.currentDataSegmentAddress, data);
-        this.currentDataSegmentAddress += 4;
-    }
-
-    addAssembledLine(currentLineNumber: number | undefined, source: string, basic: string, code: word, address: word) {
-        if (currentLineNumber !== undefined) {
-            this.assembledLines.push({
-                lineNumber: currentLineNumber,
-                source: source,
-                basic: basic,
-                code: '0x' + code.toString(16).padStart(8, '0'),
-                address: '0x' + address.toString(16).padStart(8, '0')
-            });
+            this.cpu.storeInstruction(assembledInstruction.code);
         }
     }
 
-    getAssembledLines() {
-        return this.assembledLines;
+    reset() {
+        this.assembledLines = [];
+        this.lineNumber = undefined;
+        this.directive = this.directives.get(".text");
     }
+
 }

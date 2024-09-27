@@ -80,7 +80,7 @@ export function updateEditor(): void {
     if (selectedFileId !== null) {
         const fileEditor = filesEditors.find(editor => editor.fileId === selectedFileId);
         if (fileEditor) {
-            const VMState = vm.getState();
+            const VMState = vm.state;
             const aceEditor: AceAjax.Editor = fileEditor.aceEditor;
             const cursors = document.getElementsByClassName("ace_hidden-cursors");
             if (VMState === "edit") {
@@ -119,7 +119,7 @@ export function updateEditor(): void {
                     }
                 }
                 aceEditor.session.clearBreakpoints();
-                const nextInstructionLine = vm.getNextInstructionLineNumber();
+                const nextInstructionLine = vm.nextInstructionLineNumber;
                 if (nextInstructionLine) {
                     let Range = ace.require('ace/range').Range,
                         range = new Range(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);

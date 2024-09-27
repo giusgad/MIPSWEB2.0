@@ -35,10 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId } from "./files.js";
-import { addClass, removeClass, render } from "./index.js";
-import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
+import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
 import { reloadEditors, updateEditor } from "./editor.js";
-export var vm = new VirtualMachine();
+import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
+import { CPU } from "./virtual-machine/CPU.js";
+export var vm = new VirtualMachine(new CPU);
 var settings = {
     tables: {
         registers: {
@@ -58,7 +59,11 @@ document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, render('app', 'app.ejs')];
+            case 0:
+                if (!getFromLocalStorage("settings")) {
+                    setIntoLocalStorage("settings", settings);
+                }
+                return [4 /*yield*/, render('app', 'app.ejs')];
             case 1:
                 _a.sent();
                 reloadEditors(getFiles(), getSelectedFileId());
@@ -202,8 +207,8 @@ export function stopExecution() {
     });
 }
 export function getContext() {
-    var state = vm.getState();
-    var nextInstructionLineNumber = vm.getNextInstructionLineNumber();
+    var state = vm.state;
+    var nextInstructionLineNumber = vm.nextInstructionLineNumber;
     var files = getFiles();
     var selectedFileId = getSelectedFileId();
     if (selectedFileId === null) {
@@ -217,13 +222,7 @@ export function getContext() {
         selectedFile = getSelectedFile();
     }
     var registers = vm.getRegisters();
-    var memory = Array.from(vm.getMemory().entries()).map(function (_a) {
-        var address = _a[0], value = _a[1];
-        return ({
-            address: address,
-            value: value
-        });
-    });
+    var memory = vm.getMemory();
     var ctx = {
         state: state,
         files: files,
@@ -231,7 +230,7 @@ export function getContext() {
         registers: registers,
         memory: memory,
         nextInstructionLineNumber: nextInstructionLineNumber,
-        settings: settings
+        settings: getFromLocalStorage("settings")
     };
     return ctx;
 }

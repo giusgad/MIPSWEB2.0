@@ -63,7 +63,7 @@ export function updateEditor() {
     if (selectedFileId !== null) {
         var fileEditor = filesEditors.find(function (editor) { return editor.fileId === selectedFileId; });
         if (fileEditor) {
-            var VMState = vm.getState();
+            var VMState = vm.state;
             var aceEditor = fileEditor.aceEditor;
             var cursors = document.getElementsByClassName("ace_hidden-cursors");
             if (VMState === "edit") {
@@ -100,7 +100,7 @@ export function updateEditor() {
                     }
                 }
                 aceEditor.session.clearBreakpoints();
-                var nextInstructionLine = vm.getNextInstructionLineNumber();
+                var nextInstructionLine = vm.nextInstructionLineNumber;
                 if (nextInstructionLine) {
                     var Range_1 = ace.require('ace/range').Range, range = new Range_1(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
                     aceEditor.session.addMarker(range, "next-instruction", "fullLine", false);

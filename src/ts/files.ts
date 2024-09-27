@@ -1,6 +1,6 @@
 import {updateInterface, stopExecution} from "./app.js";
 import {addFileEditor, removeFileEditor, showEditor} from "./editor.js";
-import {removeClass, render} from "./index.js";
+import {getFromLocalStorage, removeClass, render, setIntoLocalStorage} from "./index.js";
 
 export type file = {
     id: number,
@@ -120,12 +120,12 @@ async function addFile(file: file, files: file[]) {
 }
 
 export function getFiles(): file[] {
-    const files = localStorage.getItem("files");
-    return files ? JSON.parse(files) : [];
+    const files = getFromLocalStorage("files");
+    return files ? files : [];
 }
 
 export function setFiles(files: file[]) {
-    localStorage.setItem("files", JSON.stringify(files));
+    setIntoLocalStorage("files", files);
 }
 
 export function getFile(fileId: number) {

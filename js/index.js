@@ -47,7 +47,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 import { Icons } from "./icons.js";
 import { getContext } from "./app.js";
-import { Instructions } from "./virtual-machine/Instructions.js";
+import { Utils } from "./virtual-machine/Utils.js";
+import { vm } from "./app.js";
 window.ejs = ejs;
 document.addEventListener('DOMContentLoaded', function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -122,20 +123,20 @@ export function removeClass(className, id) {
         console.error("Element with id \"".concat(id, "\" not found."));
     }
 }
+export function getFromLocalStorage(key) {
+    var item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : undefined;
+}
+export function setIntoLocalStorage(key, item) {
+    localStorage.setItem(key, JSON.stringify(item));
+}
 window.convert = convert;
 function convert(format, value) {
     if (format === "hex") {
-        return convertToHex(value);
+        return Utils.convertToHex(value);
     }
     if (format === "basic") {
-        return convertToBasic(value);
+        return Utils.convertToBasic(value, vm.cpu);
     }
     return value;
-}
-function convertToHex(value) {
-    return '0x' + value.toString(16).padStart(8, '0');
-}
-function convertToBasic(value) {
-    var _a;
-    return (_a = Instructions.get(value)) === null || _a === void 0 ? void 0 : _a.basic;
 }

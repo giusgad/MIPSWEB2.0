@@ -2,9 +2,6 @@ var Memory = /** @class */ (function () {
     function Memory() {
         this.memory = new Map();
     }
-    Memory.prototype.clear = function () {
-        this.memory.clear();
-    };
     Memory.prototype.store = function (address, value) {
         this.memory.set(address, value);
     };
@@ -19,6 +16,9 @@ var Memory = /** @class */ (function () {
             sortedMemory.set(key, this.memory.get(key));
         }
         return sortedMemory;
+    };
+    Memory.prototype.reset = function () {
+        this.memory.clear();
     };
     return Memory;
 }());

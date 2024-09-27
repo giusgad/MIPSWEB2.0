@@ -1,28 +1,27 @@
-export type word = number;
+import {Word} from "./Utils.js";
 
 export class Memory {
 
-    private memory: Map<word, word> = new Map<word, word>();
+    private memory: Map<Word, Word> = new Map<Word, Word>();
 
-    clear() {
-        this.memory.clear();
-    }
-
-    store(address: word, value: word) {
+    store(address: Word, value: Word) {
         this.memory.set(address, value);
     }
 
-    fetch(address: word) {
+    fetch(address: Word) {
         return this.memory.get(address);
     }
 
     get() {
         const sortedKeys = Array.from(this.memory.keys()).sort((a, b) => a - b);
-        const sortedMemory = new Map<word, word>();
+        const sortedMemory = new Map<Word, Word>();
         for (const key of sortedKeys) {
             sortedMemory.set(key, this.memory.get(key)!);
         }
         return sortedMemory;
     }
 
+    reset() {
+        this.memory.clear();
+    }
 }
