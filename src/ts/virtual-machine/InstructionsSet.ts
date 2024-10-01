@@ -159,14 +159,11 @@ export class InstructionsSet {
                 const rs = params.rs!;
                 const rt = params.rt!;
 
-                // Convert both registers to signed
                 const rsVal = Utils.toSigned(registers[rs].value);
                 const rtVal = Utils.toSigned(registers[rt].value);
 
-                // Perform signed multiplication
                 const product = BigInt(rsVal) * BigInt(rtVal);
 
-                // Store the lower 32 bits in LO and the upper 32 bits in HI
                 cpu.lo = Number(product & BigInt(0xFFFFFFFF));  // Lower 32 bits
                 cpu.hi = Number(product >> BigInt(32));         // Upper 32 bits
                 cpu.pc += cpu.instructionBytesLength;
@@ -186,14 +183,11 @@ export class InstructionsSet {
                 const rs = params.rs!;
                 const rt = params.rt!;
 
-                // Convert values to unsigned
                 const rsVal = Utils.toUnsigned(registers[rs].value);
                 const rtVal = Utils.toUnsigned(registers[rt].value);
 
-                // Perform unsigned multiplication
                 const product = BigInt(rsVal) * BigInt(rtVal);
 
-                // Store the lower 32 bits in LO and the upper 32 bits in HI
                 cpu.lo = Number(product & BigInt(0xFFFFFFFF));  // Lower 32 bits
                 cpu.hi = Number(product >> BigInt(32));         // Upper 32 bits
                 cpu.pc += cpu.instructionBytesLength;
@@ -213,11 +207,9 @@ export class InstructionsSet {
                 const rs = params.rs!;
                 const rt = params.rt!;
 
-                // Convert both values to signed
                 const rsVal = Utils.toSigned(registers[rs].value);
                 const rtVal = Utils.toSigned(registers[rt].value);
 
-                // Handle division by zero
                 if (rtVal === 0) {
                     cpu.lo = 0;
                     cpu.hi = 0;
@@ -225,11 +217,9 @@ export class InstructionsSet {
                     return;
                 }
 
-                // Perform signed division, truncating towards zero
-                const quotient = (rsVal / rtVal) | 0;  // Signed division with truncation
-                const remainder = rsVal % rtVal;  // Signed remainder
+                const quotient = (rsVal / rtVal) | 0;
+                const remainder = rsVal % rtVal;
 
-                // Store the quotient in LO and the remainder in HI
                 cpu.lo = quotient;
                 cpu.hi = remainder;
                 cpu.pc += cpu.instructionBytesLength;
@@ -278,7 +268,6 @@ export class InstructionsSet {
                 const rsVal = Utils.toUnsigned(registers[rs].value);
                 const rtVal = Utils.toUnsigned(registers[rt].value);
 
-                // Perform unsigned addition
                 const result = rsVal + rtVal;
 
                 registers[rd].value = Utils.toUnsigned(result);
@@ -328,7 +317,6 @@ export class InstructionsSet {
                 const rsVal = Utils.toUnsigned(registers[rs].value);
                 const rtVal = Utils.toUnsigned(registers[rt].value);
 
-                // Perform unsigned subtraction
                 const result = rsVal - rtVal;
 
                 registers[rd].value = Utils.toUnsigned(result);
@@ -350,7 +338,6 @@ export class InstructionsSet {
                 const rs = params.rs!;
                 const rt = params.rt!;
 
-                // Perform bitwise AND operation
                 registers[rd].value = registers[rs].value & registers[rt].value;
                 cpu.pc += cpu.instructionBytesLength;
             }
@@ -370,7 +357,6 @@ export class InstructionsSet {
                 const rs = params.rs!;
                 const rt = params.rt!;
 
-                // Perform bitwise OR operation
                 registers[rd].value = registers[rs].value | registers[rt].value;
                 cpu.pc += cpu.instructionBytesLength;
             }
@@ -432,11 +418,10 @@ export class InstructionsSet {
                 const rs = params.rs!;
                 let immediate = params.immediate!;
 
-                // Estende l'immediato come unsigned (nessun overflow rilevato)
-                immediate = Utils.asSigned(immediate, 16);  // Estende a 16 bit signed
+                immediate = Utils.asSigned(immediate, 16);
 
-                registers[rt].value = (registers[rs].value + immediate) >>> 0;  // Trattamento unsigned
-                cpu.pc += cpu.instructionBytesLength;  // Aggiornamento del PC
+                registers[rt].value = (registers[rs].value + immediate) >>> 0;
+                cpu.pc += cpu.instructionBytesLength;
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -452,9 +437,9 @@ export class InstructionsSet {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
                 const rs = params.rs!;
-                const immediate = params.immediate! & 0xFFFF;  // Immediate is unsigned 16-bit
-                registers[rt].value = registers[rs].value & immediate;  // Perform bitwise AND
-                cpu.pc += cpu.instructionBytesLength;  // Update PC
+                const immediate = params.immediate! & 0xFFFF;
+                registers[rt].value = registers[rs].value & immediate;
+                cpu.pc += cpu.instructionBytesLength;
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -470,9 +455,9 @@ export class InstructionsSet {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
                 const rs = params.rs!;
-                const immediate = params.immediate! & 0xFFFF;  // Immediate is unsigned 16-bit
-                registers[rt].value = registers[rs].value | immediate;  // Perform bitwise OR
-                cpu.pc += cpu.instructionBytesLength;  // Update PC
+                const immediate = params.immediate! & 0xFFFF;
+                registers[rt].value = registers[rs].value | immediate;
+                cpu.pc += cpu.instructionBytesLength;
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -487,9 +472,9 @@ export class InstructionsSet {
             execute(cpu: CPU, params: Params): void {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
-                const immediate = params.immediate! & 0xFFFF;  // Immediate is unsigned 16-bit
-                registers[rt].value = immediate << 16;  // Load the immediate into the upper 16 bits
-                cpu.pc += cpu.instructionBytesLength;  // Update PC
+                const immediate = Utils.asUnsigned(params.immediate!, 16);
+                registers[rt].value = immediate << 16;
+                cpu.pc += cpu.instructionBytesLength;
             }
         }());
         this.instructions.push(new class extends Instruction {
