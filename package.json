@@ -6,7 +6,8 @@
   "scripts": {
     "watch:less": "less-watch-compiler src/less css",
     "watch:ts": "npx tsc --watch",
-    "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\""
+    "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\"",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -21,9 +22,12 @@
   "homepage": "https://github.com/mattiamendicino/mipsweb#readme",
   "devDependencies": {
     "@types/ace": "^0.0.52",
+    "@types/jest": "^29.5.13",
     "@types/node": "^22.5.1",
     "concurrently": "^8.2.2",
     "ejs": "^3.1.10",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "less": "^4.2.0",
     "less-watch-compiler": "^1.16.3",
     "ts-jest": "^29.2.5",

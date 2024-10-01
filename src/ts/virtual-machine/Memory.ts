@@ -8,8 +8,13 @@ export class Memory {
         this.memory.set(address, value);
     }
 
-    fetch(address: Word) {
-        return this.memory.get(address);
+    fetch(address: Word): Word {
+        const word = this.memory.get(address);
+        if (word !== undefined) {
+            return word;
+        } else {
+            return 0x00000000;
+        }
     }
 
     get() {

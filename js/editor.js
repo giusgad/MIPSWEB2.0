@@ -1,15 +1,15 @@
 import { getSelectedFileId, updateFile } from "./files.js";
 import { vm } from "./app.js";
-export var filesEditors = [];
+export let filesEditors = [];
 export function addFileEditor(file) {
-    var fileEditorElement = document.createElement('div');
-    fileEditorElement.id = "file-editor-".concat(file.id);
+    const fileEditorElement = document.createElement('div');
+    fileEditorElement.id = `file-editor-${file.id}`;
     fileEditorElement.className = 'file-editor';
-    var fileEditorsElement = document.getElementById('files-editors');
+    const fileEditorsElement = document.getElementById('files-editors');
     if (fileEditorsElement) {
         fileEditorsElement.appendChild(fileEditorElement);
     }
-    var aceEditor = ace.edit(fileEditorElement);
+    const aceEditor = ace.edit(fileEditorElement);
     aceEditor.setTheme("ace/theme/chrome");
     aceEditor.session.setMode("ace/mode/mips");
     aceEditor.setValue(file.content, 1);
@@ -17,17 +17,17 @@ export function addFileEditor(file) {
         fileId: file.id,
         aceEditor: aceEditor
     });
-    aceEditor.session.on("change", function () {
+    aceEditor.session.on("change", () => {
         updateFile(file.id, aceEditor.getValue());
     });
     showEditor(file.id);
 }
 export function removeFileEditor(fileId) {
-    var fileEditorElement = document.getElementById("file-editor-".concat(fileId));
+    const fileEditorElement = document.getElementById(`file-editor-${fileId}`);
     if (fileEditorElement) {
         fileEditorElement.remove();
     }
-    filesEditors = filesEditors.filter(function (fileEditor) { return fileEditor.fileId !== fileId; });
+    filesEditors = filesEditors.filter(fileEditor => fileEditor.fileId !== fileId);
 }
 export function reloadEditors(files, fileId) {
     document.getElementById('files-editors').innerHTML = '';
@@ -36,19 +36,17 @@ export function reloadEditors(files, fileId) {
     showEditor(fileId);
 }
 export function addFilesEditors(files) {
-    for (var _i = 0, files_1 = files; _i < files_1.length; _i++) {
-        var file = files_1[_i];
+    for (const file of files) {
         addFileEditor(file);
     }
 }
 export function showEditor(fileId) {
     if (fileId !== null) {
-        for (var _i = 0, filesEditors_1 = filesEditors; _i < filesEditors_1.length; _i++) {
-            var fileEditor = filesEditors_1[_i];
-            var id = String(fileEditor.fileId);
-            var editorElement = document.getElementById("file-editor-".concat(id));
+        for (const fileEditor of filesEditors) {
+            const id = String(fileEditor.fileId);
+            const editorElement = document.getElementById(`file-editor-${id}`);
             if (editorElement) {
-                var isActive = id == fileId.toString();
+                const isActive = id == fileId.toString();
                 editorElement.style.display = isActive ? 'block' : 'none';
                 if (isActive) {
                     fileEditor.aceEditor.focus();
@@ -59,24 +57,24 @@ export function showEditor(fileId) {
     }
 }
 export function updateEditor() {
-    var selectedFileId = getSelectedFileId();
+    const selectedFileId = getSelectedFileId();
     if (selectedFileId !== null) {
-        var fileEditor = filesEditors.find(function (editor) { return editor.fileId === selectedFileId; });
+        const fileEditor = filesEditors.find(editor => editor.fileId === selectedFileId);
         if (fileEditor) {
-            var VMState = vm.state;
-            var aceEditor = fileEditor.aceEditor;
-            var cursors = document.getElementsByClassName("ace_hidden-cursors");
+            const VMState = vm.state;
+            const aceEditor = fileEditor.aceEditor;
+            const cursors = document.getElementsByClassName("ace_hidden-cursors");
             if (VMState === "edit") {
                 aceEditor.setOptions({
                     readOnly: false,
                     highlightActiveLine: true,
                     highlightGutterLine: true
                 });
-                for (var i = 0; i < cursors.length; i++) {
+                for (let i = 0; i < cursors.length; i++) {
                     cursors[i].style.display = "block";
                 }
-                var markers = aceEditor.session.getMarkers(false);
-                for (var i in markers) {
+                let markers = aceEditor.session.getMarkers(false);
+                for (let i in markers) {
                     if (markers[i].clazz === "next-instruction") {
                         aceEditor.session.removeMarker(markers[i].id);
                     }
@@ -90,19 +88,19 @@ export function updateEditor() {
                     highlightActiveLine: false,
                     highlightGutterLine: false
                 });
-                for (var i = 0; i < cursors.length; i++) {
+                for (let i = 0; i < cursors.length; i++) {
                     cursors[i].style.display = "none";
                 }
-                var markers = aceEditor.session.getMarkers(false);
-                for (var i in markers) {
+                let markers = aceEditor.session.getMarkers(false);
+                for (let i in markers) {
                     if (markers[i].clazz === "next-instruction") {
                         aceEditor.session.removeMarker(markers[i].id);
                     }
                 }
                 aceEditor.session.clearBreakpoints();
-                var nextInstructionLine = vm.nextInstructionLineNumber;
+                const nextInstructionLine = vm.nextInstructionLineNumber;
                 if (nextInstructionLine) {
-                    var Range_1 = ace.require('ace/range').Range, range = new Range_1(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
+                    let Range = ace.require('ace/range').Range, range = new Range(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
                     aceEditor.session.addMarker(range, "next-instruction", "fullLine", false);
                     aceEditor.session.setBreakpoint(nextInstructionLine - 1, "breakpoint");
                 }

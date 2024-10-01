@@ -1,8 +1,8 @@
-var Registers = /** @class */ (function () {
-    function Registers(names) {
+export class Registers {
+    constructor(names) {
         this.registers = [];
-        for (var i = 0; i < names.length; i++) {
-            var registerName = names[i];
+        for (let i = 0; i < names.length; i++) {
+            const registerName = names[i];
             this.registers.push({
                 name: registerName,
                 number: i,
@@ -10,22 +10,19 @@ var Registers = /** @class */ (function () {
             });
         }
     }
-    Registers.prototype.get = function (name) {
-        var register = this.registers.find(function (reg) { return reg.name === name; });
+    get(name) {
+        let register = this.registers.find(reg => reg.name === name);
         if (!register) {
-            var number_1 = parseInt(name.split('$')[1], 10);
-            if (!isNaN(number_1)) {
-                register = this.registers.find(function (reg) { return reg.number === number_1; });
+            const number = parseInt(name.split('$')[1], 10);
+            if (!isNaN(number)) {
+                register = this.registers.find(reg => reg.number === number);
             }
         }
         return register;
-    };
-    Registers.prototype.reset = function () {
-        for (var _i = 0, _a = this.registers; _i < _a.length; _i++) {
-            var register = _a[_i];
+    }
+    reset() {
+        for (let register of this.registers) {
             register.value = 0;
         }
-    };
-    return Registers;
-}());
-export { Registers };
+    }
+}

@@ -51,13 +51,8 @@ export class CPU {
         this.formats.set('J', new J_Format());
     }
 
-    fetch(): Word {
-        const word = this.memory.fetch(this.pc);
-        if (word) {
-            return word;
-        } else {
-            return 0x00000000;
-        }
+    fetchInstruction(): Word {
+        return this.memory.fetch(this.pc);
     }
 
     decode(instructionCode: Word): Instruction | undefined {
@@ -66,7 +61,7 @@ export class CPU {
 
     execute() {
         if (this.pc <= this.textEndingAddress) {
-            const instructionCode = this.fetch();
+            const instructionCode = this.fetchInstruction();
             const instruction = this.decode(instructionCode);
             if (instruction) {
 
@@ -76,7 +71,6 @@ export class CPU {
                     let params = format.disassemble(instructionCode);
 
                     instruction.execute(this, params);
-                    this.pc += this.instructionBytesLength;
 
                 }
 
@@ -94,6 +88,8 @@ export class CPU {
         this.textEndingAddress = this.textStartingAddress;
         this.dataAddress = this.dataStartingAddress;
         this.registers.reset();
+        this.registers.get("$gp")!.value = 0x10008000;
+        this.registers.get("$sp")!.value = 0x7fffeffc;
         this.pc = this.textStartingAddress;
         this.lo = 0x00000000;
         this.hi = 0x00000000;
@@ -119,7 +115,6 @@ export class CPU {
     }
 
     getInstructionByCode(code: Word): { instruction: Instruction, basic: string } | undefined {
-
         const opcode = Utils.getBits(code, 31, 26);
         let funct: number | undefined = undefined;
         if (opcode === 0x00) {
@@ -128,32 +123,32 @@ export class CPU {
 
         let foundInstruction: Instruction | undefined = undefined;
 
-        this.instructionsSet.instructions.forEach((instruction) => {
-            if (foundInstruction) return;
+        for (const instruction of this.instructionsSet.instructions) {
             if (instruction.opcode === opcode) {
                 if (funct !== undefined) {
                     if (instruction.funct === funct) {
                         foundInstruction = instruction;
+                        break;
                     }
                 } else {
                     if (!instruction.funct) {
                         foundInstruction = instruction;
+                        break;
                     }
                 }
             }
-        });
+        }
 
         if (foundInstruction) {
-            // @ts-ignore
             const format = this.getFormat(foundInstruction.format);
             if (format) {
                 let params = format.disassemble(code);
-                // @ts-ignore
                 const basic = foundInstruction.basic(params);
-                return { instruction: foundInstruction, basic: basic };
+                return { instruction: foundInstruction, basic };
             }
         }
 
+        console.error(`Instruction not found for code: ${code} (0x${code.toString(16).padStart(8, '0')})`);
         return undefined;
     }
 

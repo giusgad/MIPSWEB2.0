@@ -3,8 +3,8 @@ import { Utils } from "./Utils.js";
 import { Registers } from "./Registers.js";
 import { InstructionsSet } from "./InstructionsSet.js";
 import { I_Format, J_Format, R_Format } from "./Formats.js";
-var CPU = /** @class */ (function () {
-    function CPU() {
+export class CPU {
+    constructor() {
         this.memory = new Memory();
         this.textStartingAddress = 0x00400000;
         this.textAddress = this.textStartingAddress;
@@ -39,105 +39,97 @@ var CPU = /** @class */ (function () {
         this.formats.set('I', new I_Format());
         this.formats.set('J', new J_Format());
     }
-    CPU.prototype.fetch = function () {
-        var word = this.memory.fetch(this.pc);
-        if (word) {
-            return word;
-        }
-        else {
-            return 0x00000000;
-        }
-    };
-    CPU.prototype.decode = function (instructionCode) {
+    fetchInstruction() {
+        return this.memory.fetch(this.pc);
+    }
+    decode(instructionCode) {
         var _a;
         return (_a = this.getInstructionByCode(instructionCode)) === null || _a === void 0 ? void 0 : _a.instruction;
-    };
-    CPU.prototype.execute = function () {
+    }
+    execute() {
         if (this.pc <= this.textEndingAddress) {
-            var instructionCode = this.fetch();
-            var instruction = this.decode(instructionCode);
+            const instructionCode = this.fetchInstruction();
+            const instruction = this.decode(instructionCode);
             if (instruction) {
-                var format = this.getFormat(instruction.format);
+                const format = this.getFormat(instruction.format);
                 if (format) {
-                    var params = format.disassemble(instructionCode);
+                    let params = format.disassemble(instructionCode);
                     instruction.execute(this, params);
-                    this.pc += this.instructionBytesLength;
                 }
             }
             else {
-                throw new Error("Unknown instruction code: ".concat(instructionCode));
+                throw new Error(`Unknown instruction code: ${instructionCode}`);
             }
         }
         else {
             this.halt();
         }
-    };
-    CPU.prototype.reset = function () {
+    }
+    reset() {
         this.memory.reset();
         this.textAddress = this.textStartingAddress;
         this.textEndingAddress = this.textStartingAddress;
         this.dataAddress = this.dataStartingAddress;
         this.registers.reset();
+        this.registers.get("$gp").value = 0x10008000;
+        this.registers.get("$sp").value = 0x7fffeffc;
         this.pc = this.textStartingAddress;
         this.lo = 0x00000000;
         this.hi = 0x00000000;
         this.halted = false;
-    };
-    CPU.prototype.halt = function () {
+    }
+    halt() {
         this.halted = true;
-    };
-    CPU.prototype.isHalted = function () {
+    }
+    isHalted() {
         return this.halted;
-    };
-    CPU.prototype.storeInstruction = function (code) {
+    }
+    storeInstruction(code) {
         this.memory.store(this.textAddress, code);
         this.textEndingAddress = this.textAddress;
         this.textAddress += this.instructionBytesLength;
-    };
-    CPU.prototype.getFormat = function (format) {
+    }
+    getFormat(format) {
         return this.formats.get(format);
-    };
-    CPU.prototype.getInstructionByCode = function (code) {
-        var opcode = Utils.getBits(code, 31, 26);
-        var funct = undefined;
+    }
+    getInstructionByCode(code) {
+        const opcode = Utils.getBits(code, 31, 26);
+        let funct = undefined;
         if (opcode === 0x00) {
             funct = Utils.getBits(code, 5, 0);
         }
-        var foundInstruction = undefined;
-        this.instructionsSet.instructions.forEach(function (instruction) {
-            if (foundInstruction)
-                return;
+        let foundInstruction = undefined;
+        for (const instruction of this.instructionsSet.instructions) {
             if (instruction.opcode === opcode) {
                 if (funct !== undefined) {
                     if (instruction.funct === funct) {
                         foundInstruction = instruction;
+                        break;
                     }
                 }
                 else {
                     if (!instruction.funct) {
                         foundInstruction = instruction;
+                        break;
                     }
                 }
             }
-        });
+        }
         if (foundInstruction) {
-            // @ts-ignore
-            var format = this.getFormat(foundInstruction.format);
+            const format = this.getFormat(foundInstruction.format);
             if (format) {
-                var params = format.disassemble(code);
-                // @ts-ignore
-                var basic = foundInstruction.basic(params);
-                return { instruction: foundInstruction, basic: basic };
+                let params = format.disassemble(code);
+                const basic = foundInstruction.basic(params);
+                return { instruction: foundInstruction, basic };
             }
         }
+        console.error(`Instruction not found for code: ${code} (0x${code.toString(16).padStart(8, '0')})`);
         return undefined;
-    };
-    CPU.prototype.getRegisters = function () {
+    }
+    getRegisters() {
         return this.registers.registers;
-    };
-    CPU.prototype.getMemory = function () {
+    }
+    getMemory() {
         return this.memory.get();
-    };
-    return CPU;
-}());
-export { CPU };
+    }
+}

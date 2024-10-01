@@ -1,21 +1,15 @@
-var DataDirective = /** @class */ (function () {
-    function DataDirective() {
-    }
-    DataDirective.prototype.assemble = function (parts, assembler) {
+class DataDirective {
+    assemble(parts, assembler) {
         assembler.assembleData(parts);
-    };
-    return DataDirective;
-}());
-var TextDirective = /** @class */ (function () {
-    function TextDirective() {
     }
-    TextDirective.prototype.assemble = function (parts, assembler) {
+}
+class TextDirective {
+    assemble(parts, assembler) {
         assembler.assembleInstruction(parts);
-    };
-    return TextDirective;
-}());
-var Assembler = /** @class */ (function () {
-    function Assembler(cpu) {
+    }
+}
+export class Assembler {
+    constructor(cpu) {
         this.assembledLines = [];
         this.directives = new Map([
             [".data", new DataDirective()],
@@ -24,24 +18,24 @@ var Assembler = /** @class */ (function () {
         this.directive = this.directives.get(".text");
         this.cpu = cpu;
     }
-    Assembler.prototype.assemble = function (program) {
+    assemble(program) {
         this.reset();
-        var lines = program.split('\n');
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
+        const lines = program.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
             if (line.trim().length > 0) {
                 this.assembleLine(i + 1, lines[i]);
             }
         }
         return this.assembledLines;
-    };
-    Assembler.prototype.assembleLine = function (lineNumber, line) {
+    }
+    assembleLine(lineNumber, line) {
         this.lineNumber = lineNumber;
-        var parts = line.split('#')[0].trim().replace(/,/g, '').split(/\s+/);
+        const parts = line.split('#')[0].trim().replace(/,/g, '').split(/\s+/);
         if (parts.length === 0 || parts[0] === '') {
             return undefined;
         }
-        var directive = this.directives.get(parts[0]);
+        let directive = this.directives.get(parts[0]);
         if (directive) {
             this.directive = directive;
         }
@@ -50,18 +44,18 @@ var Assembler = /** @class */ (function () {
                 this.directive.assemble(parts, this);
             }
         }
-    };
-    Assembler.prototype.assembleData = function (parts) {
-    };
-    Assembler.prototype.assembleInstruction = function (parts) {
-        var instructionSymbol = parts[0];
-        var source = parts.join(' ');
-        var instruction = this.cpu.instructionsSet.getBySymbol(instructionSymbol);
+    }
+    assembleData(parts) {
+    }
+    assembleInstruction(parts) {
+        const instructionSymbol = parts[0];
+        const source = parts.join(' ');
+        const instruction = this.cpu.instructionsSet.getBySymbol(instructionSymbol);
         if (!instruction)
-            throw new Error("Instruction ".concat(source, " not found"));
-        var format = this.cpu.getFormat(instruction.format);
+            throw new Error(`Instruction ${source} not found`);
+        const format = this.cpu.getFormat(instruction.format);
         if (format) {
-            var assembledInstruction = format.assemble(parts, instruction, this.cpu);
+            const assembledInstruction = format.assemble(parts, instruction, this.cpu);
             if (this.lineNumber !== undefined) {
                 this.assembledLines.push({
                     lineNumber: this.lineNumber,
@@ -73,12 +67,10 @@ var Assembler = /** @class */ (function () {
             }
             this.cpu.storeInstruction(assembledInstruction.code);
         }
-    };
-    Assembler.prototype.reset = function () {
+    }
+    reset() {
         this.assembledLines = [];
         this.lineNumber = undefined;
         this.directive = this.directives.get(".text");
-    };
-    return Assembler;
-}());
-export { Assembler };
+    }
+}

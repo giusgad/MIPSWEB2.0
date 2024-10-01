@@ -1,25 +1,28 @@
-var Memory = /** @class */ (function () {
-    function Memory() {
+export class Memory {
+    constructor() {
         this.memory = new Map();
     }
-    Memory.prototype.store = function (address, value) {
+    store(address, value) {
         this.memory.set(address, value);
-    };
-    Memory.prototype.fetch = function (address) {
-        return this.memory.get(address);
-    };
-    Memory.prototype.get = function () {
-        var sortedKeys = Array.from(this.memory.keys()).sort(function (a, b) { return a - b; });
-        var sortedMemory = new Map();
-        for (var _i = 0, sortedKeys_1 = sortedKeys; _i < sortedKeys_1.length; _i++) {
-            var key = sortedKeys_1[_i];
+    }
+    fetch(address) {
+        const word = this.memory.get(address);
+        if (word !== undefined) {
+            return word;
+        }
+        else {
+            return 0x00000000;
+        }
+    }
+    get() {
+        const sortedKeys = Array.from(this.memory.keys()).sort((a, b) => a - b);
+        const sortedMemory = new Map();
+        for (const key of sortedKeys) {
             sortedMemory.set(key, this.memory.get(key));
         }
         return sortedMemory;
-    };
-    Memory.prototype.reset = function () {
+    }
+    reset() {
         this.memory.clear();
-    };
-    return Memory;
-}());
-export { Memory };
+    }
+}

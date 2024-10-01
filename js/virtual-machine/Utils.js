@@ -1,37 +1,61 @@
-var Utils = /** @class */ (function () {
-    function Utils() {
-    }
-    Utils.getBits = function (word, to, from) {
+export class Utils {
+    static getBits(word, to, from) {
         if (to < from || to > 31 || from < 0) {
-            throw new Error("Invalid parameters: 'from' (".concat(from, ") and 'to' (").concat(to, ") must be within valid range."));
+            throw new Error(`Invalid parameters: 'from' (${from}) and 'to' (${to}) must be within valid range.`);
         }
-        var numBits = to - from + 1;
+        const numBits = to - from + 1;
         return (word >>> from) & ((1 << numBits) - 1);
-    };
-    Utils.setBits = function (word, bits, to, from) {
+    }
+    static setBits(word, bits, to, from) {
         if (to < from || to > 31 || from < 0) {
-            throw new Error("Invalid parameters: 'from' (".concat(from, ") and 'to' (").concat(to, ") must be within valid range."));
+            throw new Error(`Invalid parameters: 'from' (${from}) and 'to' (${to}) must be within valid range.`);
         }
-        var numBits = to - from + 1;
-        var maxBitsValue = (1 << numBits) - 1; // Valore massimo rappresentabile con 'numBits' bit
+        const numBits = to - from + 1;
+        const maxBitsValue = (1 << numBits) - 1; // Valore massimo rappresentabile con 'numBits' bit
         if (bits > maxBitsValue) {
-            throw new Error("Bits value (".concat(bits, ") exceeds maximum (").concat(maxBitsValue, ") for the range from ").concat(from, " to ").concat(to, "."));
+            throw new Error(`Bits value (${bits}) exceeds maximum (${maxBitsValue}) for the range from ${from} to ${to}.`);
         }
-        var mask = ((1 << numBits) - 1) << from;
-        word &= ~mask;
-        word |= (bits << from) & mask;
-        return word;
-    };
-    Utils.convertToHex = function (value) {
+        const mask = ((1 << numBits) - 1) << from;
+        word &= ~mask; // Resetta i bit nel range specificato
+        word |= (bits << from) & mask; // Imposta i nuovi bit
+        // Forza `word` a essere trattato come unsigned a 32 bit.
+        return word >>> 0; // Il `>>> 0` forza il numero a essere unsigned
+    }
+    static convertToHex(value) {
         return '0x' + value.toString(16).padStart(8, '0');
-    };
-    Utils.convertToBasic = function (value, cpu) {
-        var _a;
-        return (_a = cpu.getInstructionByCode(value)) === null || _a === void 0 ? void 0 : _a.basic;
-    };
-    Utils.convertToBinary = function (value) {
+    }
+    static convertToBasic(value, cpu) {
+        const instruction = cpu.getInstructionByCode(value);
+        if (instruction) {
+            return instruction.basic;
+        }
+        else {
+            return value;
+        }
+    }
+    static convertToBinary(value) {
         return '0b' + value.toString(2).padStart(32, '0');
-    };
-    return Utils;
-}());
-export { Utils };
+    }
+    static toSigned(value) {
+        return value > 0x7FFFFFFF ? value - 0x100000000 : value;
+    }
+    static toUnsigned(value) {
+        return value >>> 0;
+    }
+    static asUnsigned(value, bits) {
+        const mask = (1 << bits) - 1;
+        return value & mask;
+    }
+    static asSigned(value, bits) {
+        const mask = (1 << bits) - 1;
+        value &= mask;
+        const signBit = 1 << (bits - 1);
+        return (value ^ signBit) - signBit;
+    }
+    static detectSignedOverflow(result) {
+        return result > 0x7FFFFFFF || result < -0x80000000;
+    }
+    static detectUnsignedOverflow(result) {
+        return result > 0xFFFFFFFF;
+    }
+}

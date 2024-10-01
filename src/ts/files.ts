@@ -12,27 +12,67 @@ export type file = {
 export const samples: { [name: string]: string } = {
     "sample":
 `
-.data
+# LUI, ORI
+LUI $t0, 0x1234        # $t0 = 0x12340000
+ORI $t0, $t0, 0x5678   # $t0 = 0x12345678
 
+LUI $t1, 0x0000        # $t1 = 0x00000000
+ORI $t1, $t1, 0x0005   # $t1 = 0x00000005
 
+LUI $t2, 0x0000        # $t2 = 0x00000000
+ORI $t2, $t2, 0x0003   # $t2 = 0x00000003
 
-.text
+# ADD
+ADD $t3, $t1, $t2      # $t3 = $t1 + $t2 = 5 + 3 = 8
 
-    addi $t1, $zero, 1  # 0 + 1 = 1 -> $t1
-    addi $t2, $zero, 2  # 0 + 2 = 2 -> $t2
-    addi $t3, $zero, 3  # 0 + 3 = 3 -> $t3
-    addi $t4, $zero, 4  # 0 + 4 = 4 -> $t4
-    addi $t5, $zero, 5  # 0 + 5 = 5 -> $t5
-    sub  $t6, $t4, $t3  # 4 - 3 = 1  -> $t6
-    add  $t7, $t6, $t2  # 1 + 2 = 3  -> $t7
-    addi $s0, $t7, 7    # 3 + 7 = 10 -> $s0
-    
-    mult $t7, $s0
-    mflo $s1            # 3 * 10 = 30 -> $s1
-    
-    div $s1, $t4
-    mflo $s2            # 30 / 4 = 7 -> $s2
-    mfhi $s3            # 30 % 4 = 2 -> $s3
+# SUB
+SUB $t4, $t1, $t2      # $t4 = $t1 - $t2 = 5 - 3 = 2
+
+# ADDI
+ADDI $t5, $t1, 10      # $t5 = $t1 + 10 = 5 + 10 = 15
+
+# ADDU
+ADDU $t6, $t0, $t0     # $t6 = $t0 + $t0
+
+# SUBU
+SUBU $t7, $t0, $t0     # $t7 = $t0 - $t0 = 0
+
+# ADDIU
+ADDIU $s0, $t1, -1     # $s0 = $t1 + (-1) = 5 - 1 = 4
+
+# MULT
+MULT $t1, $t2          # $t1 * $t2 = 5 * 3
+MFLO $s1               # $s1 = lown (15)
+MFHI $s2               # $s2 = high (0)
+
+# DIV
+DIV $t1, $t2           # $t1 / $t2 = 5 / 3
+MFLO $s3               # $s3 = 5 / 3 = 1
+MFHI $s4               # $s4 = 5 % 3 = 2
+
+# AND
+AND $s5, $t0, $t3      # $s5 = $t0 AND $t3
+
+# OR
+OR $s6, $t0, $t3       # $s6 = $t0 OR $t3
+
+# ANDI
+ANDI $s7, $t0, 0x00FF  # $s7 = $t0 AND 0x00FF
+
+# ORI
+ORI $t8, $t0, 0x00FF   # $t8 = $t0 OR 0x00FF
+
+# SLL
+SLL $t9, $t1, 2        # $t9 = $t1 << 2 (5 << 2 = 20)
+
+# SRL
+SRL $v0, $t1, 1        # $v0 = $t1 >> 1 (5 >> 1 = 2)
+
+# SW
+SW $t0, 0($sp)         # $t0 -> stack
+
+# LW
+LW $a0, 0($sp)         # stack -> $a0
 `
 };
 
