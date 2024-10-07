@@ -29,6 +29,7 @@ export class VirtualMachine {
   }
 
   assemble(program: string) {
+    this.stop();
     this.assembledLines = this.assembler.assemble(program);
     if (this.assembledLines.length > 0) {
       this.nextInstructionLineNumber = this.assembledLines[this.assembledLinesIndex].lineNumber;

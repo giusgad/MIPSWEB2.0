@@ -18,7 +18,7 @@ export class R_Format {
             basic = `${instruction.symbol.toLowerCase()} $${rs.number} $${rt.number}`;
         }
         else if (instruction.symbol === 'MFLO' || instruction.symbol === 'MFHI') {
-            // Formato: OP rd
+            // OP rd
             rd = cpu.registers.get(parts[1]);
             if (!rd) {
                 throw new Error(`Invalid params for instruction ${parts.join(' ')}`);
@@ -46,24 +46,24 @@ export class R_Format {
             basic = `${instruction.symbol.toLowerCase()} $${rd.number} $${rs.number} $${rt.number}`;
         }
         let code = 0;
-        code = Utils.setBits(code, opcode, 31, 26);
-        code = Utils.setBits(code, rs.number, 25, 21);
-        code = Utils.setBits(code, rt.number, 20, 16);
-        code = Utils.setBits(code, rd.number, 15, 11);
-        code = Utils.setBits(code, shamt, 10, 6);
-        code = Utils.setBits(code, funct, 5, 0);
+        code = Utils.setBits(code, Utils.asUnsigned(opcode, 6), 31, 26);
+        code = Utils.setBits(code, Utils.asUnsigned(rs.number, 5), 25, 21);
+        code = Utils.setBits(code, Utils.asUnsigned(rt.number, 5), 20, 16);
+        code = Utils.setBits(code, Utils.asUnsigned(rd.number, 5), 15, 11);
+        code = Utils.setBits(code, Utils.asUnsigned(shamt, 5), 10, 6);
+        code = Utils.setBits(code, Utils.asUnsigned(funct, 6), 5, 0);
         return {
             code,
             basic
         };
     }
     disassemble(instructionCode) {
-        const opcode = Utils.getBits(instructionCode, 31, 26);
-        const rs = Utils.getBits(instructionCode, 25, 21);
-        const rt = Utils.getBits(instructionCode, 20, 16);
-        const rd = Utils.getBits(instructionCode, 15, 11);
-        const shamt = Utils.getBits(instructionCode, 10, 6);
-        const funct = Utils.getBits(instructionCode, 5, 0);
+        const opcode = Utils.asUnsigned(Utils.getBits(instructionCode, 31, 26), 6);
+        const rs = Utils.asUnsigned(Utils.getBits(instructionCode, 25, 21), 5);
+        const rt = Utils.asUnsigned(Utils.getBits(instructionCode, 20, 16), 5);
+        const rd = Utils.asUnsigned(Utils.getBits(instructionCode, 15, 11), 5);
+        const shamt = Utils.asUnsigned(Utils.getBits(instructionCode, 10, 6), 5);
+        const funct = Utils.asUnsigned(Utils.getBits(instructionCode, 5, 0), 6);
         return { opcode, rs, rt, rd, shamt, funct };
     }
 }
@@ -116,9 +116,9 @@ export class I_Format {
             basic = `${instruction.symbol.toLowerCase()} $${rt.number} $${rs.number} ${immediate}`;
         }
         let code = 0;
-        code = Utils.setBits(code, opcode, 31, 26);
-        code = Utils.setBits(code, rs.number, 25, 21);
-        code = Utils.setBits(code, rt.number, 20, 16);
+        code = Utils.setBits(code, Utils.asUnsigned(opcode, 6), 31, 26);
+        code = Utils.setBits(code, Utils.asUnsigned(rs.number, 5), 25, 21);
+        code = Utils.setBits(code, Utils.asUnsigned(rt.number, 5), 20, 16);
         code = Utils.setBits(code, Utils.asSigned(immediate, 16), 15, 0);
         return {
             code,
@@ -126,9 +126,9 @@ export class I_Format {
         };
     }
     disassemble(instructionCode) {
-        const opcode = Utils.getBits(instructionCode, 31, 26);
-        const rs = Utils.getBits(instructionCode, 25, 21);
-        const rt = Utils.getBits(instructionCode, 20, 16);
+        const opcode = Utils.asUnsigned(Utils.getBits(instructionCode, 31, 26), 6);
+        const rs = Utils.asUnsigned(Utils.getBits(instructionCode, 25, 21), 5);
+        const rt = Utils.asUnsigned(Utils.getBits(instructionCode, 20, 16), 5);
         const immediate = Utils.asSigned(Utils.getBits(instructionCode, 15, 0), 16);
         return { opcode, rs, rt, immediate };
     }
@@ -140,8 +140,8 @@ export class J_Format {
             throw new Error(`Invalid params for instruction ${parts.join(' ')}`);
         const jumpAddress = (address >>> 2) & 0x03FFFFFF;
         let code = 0;
-        code = Utils.setBits(code, instruction.opcode, 31, 26);
-        code = Utils.setBits(code, jumpAddress, 25, 0);
+        code = Utils.setBits(code, Utils.asUnsigned(instruction.opcode, 6), 31, 26);
+        code = Utils.setBits(code, Utils.asUnsigned(jumpAddress, 26), 25, 0);
         const basic = `${parts[0]} ${address}`;
         return {
             code,
@@ -149,8 +149,8 @@ export class J_Format {
         };
     }
     disassemble(instructionCode) {
-        const opcode = Utils.getBits(instructionCode, 31, 26);
-        const address = Utils.getBits(instructionCode, 25, 0);
+        const opcode = Utils.asUnsigned(Utils.getBits(instructionCode, 31, 26), 6);
+        const address = Utils.asUnsigned(Utils.getBits(instructionCode, 25, 0), 26);
         return { opcode, address };
     }
 }

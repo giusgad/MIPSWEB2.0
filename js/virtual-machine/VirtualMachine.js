@@ -8,6 +8,7 @@ export class VirtualMachine {
         this.state = "edit";
     }
     assemble(program) {
+        this.stop();
         this.assembledLines = this.assembler.assemble(program);
         if (this.assembledLines.length > 0) {
             this.nextInstructionLineNumber = this.assembledLines[this.assembledLinesIndex].lineNumber;

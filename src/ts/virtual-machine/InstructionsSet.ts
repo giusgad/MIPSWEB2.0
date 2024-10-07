@@ -16,12 +16,8 @@ export abstract class Instruction {
         this.params = params;
         this.name = name;
         this.format = format;
-        this.opcode = opcode;
-        if (funct) {
-            this.funct = funct;
-        } else {
-            this.funct = 0x00;
-        }
+        this.opcode = Utils.asUnsigned(opcode, 6);
+        this.funct = funct ? Utils.asUnsigned(funct, 6) : 0x00;
     }
 
     abstract execute(cpu: CPU, params: Params): void;
@@ -89,6 +85,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -128,6 +125,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -145,6 +143,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -169,6 +168,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -193,6 +193,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -225,6 +226,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -251,6 +253,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -274,6 +277,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -300,6 +304,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -323,6 +328,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -342,6 +348,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -361,6 +368,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -370,12 +378,11 @@ export class InstructionsSet {
                     0x02);
             }
             execute(cpu: CPU, params: Params): void {
-                const registers = cpu.getRegisters();
-                const address = params.address!;
-                console.error("TO-DO: J");
-                cpu.pc += cpu.instructionBytesLength;
+                const address = Utils.asUnsigned(params.address!, 26);
+                cpu.pc = (cpu.pc & 0xF0000000) | (address << 2);
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -391,7 +398,7 @@ export class InstructionsSet {
                 let immediate = params.immediate!;
 
                 const rsVal = Utils.toSigned(registers[rs].value);
-                immediate = Utils.asSigned(immediate, 16);  // Estendi il valore immediato a 16 bit signed
+                immediate = Utils.asSigned(immediate, 16);
                 const result = rsVal + immediate;
 
                 if (Utils.detectSignedOverflow(result)) {
@@ -402,6 +409,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -420,10 +428,11 @@ export class InstructionsSet {
 
                 immediate = Utils.asSigned(immediate, 16);
 
-                registers[rt].value = (registers[rs].value + immediate) >>> 0;
+                registers[rt].value = Utils.toUnsigned(registers[rs].value + immediate);
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -437,11 +446,12 @@ export class InstructionsSet {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
                 const rs = params.rs!;
-                const immediate = params.immediate! & 0xFFFF;
+                const immediate = Utils.asUnsigned(params.immediate!, 16);
                 registers[rt].value = registers[rs].value & immediate;
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -455,11 +465,12 @@ export class InstructionsSet {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
                 const rs = params.rs!;
-                const immediate = params.immediate! & 0xFFFF;
+                const immediate = Utils.asUnsigned(params.immediate!, 16);
                 registers[rt].value = registers[rs].value | immediate;
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -477,6 +488,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -490,7 +502,7 @@ export class InstructionsSet {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
                 const rs = params.rs!;
-                const offset = Utils.toSigned(params.immediate!);
+                const offset = Utils.asSigned(params.immediate!, 16);
                 const address = registers[rs].value + offset;
 
                 const word = cpu.memory.fetch(address);
@@ -502,6 +514,7 @@ export class InstructionsSet {
                 cpu.pc += cpu.instructionBytesLength;
             }
         }());
+
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super(
@@ -515,7 +528,7 @@ export class InstructionsSet {
                 const registers = cpu.getRegisters();
                 const rt = params.rt!;
                 const rs = params.rs!;
-                const offset = params.immediate!;
+                const offset = Utils.asSigned(params.immediate!, 16);
                 const address = registers[rs].value + offset;
                 const word = registers[rt].value;
                 cpu.memory.store(address, word);
@@ -526,40 +539,3 @@ export class InstructionsSet {
     }
 
 }
-
-/**
- * add
- * sub
- * addi
- * addu
- * subu
- * addiu
- * mul ?
- * mult
- * div
- * and
- * or
- * andi
- * ori
- * sll
- * srl
- * lw
- * sw
- * lui
- * la (pseudo-istruzione)
- * li (pseudo-istruzione)
- * mfhi
- * mflo
- * move (pseudo-istruzione)
- * beq ---
- * bne
- * bgt (pseudo-istruzione)
- * bge (pseudo-istruzione)
- * blt (pseudo-istruzione)
- * ble (pseudo-istruzione)
- * slt
- * slti
- * j
- * jr
- * jal
- */
