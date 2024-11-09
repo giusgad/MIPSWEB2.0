@@ -1,2 +1,2 @@
-# Simulatore MIPS per il web
+# MIPSWEB
 
