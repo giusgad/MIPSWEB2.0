@@ -1,5 +1,5 @@
 import { getSelectedFileId, updateFile } from "./files.js";
-import { vm } from "./app.js";
+import { state, vm } from "./app.js";
 export let filesEditors = [];
 export function addFileEditor(file) {
     const fileEditorElement = document.createElement('div');
@@ -61,7 +61,7 @@ export function updateEditor() {
     if (selectedFileId !== null) {
         const fileEditor = filesEditors.find(editor => editor.fileId === selectedFileId);
         if (fileEditor) {
-            const VMState = vm.state;
+            const VMState = state;
             const aceEditor = fileEditor.aceEditor;
             const cursors = document.getElementsByClassName("ace_hidden-cursors");
             if (VMState === "edit") {

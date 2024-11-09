@@ -137,6 +137,15 @@ body {
   bottom:0;
 }
 
+select {
+  outline: none;
+  background-color: @light-gray-4;
+  border-radius: @space-2;
+  border: 1px solid @light-gray-2;
+  font-size: @font-size-small;
+  color: @dark-gray-1;
+}
+
 .buttons {
   display: flex;
   padding: @space-3;
@@ -222,12 +231,15 @@ body {
     bottom: 0;
     .next-instruction {
       position: absolute;
-      background-color: rgba(@blue, 0.125);
     }
     .breakpoint {
       background-color: rgba(@blue, 0.5);
     }
   }
+}
+
+.next-instruction {
+  background-color: rgba(@blue, 0.125);
 }
 
 #opened-files {
@@ -355,10 +367,11 @@ body {
       padding: @space-2;
       transition: all 0.5s;
       overflow: scroll;
-      &:hover {
-        background-color: rgba(@light-gray-3, 0.5);
-        user-select: none;
-      }
+    }
+    .col-format {
+      display: flex;
+      padding-bottom: @space-2 + @space-1;
+      padding-top: 0;
     }
   }
   .rows {

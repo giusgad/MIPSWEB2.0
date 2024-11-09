@@ -1,61 +1,103 @@
 export class Utils {
-    static getBits(word, to, from) {
-        if (to < from || to > 31 || from < 0) {
-            throw new Error(`Invalid parameters: 'from' (${from}) and 'to' (${to}) must be within valid range.`);
-        }
-        const numBits = to - from + 1;
-        return (word >>> from) & ((1 << numBits) - 1);
+    static toHex(value, bits = 32) {
+        const hex = (value >>> 0).toString(16).padStart(Math.ceil(bits / 4), '0');
+        return '0x' + hex;
     }
-    static setBits(word, bits, to, from) {
-        if (to < from || to > 31 || from < 0) {
-            throw new Error(`Invalid parameters: 'from' (${from}) and 'to' (${to}) must be within valid range.`);
-        }
-        const numBits = to - from + 1;
-        const maxBitsValue = (1 << numBits) - 1; // Valore massimo rappresentabile con 'numBits' bit
-        if (bits > maxBitsValue) {
-            throw new Error(`Bits value (${bits}) exceeds maximum (${maxBitsValue}) for the range from ${from} to ${to}.`);
-        }
-        const mask = ((1 << numBits) - 1) << from;
-        word &= ~mask; // Resetta i bit nel range specificato
-        word |= (bits << from) & mask; // Imposta i nuovi bit
-        // Forza `word` a essere trattato come unsigned a 32 bit.
-        return word >>> 0; // Il `>>> 0` forza il numero a essere unsigned
+    static toBinary(value, bits = 32) {
+        const binary = (value >>> 0).toString(2).padStart(bits, '0');
+        return binary;
     }
-    static convertToHex(value) {
-        return '0x' + value.toString(16).padStart(8, '0');
+    static toAscii(value, bits) {
+        if (bits <= 0 || bits % 8 !== 0) {
+            throw new Error(`The number of bits (${bits}) must be a positive multiple of 8.`);
+        }
+        let ascii = [];
+        for (let i = bits - 8; i >= 0; i -= 8) {
+            const byte = (value >> i) & 0xFF;
+            const char = String.fromCharCode(byte);
+            if (char) {
+                ascii.push(char);
+            }
+        }
+        return ascii;
     }
-    static convertToBasic(value, cpu) {
-        const instruction = cpu.getInstructionByCode(value);
-        if (instruction) {
-            return instruction.basic;
+    static toSigned(value, bits) {
+        const min = -1 * Math.pow(2, bits - 1);
+        const max = Math.pow(2, bits - 1) - 1;
+        if (value < min || value > max) {
+            throw new Error(`Value ${value} is out of range for signed ${bits}-bit representation. Expected between ${min} and ${max}.`);
+        }
+        if (value >= 0) {
+            return value;
+        }
+        else {
+            return Math.pow(2, bits) + value;
+        }
+    }
+    static fromSigned(value, bits) {
+        if (value >= Math.pow(2, bits - 1)) {
+            return value - Math.pow(2, bits);
         }
         else {
             return value;
         }
     }
-    static convertToBinary(value) {
-        return '0b' + value.toString(2).padStart(32, '0');
+    static toUnsigned(value, bits) {
+        const min = 0;
+        const max = Math.pow(2, bits) - 1;
+        if (value < min || value > max) {
+            throw new Error(`Value ${value} is out of range for unsigned ${bits}-bit representation. Expected between ${min} and ${max}.`);
+        }
+        return value;
     }
-    static toSigned(value) {
-        return value > 0x7FFFFFFF ? value - 0x100000000 : value;
+}
+export class Binary {
+    constructor(value = 0, bits = 32, signed = false) {
+        this.binary = 0;
+        this.length = bits;
+        this.signed = signed;
+        this.set(value);
     }
-    static toUnsigned(value) {
-        return value >>> 0;
+    set(value, signed = this.signed) {
+        this.signed = signed;
+        if (signed) {
+            this.binary = Utils.toSigned(value, this.length);
+        }
+        else {
+            this.binary = Utils.toUnsigned(value, this.length);
+        }
     }
-    static asUnsigned(value, bits) {
-        const mask = (1 << bits) - 1;
-        return value & mask;
+    getValue() {
+        if (this.signed) {
+            return Utils.fromSigned(this.binary, this.length);
+        }
+        else {
+            return this.binary;
+        }
     }
-    static asSigned(value, bits) {
-        const mask = (1 << bits) - 1;
-        value &= mask;
-        const signBit = 1 << (bits - 1);
-        return (value ^ signBit) - signBit;
+    getBits(from, to, signed = false) {
+        const bits = from - to + 1;
+        const mask = ((1 << bits) - 1) << to;
+        const extractedBits = (this.binary & mask) >>> to;
+        if (signed) {
+            return new Binary(Utils.fromSigned(extractedBits, bits), bits, true);
+        }
+        else {
+            return new Binary(extractedBits, bits);
+        }
     }
-    static detectSignedOverflow(result) {
-        return result > 0x7FFFFFFF || result < -0x80000000;
+    setBits(bits, from, to) {
+        const mask = ((1 << (from - to + 1)) - 1) << to;
+        this.binary = ((this.binary & ~mask) | ((bits.binary << to) & mask)) >>> 0;
     }
-    static detectUnsignedOverflow(result) {
-        return result > 0xFFFFFFFF;
+    getHex() {
+        return Utils.toHex(this.binary, this.length);
+    }
+    getBinary() {
+        return Utils.toBinary(this.binary, this.length);
+    }
+    getAscii() {
+        const asciiArray = Utils.toAscii(this.binary, this.length);
+        return asciiArray.join(' ');
     }
 }

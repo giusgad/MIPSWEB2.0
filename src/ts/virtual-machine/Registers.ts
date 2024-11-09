@@ -1,14 +1,14 @@
-import {Word} from "./Utils.js";
+import {Binary} from "./Utils.js";
 
-export type Register = {
+export type register = {
     name: string,
     number?: number,
-    value: Word
+    binary: Binary
 }
 
 export class Registers {
 
-    registers: Register[] = [];
+    registers: register[] = [];
 
     constructor(names: string[]) {
         for (let i = 0; i < names.length; i++) {
@@ -16,18 +16,26 @@ export class Registers {
             this.registers.push({
                 name: registerName,
                 number: i,
-                value: 0
+                binary: new Binary(0, 32, true)
             });
         }
     }
 
-    get(name: string): Register | undefined {
+    get(name: string): register | undefined {
+        if (!name) {
+            return undefined;
+        }
+
         let register = this.registers.find(reg => reg.name === name);
 
         if (!register) {
-            const number = parseInt(name.split('$')[1], 10);
-            if (!isNaN(number)) {
-                register = this.registers.find(reg => reg.number === number);
+            const dollarIndex = name.indexOf('$');
+            if (dollarIndex !== -1) {
+                const numberStr = name.substring(dollarIndex + 1);
+                const number = parseInt(numberStr, 10);
+                if (!isNaN(number)) {
+                    register = this.registers.find(reg => reg.number === number);
+                }
             }
         }
 
@@ -36,7 +44,8 @@ export class Registers {
 
     reset() {
         for (let register of this.registers) {
-            register.value = 0;
+            register.binary.set(0);
         }
     }
+
 }

@@ -32,5 +32,8 @@
     "less-watch-compiler": "^1.16.3",
     "ts-jest": "^29.2.5",
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "psl": "^1.9.0"
   }
 }

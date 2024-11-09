@@ -1,76 +1,131 @@
-class DataDirective {
-    assemble(parts, assembler) {
-        assembler.assembleData(parts);
-    }
-}
-class TextDirective {
-    assemble(parts, assembler) {
-        assembler.assembleInstruction(parts);
-    }
-}
+import { Binary } from "./Utils.js";
+import { asciizDirective, asmDirective, byteDirective, spaceDirective, wordDirective } from "./Directives.js";
 export class Assembler {
     constructor(cpu) {
-        this.assembledLines = [];
+        this.labels = new Map();
+        this.section = ".text";
         this.directives = new Map([
-            [".data", new DataDirective()],
-            [".text", new TextDirective()]
+            [".asm", new asmDirective()],
+            [".word", new wordDirective()],
+            [".byte", new byteDirective()],
+            [".space", new spaceDirective()],
+            [".asciiz", new asciizDirective()],
         ]);
-        this.directive = this.directives.get(".text");
+        this.directive = this.directives.get(".asm");
+        this.addressLineMap = new Map();
         this.cpu = cpu;
+        this.textSegmentAddress = new Binary(this.cpu.textSegmentStart.getValue());
+        this.dataSegmentAddress = new Binary(this.cpu.dataSegmentStart.getValue());
     }
-    assemble(program) {
-        this.reset();
+    assemble(program, withLabels = false) {
         const lines = program.split('\n');
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            if (line.trim().length > 0) {
-                this.assembleLine(i + 1, lines[i]);
+            let line = lines[i].trim();
+            if (line === '' || line.startsWith('#'))
+                continue;
+            let tokens = this.tokenize(line);
+            if (tokens.length === 0)
+                continue;
+            if (tokens[0] === '.text') {
+                this.section = ".text";
+                this.directive = this.directives.get(".asm");
+                this.textSegmentAddress.set(this.cpu.textSegmentEnd.getValue());
+                continue;
+            }
+            else if (tokens[0] === '.data') {
+                this.section = ".data";
+                this.directive = this.directives.get(".word");
+                this.dataSegmentAddress.set(this.cpu.dataSegmentEnd.getValue());
+                continue;
+            }
+            if (tokens[0].endsWith(':')) {
+                const label = tokens[0].slice(0, -1);
+                if (!withLabels) {
+                    if (this.labels.has(label)) {
+                        throw new Error(`Duplicate label: ${label}`);
+                    }
+                    if (this.section === ".text") {
+                        this.labels.set(label, new Binary(this.textSegmentAddress.getValue()));
+                    }
+                    else {
+                        this.labels.set(label, new Binary(this.dataSegmentAddress.getValue()));
+                    }
+                }
+                tokens.shift();
+                if (tokens.length === 0)
+                    continue;
+            }
+            if (tokens[0] === ".globl")
+                continue;
+            const directive = this.directives.get(tokens[0]);
+            if (directive) {
+                this.directive = directive;
+                tokens.shift();
+            }
+            tokens = this.directive.tokenize(tokens);
+            if (withLabels) {
+                if (this.section === ".text") {
+                    this.directive.assemble(tokens, this.textSegmentAddress, this, i + 1);
+                }
+                else {
+                    this.directive.assemble(tokens, this.dataSegmentAddress, this, i + 1);
+                }
+            }
+            else {
+                if (this.section === ".text") {
+                    this.textSegmentAddress.set(this.textSegmentAddress.getValue() + 4);
+                }
+                else {
+                    this.dataSegmentAddress.set(this.dataSegmentAddress.getValue() + this.directive.size(tokens));
+                }
             }
         }
-        return this.assembledLines;
-    }
-    assembleLine(lineNumber, line) {
-        this.lineNumber = lineNumber;
-        const parts = line.split('#')[0].trim().replace(/,/g, '').split(/\s+/);
-        if (parts.length === 0 || parts[0] === '') {
-            return undefined;
-        }
-        let directive = this.directives.get(parts[0]);
-        if (directive) {
-            this.directive = directive;
+        if (withLabels) {
+            this.cpu.textSegmentEnd.set(this.textSegmentAddress.getValue());
+            this.cpu.dataSegmentEnd.set(this.dataSegmentAddress.getValue());
         }
         else {
-            if (this.directive) {
-                this.directive.assemble(parts, this);
-            }
+            this.textSegmentAddress = new Binary(this.cpu.textSegmentStart.getValue());
+            this.dataSegmentAddress = new Binary(this.cpu.dataSegmentStart.getValue());
+            this.section = ".text";
+            this.directive = this.directives.get(".asm");
+            this.assemble(program, true);
         }
     }
-    assembleData(parts) {
-    }
-    assembleInstruction(parts) {
-        const instructionSymbol = parts[0];
-        const source = parts.join(' ');
-        const instruction = this.cpu.instructionsSet.getBySymbol(instructionSymbol);
+    assembleInstruction(tokens) {
+        const symbol = tokens[0];
+        if (symbol.toLowerCase() === "nop")
+            return new Binary();
+        const instruction = this.cpu.instructionsSet.getBySymbol(symbol);
         if (!instruction)
-            throw new Error(`Instruction ${source} not found`);
+            throw new Error(`Instruction ${tokens.join(' ')} not found`);
         const format = this.cpu.getFormat(instruction.format);
-        if (format) {
-            const assembledInstruction = format.assemble(parts, instruction, this.cpu);
-            if (this.lineNumber !== undefined) {
-                this.assembledLines.push({
-                    lineNumber: this.lineNumber,
-                    source: source,
-                    basic: assembledInstruction.basic,
-                    code: '0x' + assembledInstruction.code.toString(16).padStart(8, '0'),
-                    address: '0x' + this.cpu.textAddress.toString(16).padStart(8, '0')
-                });
-            }
-            this.cpu.storeInstruction(assembledInstruction.code);
+        if (!format)
+            throw new Error(`Format ${instruction.format} for instruction ${tokens.join(' ')}`);
+        const code = format.assemble(tokens, instruction, this.cpu, this);
+        return code;
+    }
+    resolveLabel(token) {
+        if (!isNaN(Number(token))) {
+            return Number(token);
         }
+        const labelAddress = this.labels.get(token);
+        if (!labelAddress) {
+            throw new Error(`Label ${token} non trovata.`);
+        }
+        return ((labelAddress.getValue() - (this.textSegmentAddress.getValue() + 4)) >> 2);
+    }
+    tokenize(line) {
+        line = line.split('#')[0].trim();
+        return line.match(/"([^"]*)"|'([^']*)'|\S+/g) || [];
     }
     reset() {
-        this.assembledLines = [];
-        this.lineNumber = undefined;
-        this.directive = this.directives.get(".text");
+        this.labels.clear();
+        this.cpu.reset();
+        this.textSegmentAddress = new Binary(this.cpu.textSegmentStart.getValue());
+        this.dataSegmentAddress = new Binary(this.cpu.dataSegmentStart.getValue());
+        this.section = ".text";
+        this.directive = this.directives.get(".asm");
+        this.addressLineMap.clear();
     }
 }

@@ -1,19 +1,16 @@
-import {Memory} from "./Memory.js";
-import {Utils, Word} from "./Utils.js";
 import {Registers} from "./Registers.js";
-import {Instruction, InstructionsSet} from "./InstructionsSet.js";
+import {Memory} from "./Memory.js";
+import {Binary} from "./Utils.js";
+import {Instruction, Instructions} from "./Instructions.js";
 import {Format, I_Format, J_Format, R_Format} from "./Formats.js";
-
-export type Endianness = "big" | "little";
+import {Syscalls} from "./Syscalls.js";
 
 export class CPU {
 
-    memory: Memory = new Memory();
-    textStartingAddress: Word = 0x00400000;
-    textAddress: Word = this.textStartingAddress;
-    textEndingAddress: Word = this.textStartingAddress;
-    dataStartingAddress: Word = 0x10010000;
-    dataAddress: Word = this.dataStartingAddress;
+    textSegmentStart: Binary = new Binary(0x00400000);
+    textSegmentEnd: Binary = this.textSegmentStart;
+    dataSegmentStart: Binary = new Binary(0x10010000);
+    dataSegmentEnd: Binary = this.dataSegmentStart;
 
     registers: Registers = new Registers(
         [
@@ -31,102 +28,57 @@ export class CPU {
             "$ra"
         ]
     );
-    pc: Word = this.textStartingAddress;
-    lo: Word = 0x00000000;
-    hi: Word = 0x00000000;
+    pc: Binary = this.textSegmentStart;
+    lo: Binary = new Binary();
+    hi: Binary = new Binary();
 
-    instructionsSet: InstructionsSet = new InstructionsSet();
+    instructionsSet: Instructions = new Instructions();
+    syscallsSet: Syscalls = new Syscalls();
     formats: Map<string, Format> = new Map();
 
-    instructionBytesLength: number = 4;
-    endianness: Endianness = "big";
+    memory: Memory = new Memory();
 
     halted: boolean = false;
 
     constructor() {
-        this.registers.get("$gp")!.value = 0x10008000;
-        this.registers.get("$sp")!.value = 0x7fffeffc;
+        this.registers.get("$gp")!.binary = new Binary(0x10008000);
+        this.registers.get("$sp")!.binary = new Binary(0x7fffeffc);
         this.formats.set('R', new R_Format());
         this.formats.set('I', new I_Format());
         this.formats.set('J', new J_Format());
     }
 
-    fetchInstruction(): Word {
-        return this.memory.fetch(this.pc);
+    storeByte(address: Binary, value: Binary) {
+        this.memory.storeByte(address, value);
     }
 
-    decode(instructionCode: Word): Instruction | undefined {
-        return this.getInstructionByCode(instructionCode)?.instruction;
+    storeWord(address: Binary, value: Binary) {
+        this.memory.storeWord(address, value);
     }
 
-    execute() {
-        if (this.pc <= this.textEndingAddress) {
-            const instructionCode = this.fetchInstruction();
-            const instruction = this.decode(instructionCode);
-            if (instruction) {
-
-                const format = this.getFormat(instruction.format);
-                if (format) {
-
-                    let params = format.disassemble(instructionCode);
-
-                    instruction.execute(this, params);
-
-                }
-
-            } else {
-                throw new Error(`Unknown instruction code: ${instructionCode}`);
-            }
-        } else {
-            this.halt();
-        }
+    fetchByte(address: Binary): Binary {
+        return this.memory.fetchByte(address);
     }
 
-    reset() {
-        this.memory.reset();
-        this.textAddress = this.textStartingAddress;
-        this.textEndingAddress = this.textStartingAddress;
-        this.dataAddress = this.dataStartingAddress;
-        this.registers.reset();
-        this.registers.get("$gp")!.value = 0x10008000;
-        this.registers.get("$sp")!.value = 0x7fffeffc;
-        this.pc = this.textStartingAddress;
-        this.lo = 0x00000000;
-        this.hi = 0x00000000;
-        this.halted = false;
+    fetchWord(address: Binary): Binary {
+        return this.memory.fetchWord(address);
     }
 
-    halt(): void {
-        this.halted = true;
-    }
+    decode(instructionCode: Binary): { instruction: Instruction, params: { [key: string]: Binary }, basic: string } | undefined {
 
-    isHalted(): boolean {
-        return this.halted;
-    }
+        const opcode = new Binary(instructionCode.getBits(31, 26).getValue(), 6);
 
-    storeInstruction(code: Word) {
-        this.memory.store(this.textAddress, code);
-        this.textEndingAddress = this.textAddress;
-        this.textAddress += this.instructionBytesLength;
-    }
-
-    getFormat(format: string) {
-        return this.formats.get(format);
-    }
-
-    getInstructionByCode(code: Word): { instruction: Instruction, basic: string } | undefined {
-        const opcode = Utils.getBits(code, 31, 26);
-        let funct: number | undefined = undefined;
-        if (opcode === 0x00) {
-            funct = Utils.getBits(code, 5, 0);
+        let funct: Binary | undefined = undefined;
+        if (opcode.getValue() === 0) {
+            funct = new Binary(instructionCode.getBits(5, 0).getValue(), 6);
         }
 
         let foundInstruction: Instruction | undefined = undefined;
 
         for (const instruction of this.instructionsSet.instructions) {
-            if (instruction.opcode === opcode) {
-                if (funct !== undefined) {
-                    if (instruction.funct === funct) {
+            if (instruction.opcode.getValue() === opcode.getValue()) {
+                if (funct) {
+                    if (instruction.funct?.getValue() === funct.getValue()) {
                         foundInstruction = instruction;
                         break;
                     }
@@ -142,14 +94,58 @@ export class CPU {
         if (foundInstruction) {
             const format = this.getFormat(foundInstruction.format);
             if (format) {
-                let params = format.disassemble(code);
+
+                let params = format.disassemble(foundInstruction, instructionCode);
+
                 const basic = foundInstruction.basic(params);
-                return { instruction: foundInstruction, basic };
+                return { instruction: foundInstruction, params, basic };
             }
         }
 
-        console.error(`Instruction not found for code: ${code} (0x${code.toString(16).padStart(8, '0')})`);
+        //console.error(`Instruction not found for code: ${instructionCode} (0x${instructionCode.getHex()})`);
         return undefined;
+    }
+
+    execute() {
+        if (this.pc <= this.textSegmentEnd) {
+            const instructionCode = this.memory.fetchWord(this.pc);
+            const decodedInstruction = this.decode(instructionCode);
+            if (decodedInstruction) {
+                const instruction = decodedInstruction.instruction;
+                if (instruction) {
+                    instruction.execute(this, decodedInstruction.params);
+                }
+            }
+        } else {
+            this.halt();
+        }
+    }
+
+    getFormat(format: string) {
+        return this.formats.get(format);
+    }
+
+    halt(): void {
+        this.halted = true;
+    }
+
+    isHalted(): boolean {
+        return this.halted;
+    }
+
+    reset() {
+        this.registers.reset();
+        this.memory.reset();
+        this.textSegmentStart = new Binary(0x00400000);
+        this.textSegmentEnd = this.textSegmentStart;
+        this.dataSegmentStart = new Binary(0x10010000);
+        this.dataSegmentEnd = this.dataSegmentStart;
+        this.registers.get("$gp")!.binary = new Binary(0x10008000);
+        this.registers.get("$sp")!.binary = new Binary(0x7fffeffc);
+        this.pc = this.textSegmentStart;
+        this.lo = new Binary();
+        this.hi = new Binary();
+        this.halted = false;
     }
 
     getRegisters() {

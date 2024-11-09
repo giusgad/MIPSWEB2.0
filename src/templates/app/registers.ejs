@@ -1,19 +1,32 @@
 <% if (files.length > 0) { %>
 
+<%
+    const registersValueFormat = settings.tables.registers.columns.value.format;
+%>
+
 <div class="component">
     <div class="title">Registers</div>
     <div class="table">
         <div class="cols-names">
-            <div class="col col-name number">Number</div>
-            <div class="col col-name name">Name</div>
-            <div class="col col-name value">Value</div>
+            <div class="col number"><div class="col-name">Number</div></div>
+            <div class="col name"><div class="col-name">Name</div></div>
+            <div class="col value">
+                <div class="col-name">Value</div>
+                <div class="col-format">
+                    <select name="col-format" id="col-format-registers-value">
+                        <option value="decimal" <%= registersValueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
+                        <option value="hex" <%= registersValueFormat === "hex" ? "selected" : "" %>>Hexadecimal</option>
+                        <option value="binary" <%= registersValueFormat === "binary" ? "selected" : "" %>>Binary</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <div class="rows">
             <%registers.forEach((register) => {%>
                 <div class="row">
                     <div class="col number"><%=register.number%></div>
                     <div class="col name"><%=register.name%></div>
-                    <div class="col value"><%=convert(settings.tables.registers.columns.value.format, register.value)%></div>
+                    <div class="col value"><%=convert(registersValueFormat, register.value, true)%></div>
                 </div>
             <%});%>
         </div>

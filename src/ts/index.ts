@@ -1,7 +1,5 @@
 import {Icons} from "./icons.js";
 import {getContext} from "./app.js";
-import {Utils} from "./virtual-machine/Utils.js";
-import {vm} from "./app.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -61,15 +59,4 @@ export function getFromLocalStorage(key: string): any {
 
 export function setIntoLocalStorage(key: string, item: any) {
     localStorage.setItem(key, JSON.stringify(item));
-}
-
-(window as any).convert = convert;
-function convert(format: string, value: number) {
-    if (format === "hex") {
-        return Utils.convertToHex(value);
-    }
-    if (format === "basic") {
-        return Utils.convertToBasic(value, vm.cpu);
-    }
-    return value;
 }

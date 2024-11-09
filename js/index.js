@@ -9,8 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Icons } from "./icons.js";
 import { getContext } from "./app.js";
-import { Utils } from "./virtual-machine/Utils.js";
-import { vm } from "./app.js";
 window.ejs = ejs;
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     if (typeof ejs === 'undefined' || typeof ace === 'undefined') {
@@ -68,14 +66,4 @@ export function getFromLocalStorage(key) {
 }
 export function setIntoLocalStorage(key, item) {
     localStorage.setItem(key, JSON.stringify(item));
-}
-window.convert = convert;
-function convert(format, value) {
-    if (format === "hex") {
-        return Utils.convertToHex(value);
-    }
-    if (format === "basic") {
-        return Utils.convertToBasic(value, vm.cpu);
-    }
-    return value;
 }

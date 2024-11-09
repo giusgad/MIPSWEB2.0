@@ -3,10 +3,13 @@ import {addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage}
 import {reloadEditors, updateEditor} from "./editor.js";
 import {VirtualMachine} from "./virtual-machine/VirtualMachine.js";
 import {CPU} from "./virtual-machine/CPU.js";
+import {Binary} from "./virtual-machine/Utils.js";
 
 export const vm = new VirtualMachine(new CPU);
 
-const settings = {
+export let state: "edit" | "execute" = "edit";
+
+const default_settings = {
     tables: {
         registers: {
             columns: {
@@ -16,7 +19,7 @@ const settings = {
         memory: {
             columns: {
                 address: { format: 'decimal' },
-                value: { format: 'basic' }
+                value: { format: 'hex' }
             }
         }
     }
@@ -26,13 +29,56 @@ document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
 
     if (!getFromLocalStorage("settings")) {
-        setIntoLocalStorage("settings", settings);
+        setIntoLocalStorage("settings", default_settings);
     }
+
     await render('app', 'app.ejs');
     reloadEditors(getFiles(), getSelectedFileId());
 
+    initializeSelectListeners();
+
     document.body.classList.remove('wait');
 });
+
+function initializeSelectListeners() {
+    const registersValueFormatSelect = document.getElementById('col-format-registers-value') as HTMLSelectElement;
+    const memoryAddressFormatSelect = document.getElementById('col-format-memory-address') as HTMLSelectElement;
+    const memoryValueFormatSelect = document.getElementById('col-format-memory-value') as HTMLSelectElement;
+    if (registersValueFormatSelect) {
+        registersValueFormatSelect.addEventListener('change', async () => {
+            updateSettingInLocalStorage('tables.registers.columns.value.format', registersValueFormatSelect.value);
+            await updateInterface();
+        });
+    }
+    if (memoryAddressFormatSelect) {
+        memoryAddressFormatSelect.addEventListener('change', async () => {
+            updateSettingInLocalStorage('tables.memory.columns.address.format', memoryAddressFormatSelect.value);
+            await updateInterface();
+        });
+    }
+    if (memoryValueFormatSelect) {
+        memoryValueFormatSelect.addEventListener('change', async () => {
+            updateSettingInLocalStorage('tables.memory.columns.value.format', memoryValueFormatSelect.value);
+            await updateInterface();
+        });
+    }
+}
+
+function updateSettingInLocalStorage(path: string, value: string) {
+    const settings = getFromLocalStorage("settings") || {};
+    setDeepValue(settings, path, value);
+    setIntoLocalStorage("settings", settings);
+}
+
+function setDeepValue(obj: any, path: string, value: any) {
+    const keys = path.split('.');
+    let temp = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+        if (!temp[keys[i]]) temp[keys[i]] = {};
+        temp = temp[keys[i]];
+    }
+    temp[keys[keys.length - 1]] = value;
+}
 
 export async function updateInterface() {
 
@@ -59,6 +105,9 @@ export async function updateInterface() {
         removeClass('execute', 'opened-files');
         removeClass('execute', 'registers');
     }
+
+    initializeSelectListeners();
+
 }
 
 (window as any).assembleClick = async function() {
@@ -66,6 +115,7 @@ export async function updateInterface() {
     if (file) {
         if (file.content) {
             vm.assemble(file.content);
+            state = "execute";
             await updateInterface();
         }
     }
@@ -94,12 +144,12 @@ export async function updateInterface() {
 
 export async function stopExecution() {
     vm.stop();
+    state = "edit";
     await updateInterface();
     updateEditor();
 }
 
 export function getContext() {
-    const state = vm.state;
     const nextInstructionLineNumber = vm.nextInstructionLineNumber;
     const files = getFiles();
     let selectedFileId = getSelectedFileId();
@@ -116,6 +166,7 @@ export function getContext() {
     const registers = vm.getRegisters();
     const memory = vm.getMemory();
     const ctx = {
+        vm,
         state,
         files,
         selectedFile,
@@ -125,4 +176,27 @@ export function getContext() {
         settings: getFromLocalStorage("settings")
     };
     return ctx;
+}
+
+(window as any).convert = convert;
+function convert(format: string, value: number, signed: boolean = false) {
+    if (format === 'decimal') {
+        return value;
+    }
+    if (format === 'hex') {
+        return new Binary(value, 32, signed).getHex();
+    }
+    if (format === 'binary') {
+        return new Binary(value, 32, signed).getBinary();
+    }
+    if (format === 'ascii') {
+        return new Binary(value, 32, signed).getAscii();
+    }
+    if (format === 'asm') {
+        const decodedInstruction = vm.cpu.decode(new Binary(value));
+        if (decodedInstruction) {
+            return decodedInstruction.basic;
+        }
+    }
+    return 'undefined';
 }

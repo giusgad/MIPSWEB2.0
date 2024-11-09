@@ -1,60 +1,50 @@
 import { Assembler } from "./Assembler.js";
 export class VirtualMachine {
     constructor(cpu) {
-        this.assembledLinesIndex = 0;
         this.cpu = cpu;
         this.assembler = new Assembler(cpu);
-        this.isRunning = false;
-        this.state = "edit";
+        this.running = false;
     }
     assemble(program) {
         this.stop();
-        this.assembledLines = this.assembler.assemble(program);
-        if (this.assembledLines.length > 0) {
-            this.nextInstructionLineNumber = this.assembledLines[this.assembledLinesIndex].lineNumber;
-        }
-        this.state = "execute";
+        this.assembler.assemble(program);
+        this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+        /*
+        this.assembler.labels.forEach((address, label) => {
+            console.log(`${label}: ${address.getValue()}`);
+        });
+        */
     }
     run() {
-        this.isRunning = true;
-        while (this.isRunning && !this.cpu.isHalted()) {
+        this.running = true;
+        while (this.running && !this.cpu.isHalted()) {
             this.step();
         }
     }
     step() {
-        if (!this.cpu.isHalted()) {
+        if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
             this.cpu.execute();
-            this.assembledLinesIndex++;
-            if (this.assembledLinesIndex >= this.assembledLines.length) {
-                this.nextInstructionLineNumber = undefined;
-            }
-            else {
-                this.nextInstructionLineNumber = this.assembledLines[this.assembledLinesIndex].lineNumber;
-            }
+            this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
         }
         else {
             this.pause();
         }
     }
     pause() {
-        this.isRunning = false;
+        this.running = false;
     }
     stop() {
         this.pause();
-        this.cpu.reset();
-        this.nextInstructionLineNumber = undefined;
-        this.assembledLinesIndex = 0;
-        this.assembledLines = [];
-        this.state = "edit";
+        this.assembler.reset();
     }
     getRegisters() {
         const registers = [];
         for (const register of this.cpu.getRegisters()) {
-            registers.push({ name: register.name, number: register.number, value: register.value });
+            registers.push({ name: register.name, number: register.number, value: register.binary.getValue() });
         }
-        registers.push({ name: "pc", value: this.cpu.pc });
-        registers.push({ name: "hi", value: this.cpu.hi });
-        registers.push({ name: "lo", value: this.cpu.lo });
+        registers.push({ name: "pc", value: this.cpu.pc.getValue() });
+        registers.push({ name: "hi", value: this.cpu.hi.getValue() });
+        registers.push({ name: "lo", value: this.cpu.lo.getValue() });
         return registers;
     }
     getMemory() {

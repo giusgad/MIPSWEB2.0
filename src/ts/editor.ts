@@ -1,5 +1,5 @@
 import {file, getSelectedFileId, updateFile} from "./files.js"
-import {vm} from "./app.js";
+import {state, stopExecution, vm} from "./app.js";
 
 export type fileEditor = {
     fileId: number,
@@ -80,7 +80,7 @@ export function updateEditor(): void {
     if (selectedFileId !== null) {
         const fileEditor = filesEditors.find(editor => editor.fileId === selectedFileId);
         if (fileEditor) {
-            const VMState = vm.state;
+            const VMState = state;
             const aceEditor: AceAjax.Editor = fileEditor.aceEditor;
             const cursors = document.getElementsByClassName("ace_hidden-cursors");
             if (VMState === "edit") {

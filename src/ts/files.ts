@@ -12,67 +12,28 @@ export type file = {
 export const samples: { [name: string]: string } = {
     "sample":
 `
-# LUI, ORI
-LUI $t0, 0x1234        # $t0 = 0x12340000
-ORI $t0, $t0, 0x5678   # $t0 = 0x12345678
+.data
 
-LUI $t1, 0x0000        # $t1 = 0x00000000
-ORI $t1, $t1, 0x0005   # $t1 = 0x00000005
+int_values:  .word 10, 20, 30    
+char_values: .byte 'A', 'B', 'C' 
+buffer1:     .space 10          
+buffer2:     .space 20          
 
-LUI $t2, 0x0000        # $t2 = 0x00000000
-ORI $t2, $t2, 0x0003   # $t2 = 0x00000003
+.text
 
-# ADD
-ADD $t3, $t1, $t2      # $t3 = $t1 + $t2 = 5 + 3 = 8
+main:
+    addiu $t1, $zero, 5     
+    move $t2, $t1            
 
-# SUB
-SUB $t4, $t1, $t2      # $t4 = $t1 - $t2 = 5 - 3 = 2
+loop_start:
+    addiu $t1, $t1, -1       
+after_decrement:
+    bgtz $t1, loop_start     
+    nop                     
 
-# ADDI
-ADDI $t5, $t1, 10      # $t5 = $t1 + 10 = 5 + 10 = 15
-
-# ADDU
-ADDU $t6, $t0, $t0     # $t6 = $t0 + $t0
-
-# SUBU
-SUBU $t7, $t0, $t0     # $t7 = $t0 - $t0 = 0
-
-# ADDIU
-ADDIU $s0, $t1, -1     # $s0 = $t1 + (-1) = 5 - 1 = 4
-
-# MULT
-MULT $t1, $t2          # $t1 * $t2 = 5 * 3
-MFLO $s1               # $s1 = lown (15)
-MFHI $s2               # $s2 = high (0)
-
-# DIV
-DIV $t1, $t2           # $t1 / $t2 = 5 / 3
-MFLO $s3               # $s3 = 5 / 3 = 1
-MFHI $s4               # $s4 = 5 % 3 = 2
-
-# AND
-AND $s5, $t0, $t3      # $s5 = $t0 AND $t3
-
-# OR
-OR $s6, $t0, $t3       # $s6 = $t0 OR $t3
-
-# ANDI
-ANDI $s7, $t0, 0x00FF  # $s7 = $t0 AND 0x00FF
-
-# ORI
-ORI $t8, $t0, 0x00FF   # $t8 = $t0 OR 0x00FF
-
-# SLL
-SLL $t9, $t1, 2        # $t9 = $t1 << 2 (5 << 2 = 20)
-
-# SRL
-SRL $v0, $t1, 1        # $v0 = $t1 >> 1 (5 >> 1 = 2)
-
-# SW
-SW $t0, 0($sp)         # $t0 -> stack
-
-# LW
-LW $a0, 0($sp)         # stack -> $a0
+after_loop:
+    addiu $v0, $zero, 10    
+    syscall                 
 `
 };
 
