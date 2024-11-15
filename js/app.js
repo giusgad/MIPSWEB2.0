@@ -7,181 +7,205 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId } from "./files.js";
-import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
-import { reloadEditors, updateEditor } from "./editor.js";
 import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
 import { CPU } from "./virtual-machine/CPU.js";
+import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
+import { default_settings } from "./settings.js";
+import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, newFile, openFile } from "./files.js";
+import { initEditors } from "./editor.js";
 import { Binary } from "./virtual-machine/Utils.js";
 export const vm = new VirtualMachine(new CPU);
-export let state = "edit";
-const default_settings = {
-    tables: {
-        registers: {
-            columns: {
-                value: { format: 'decimal' }
-            }
-        },
-        memory: {
-            columns: {
-                address: { format: 'decimal' },
-                value: { format: 'hex' }
-            }
-        }
-    }
-};
+export let interfaceState = "edit";
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     if (!getFromLocalStorage("settings")) {
         setIntoLocalStorage("settings", default_settings);
     }
-    yield render('app', 'app.ejs');
-    reloadEditors(getFiles(), getSelectedFileId());
-    initializeSelectListeners();
+    yield renderApp();
+    initEditors();
+    clearMemorySelectedFormats();
     document.body.classList.remove('wait');
 }));
-function initializeSelectListeners() {
-    const registersValueFormatSelect = document.getElementById('col-format-registers-value');
-    const memoryAddressFormatSelect = document.getElementById('col-format-memory-address');
-    const memoryValueFormatSelect = document.getElementById('col-format-memory-value');
-    if (registersValueFormatSelect) {
-        registersValueFormatSelect.addEventListener('change', () => __awaiter(this, void 0, void 0, function* () {
-            updateSettingInLocalStorage('tables.registers.columns.value.format', registersValueFormatSelect.value);
-            yield updateInterface();
-        }));
-    }
-    if (memoryAddressFormatSelect) {
-        memoryAddressFormatSelect.addEventListener('change', () => __awaiter(this, void 0, void 0, function* () {
-            updateSettingInLocalStorage('tables.memory.columns.address.format', memoryAddressFormatSelect.value);
-            yield updateInterface();
-        }));
-    }
-    if (memoryValueFormatSelect) {
-        memoryValueFormatSelect.addEventListener('change', () => __awaiter(this, void 0, void 0, function* () {
-            updateSettingInLocalStorage('tables.memory.columns.value.format', memoryValueFormatSelect.value);
-            yield updateInterface();
-        }));
+export function clearMemorySelectedFormats() {
+    const settings = getFromLocalStorage('settings');
+    if (settings) {
+        for (const key in settings.colsFormats) {
+            if (key.startsWith('memory-address-format_') || key.startsWith('memory-value-format_')) {
+                delete settings.colsFormats[key];
+            }
+        }
+        setIntoLocalStorage('settings', settings);
     }
 }
-function updateSettingInLocalStorage(path, value) {
-    const settings = getFromLocalStorage("settings") || {};
-    setDeepValue(settings, path, value);
-    setIntoLocalStorage("settings", settings);
-}
-function setDeepValue(obj, path, value) {
-    const keys = path.split('.');
-    let temp = obj;
-    for (let i = 0; i < keys.length - 1; i++) {
-        if (!temp[keys[i]])
-            temp[keys[i]] = {};
-        temp = temp[keys[i]];
-    }
-    temp[keys[keys.length - 1]] = value;
-}
-export function updateInterface() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const ctx = getContext();
-        const state = ctx.state;
-        if (state === "execute") {
-            yield render('vm-buttons', '/app/vm-buttons.ejs', ctx);
-            yield render('opened-files', '/app/opened-files.ejs', ctx);
-            yield render('registers', '/app/registers.ejs', ctx);
-            yield render('memory', '/app/memory.ejs', ctx);
+export function renderApp() {
+    return __awaiter(this, arguments, void 0, function* (newState = interfaceState) {
+        interfaceState = newState;
+        if (interfaceState === "execute") {
             addClass('execute', 'files-editors');
-            addClass('execute', 'opened-files');
-            addClass('execute', 'registers');
         }
-        else if (state === "edit") {
-            yield render('vm-buttons', '/app/vm-buttons.ejs', ctx);
-            yield render('opened-files', '/app/opened-files.ejs', ctx);
-            yield render('registers', '/app/registers.ejs', ctx);
-            yield render('memory', '/app/memory.ejs', ctx);
+        else {
             removeClass('execute', 'files-editors');
-            removeClass('execute', 'opened-files');
-            removeClass('execute', 'registers');
         }
-        initializeSelectListeners();
+        yield render('app', 'app.ejs');
     });
 }
-window.assembleClick = function () {
+export function assemble() {
     return __awaiter(this, void 0, void 0, function* () {
         const file = getSelectedFile();
         if (file) {
-            if (file.content) {
-                vm.assemble(file.content);
-                state = "execute";
-                yield updateInterface();
-            }
+            vm.assemble(file.content);
+            yield renderApp("execute");
         }
-        updateEditor();
+    });
+}
+export function stop() {
+    return __awaiter(this, void 0, void 0, function* () {
+        vm.stop();
+        clearMemorySelectedFormats();
+        yield renderApp("edit");
+    });
+}
+export function step() {
+    return __awaiter(this, void 0, void 0, function* () {
+        vm.step();
+        yield render('app', 'app.ejs');
+    });
+}
+export function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        vm.run();
+        yield render('app', 'app.ejs');
+    });
+}
+export function getContext() {
+    const intervals = getIntervals();
+    return {
+        vm,
+        intervals: intervals,
+        interfaceState: interfaceState,
+        files: getFiles(),
+        selectedFile: getSelectedFile(),
+        settings: getFromLocalStorage('settings')
+    };
+}
+export function getIntervals() {
+    const memory = vm.getMemory();
+    if (memory.length === 0) {
+        return [];
+    }
+    const intervals = [];
+    let currentInterval = [memory[0]];
+    for (let i = 1; i < memory.length; i++) {
+        const currentCell = memory[i];
+        const previousCell = memory[i - 1];
+        if (currentCell.address - previousCell.address <= 4) {
+            currentInterval.push(currentCell);
+        }
+        else {
+            intervals.push(extendInterval(currentInterval, intervals.length));
+            currentInterval = [currentCell];
+        }
+    }
+    intervals.push(extendInterval(currentInterval, intervals.length));
+    return intervals;
+}
+export function extendInterval(cells, index) {
+    const settings = getFromLocalStorage('settings');
+    const interval = {
+        cells: cells,
+        colsFormats: {
+            address: settings.colsFormats['memory-address-format'],
+            value: settings.colsFormats['memory-value-format']
+        }
+    };
+    if ((interval.cells[0].address >= 4194304) && (interval.cells[interval.cells.length - 1].address <= 268500992)) {
+        interval.colsFormats.value = 'asm';
+    }
+    if (settings.colsFormats[`memory-address-format_${index}`]) {
+        interval.colsFormats.address = settings.colsFormats[`memory-address-format_${index}`];
+    }
+    if (settings.colsFormats[`memory-value-format_${index}`]) {
+        interval.colsFormats.value = settings.colsFormats[`memory-value-format_${index}`];
+    }
+    return interval;
+}
+window.colFormatSelectOnChange = function (element) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let settings = getFromLocalStorage("settings");
+        if (!settings) {
+            settings = default_settings;
+        }
+        else if (!settings.colsFormats) {
+            settings.colsFormats = default_settings.colsFormats;
+        }
+        settings.colsFormats[element.id] = element.value;
+        setIntoLocalStorage('settings', settings);
+        yield renderApp();
     });
 };
-window.stopClick = function () {
+window.assembleClick = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        yield stopExecution();
+        yield assemble();
     });
 };
 window.stepClick = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.step();
-        yield updateInterface();
-        updateEditor();
+        yield step();
     });
 };
 window.runClick = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.run();
-        yield updateInterface();
-        updateEditor();
+        yield run();
     });
 };
-window.settingsClick = function () {
+window.stopClick = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("Settings");
+        yield stop();
     });
 };
-export function stopExecution() {
+window.newFileOnClick = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.stop();
-        state = "edit";
-        yield updateInterface();
-        updateEditor();
+        yield newFile();
     });
-}
-export function getContext() {
-    const nextInstructionLineNumber = vm.nextInstructionLineNumber;
-    const files = getFiles();
-    let selectedFileId = getSelectedFileId();
-    if (selectedFileId === null) {
-        if (files.length > 0) {
-            setSelectedFileId(files[0].id);
-        }
-    }
-    let selectedFile = getSelectedFile();
-    if ((selectedFileId !== null) && (!selectedFile)) {
-        setSelectedFileId(files[0].id);
-        selectedFile = getSelectedFile();
-    }
-    const registers = vm.getRegisters();
-    const memory = vm.getMemory();
-    const ctx = {
-        vm,
-        state,
-        files,
-        selectedFile,
-        registers,
-        memory,
-        nextInstructionLineNumber,
-        settings: getFromLocalStorage("settings")
-    };
-    return ctx;
-}
-window.convert = convert;
-function convert(format, value, signed = false) {
+};
+window.importFilesOnClick = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        importFiles();
+    });
+};
+window.openFileOnClick = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield openFile();
+    });
+};
+window.importSampleOnClick = function (name) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield importSample(name);
+    });
+};
+window.changeFileOnClick = function (stringFileId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const fileId = parseInt(stringFileId);
+        yield changeFile(fileId);
+    });
+};
+window.actionsOnFileOnClick = function (stringFileId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const fileId = parseInt(stringFileId);
+        actionsOnFile(fileId);
+    });
+};
+window.closeFileOnClick = function (stringFileId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const fileId = parseInt(stringFileId);
+        yield closeFile(fileId);
+    });
+};
+window.convert = function (format, value, signed = false) {
     if (format === 'decimal') {
         return value;
     }
-    if (format === 'hex') {
+    if (format === 'hexadecimal') {
         return new Binary(value, 32, signed).getHex();
     }
     if (format === 'binary') {
@@ -197,4 +221,4 @@ function convert(format, value, signed = false) {
         }
     }
     return 'undefined';
-}
+};

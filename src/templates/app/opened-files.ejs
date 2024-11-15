@@ -1,29 +1,27 @@
-<% if (files.length > 0) { %>
-    <% if (state == "edit") { %>
+<% if (ctx.interfaceState == "edit") { %>
 
-        <div class="files-tabs">
-            <%files.forEach((file) => {%>
-                <div class="file-tab <%if((selectedFile) && (selectedFile.id === file.id)){%>active<%}%>" onclick="changeFileTab('<%=file.id%>');">
-                    <div class="file-name"><%=file.name%></div>
-                    <div class="buttons">
-                        <div class="button" onclick="event.stopPropagation();">
-                            <div class="icon"><%-Icons.render('ellipsis')%></div>
-                        </div>
-                        <div class="button" onclick="event.stopPropagation();closeFile('<%=file.id%>')">
-                            <div class="icon"><%-Icons.render('x')%></div>
-                        </div>
-                    </div>
-                </div>
-            <%});%>
-        </div>
-
-    <% } else if (state == "execute") { %>
-
-        <div class="files-tabs">
-            <div class="file-tab no-hover">
-                <div class="file-name"><%=selectedFile.name%></div>
+<div class="files-tabs">
+    <%ctx.files.forEach((file) => {%>
+    <div class="file-tab <%if((ctx.selectedFile) && (ctx.selectedFile.id === file.id)){%>active<%}%>" onclick="changeFileOnClick('<%=file.id%>');">
+        <div class="file-name"><%=file.name%></div>
+        <div class="buttons">
+            <div class="button" onclick="event.stopPropagation();actionsOnFileOnClick('<%=file.id%>');">
+                <div class="icon"><%-Icons.render('ellipsis')%></div>
+            </div>
+            <div class="button" onclick="event.stopPropagation();closeFileOnClick('<%=file.id%>');">
+                <div class="icon"><%-Icons.render('x')%></div>
             </div>
         </div>
+    </div>
+    <%});%>
+</div>
 
-    <% } %>
+<% } else if (ctx.interfaceState == "execute") { %>
+
+<div class="files-tabs">
+    <div class="file-tab no-hover">
+        <div class="file-name"><%=ctx.selectedFile.name%></div>
+    </div>
+</div>
+
 <% } %>

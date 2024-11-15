@@ -1,27 +1,22 @@
-<% if (files.length > 0) { %>
-    <% if (state == "execute") { %>
-    <div class="buttons">
-        <%if (nextInstructionLineNumber !== undefined) {%>
-            <div class="button" onclick="stepClick();">
-                <div class="icon"><%-Icons.render('step')%></div>
-                <div class="label">Step</div>
-            </div>
-            <div class="button" onclick="runClick();">
-                <div class="icon"><%-Icons.render('run')%></div>
-                <div class="label">Run</div>
-            </div>
-        <%}%>
+<div class="buttons">
+    <% if (ctx.interfaceState == "execute") { %>
+        <% if (ctx.vm.nextInstructionLineNumber !== undefined) { %>
+        <div class="button" onclick="stepClick();">
+            <div class="icon"><%-Icons.render('step')%></div>
+            <div class="label">Step</div>
+        </div>
+        <div class="button" onclick="runClick();">
+            <div class="icon"><%-Icons.render('run')%></div>
+            <div class="label">Run</div>
+        </div>
+        <% } %>
         <div class="button" onclick="stopClick();">
             <div class="icon"><%-Icons.render('stop')%></div>
             <div class="label">Stop</div>
         </div>
-    </div>
-    <% } else if (state == "edit") { %>
-    <div class="buttons">
-        <div class="button" onclick="assembleClick()">
-            <div class="icon"><%-Icons.render('assemble')%></div>
-            <div class="label">Assemble</div>
-        </div>
-    </div>
     <% } %>
-<% } %>
+    <div class="button" onclick="assembleClick()">
+        <div class="icon"><%-Icons.render('assemble')%></div>
+        <div class="label">Assemble</div>
+    </div>
+</div>

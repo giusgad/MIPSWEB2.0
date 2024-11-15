@@ -9,11 +9,9 @@ export class VirtualMachine {
         this.stop();
         this.assembler.assemble(program);
         this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-        /*
-        this.assembler.labels.forEach((address, label) => {
+        /*this.assembler.labels.forEach((address, label) => {
             console.log(`${label}: ${address.getValue()}`);
-        });
-        */
+        });*/
     }
     run() {
         this.running = true;

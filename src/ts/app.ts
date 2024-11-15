@@ -1,29 +1,24 @@
-import {getFiles, getSelectedFile, getSelectedFileId, setSelectedFileId} from "./files.js";
-import {addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage} from "./index.js";
-import {reloadEditors, updateEditor} from "./editor.js";
 import {VirtualMachine} from "./virtual-machine/VirtualMachine.js";
 import {CPU} from "./virtual-machine/CPU.js";
+import {addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage} from "./index.js";
+import {default_settings} from "./settings.js";
+import {
+    actionsOnFile,
+    changeFile,
+    closeFile,
+    getFiles,
+    getSelectedFile,
+    importFiles,
+    importSample,
+    newFile,
+    openFile
+} from "./files.js";
+import {initEditors} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
 
 export const vm = new VirtualMachine(new CPU);
 
-export let state: "edit" | "execute" = "edit";
-
-const default_settings = {
-    tables: {
-        registers: {
-            columns: {
-                value: { format: 'decimal' }
-            }
-        },
-        memory: {
-            columns: {
-                address: { format: 'decimal' },
-                value: { format: 'hex' }
-            }
-        }
-    }
-};
+export let interfaceState: "edit" | "execute" = "edit";
 
 document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
@@ -32,158 +27,180 @@ document.addEventListener('DOMContentLoaded', async () => {
         setIntoLocalStorage("settings", default_settings);
     }
 
-    await render('app', 'app.ejs');
-    reloadEditors(getFiles(), getSelectedFileId());
-
-    initializeSelectListeners();
+    await renderApp();
+    initEditors();
+    clearMemorySelectedFormats();
 
     document.body.classList.remove('wait');
 });
 
-function initializeSelectListeners() {
-    const registersValueFormatSelect = document.getElementById('col-format-registers-value') as HTMLSelectElement;
-    const memoryAddressFormatSelect = document.getElementById('col-format-memory-address') as HTMLSelectElement;
-    const memoryValueFormatSelect = document.getElementById('col-format-memory-value') as HTMLSelectElement;
-    if (registersValueFormatSelect) {
-        registersValueFormatSelect.addEventListener('change', async () => {
-            updateSettingInLocalStorage('tables.registers.columns.value.format', registersValueFormatSelect.value);
-            await updateInterface();
-        });
-    }
-    if (memoryAddressFormatSelect) {
-        memoryAddressFormatSelect.addEventListener('change', async () => {
-            updateSettingInLocalStorage('tables.memory.columns.address.format', memoryAddressFormatSelect.value);
-            await updateInterface();
-        });
-    }
-    if (memoryValueFormatSelect) {
-        memoryValueFormatSelect.addEventListener('change', async () => {
-            updateSettingInLocalStorage('tables.memory.columns.value.format', memoryValueFormatSelect.value);
-            await updateInterface();
-        });
+export function clearMemorySelectedFormats() {
+    const settings = getFromLocalStorage('settings');
+    if (settings) {
+        for (const key in settings.colsFormats) {
+            if (key.startsWith('memory-address-format_') || key.startsWith('memory-value-format_')) {
+                delete settings.colsFormats[key];
+            }
+        }
+        setIntoLocalStorage('settings', settings);
     }
 }
 
-function updateSettingInLocalStorage(path: string, value: string) {
-    const settings = getFromLocalStorage("settings") || {};
-    setDeepValue(settings, path, value);
-    setIntoLocalStorage("settings", settings);
-}
-
-function setDeepValue(obj: any, path: string, value: any) {
-    const keys = path.split('.');
-    let temp = obj;
-    for (let i = 0; i < keys.length - 1; i++) {
-        if (!temp[keys[i]]) temp[keys[i]] = {};
-        temp = temp[keys[i]];
-    }
-    temp[keys[keys.length - 1]] = value;
-}
-
-export async function updateInterface() {
-
-    const ctx = getContext();
-    const state = ctx.state;
-
-    if (state === "execute") {
-
-        await render('vm-buttons', '/app/vm-buttons.ejs', ctx);
-        await render('opened-files', '/app/opened-files.ejs', ctx);
-        await render('registers', '/app/registers.ejs', ctx);
-        await render('memory', '/app/memory.ejs', ctx);
+export async function renderApp(newState: "edit" | "execute" = interfaceState) {
+    interfaceState = newState;
+    if (interfaceState === "execute") {
         addClass('execute', 'files-editors');
-        addClass('execute', 'opened-files');
-        addClass('execute', 'registers');
-
-    } else if (state === "edit") {
-
-        await render('vm-buttons', '/app/vm-buttons.ejs', ctx);
-        await render('opened-files', '/app/opened-files.ejs', ctx);
-        await render('registers', '/app/registers.ejs', ctx);
-        await render('memory', '/app/memory.ejs', ctx);
+    } else {
         removeClass('execute', 'files-editors');
-        removeClass('execute', 'opened-files');
-        removeClass('execute', 'registers');
     }
-
-    initializeSelectListeners();
-
+    await render('app', 'app.ejs');
 }
 
-(window as any).assembleClick = async function() {
+export async function assemble() {
     const file = getSelectedFile();
     if (file) {
-        if (file.content) {
-            vm.assemble(file.content);
-            state = "execute";
-            await updateInterface();
-        }
+        vm.assemble(file.content);
+        await renderApp("execute");
     }
-    updateEditor();
-};
+}
 
-(window as any).stopClick = async function() {
-    await stopExecution();
-};
-
-(window as any).stepClick = async function() {
-    vm.step();
-    await updateInterface();
-    updateEditor();
-};
-
-(window as any).runClick = async function() {
-    vm.run();
-    await updateInterface();
-    updateEditor();
-};
-
-(window as any).settingsClick = async function() {
-    console.log("Settings");
-};
-
-export async function stopExecution() {
+export async function stop() {
     vm.stop();
-    state = "edit";
-    await updateInterface();
-    updateEditor();
+    clearMemorySelectedFormats();
+    await renderApp("edit");
+}
+
+export async function step() {
+    vm.step();
+    await render('app', 'app.ejs');
+}
+
+export async function run() {
+    vm.run();
+    await render('app', 'app.ejs');
 }
 
 export function getContext() {
-    const nextInstructionLineNumber = vm.nextInstructionLineNumber;
-    const files = getFiles();
-    let selectedFileId = getSelectedFileId();
-    if (selectedFileId === null) {
-        if (files.length > 0) {
-            setSelectedFileId(files[0].id);
-        }
-    }
-    let selectedFile = getSelectedFile();
-    if ((selectedFileId !== null) && (!selectedFile)) {
-        setSelectedFileId(files[0].id);
-        selectedFile = getSelectedFile();
-    }
-    const registers = vm.getRegisters();
-    const memory = vm.getMemory();
-    const ctx = {
+
+    const intervals = getIntervals();
+
+    return {
         vm,
-        state,
-        files,
-        selectedFile,
-        registers,
-        memory,
-        nextInstructionLineNumber,
-        settings: getFromLocalStorage("settings")
+        intervals: intervals,
+        interfaceState: interfaceState,
+        files: getFiles(),
+        selectedFile: getSelectedFile(),
+        settings: getFromLocalStorage('settings')
     };
-    return ctx;
 }
 
-(window as any).convert = convert;
-function convert(format: string, value: number, signed: boolean = false) {
+export function getIntervals() {
+    const memory = vm.getMemory();
+    if (memory.length === 0) {
+        return [];
+    }
+    const intervals = [];
+    let currentInterval = [memory[0]];
+    for (let i = 1; i < memory.length; i++) {
+        const currentCell = memory[i];
+        const previousCell = memory[i - 1];
+
+        if (currentCell.address - previousCell.address <= 4) {
+            currentInterval.push(currentCell);
+        } else {
+            intervals.push(extendInterval(currentInterval, intervals.length));
+            currentInterval = [currentCell];
+        }
+    }
+    intervals.push(extendInterval(currentInterval, intervals.length));
+    return intervals;
+}
+
+export function extendInterval(cells: any, index: number) {
+    const settings = getFromLocalStorage('settings');
+    const interval = {
+        cells: cells,
+        colsFormats: {
+            address: settings.colsFormats['memory-address-format'],
+            value: settings.colsFormats['memory-value-format']
+        }
+    };
+    if ((interval.cells[0].address >= 4194304) && (interval.cells[interval.cells.length - 1].address <= 268500992)) {
+        interval.colsFormats.value = 'asm';
+    }
+    if (settings.colsFormats[`memory-address-format_${index}`]) {
+        interval.colsFormats.address = settings.colsFormats[`memory-address-format_${index}`];
+    }
+    if (settings.colsFormats[`memory-value-format_${index}`]) {
+        interval.colsFormats.value = settings.colsFormats[`memory-value-format_${index}`];
+    }
+    return interval;
+}
+
+(window as any).colFormatSelectOnChange = async function(element: HTMLSelectElement) {
+    let settings = getFromLocalStorage("settings");
+    if (!settings) {
+        settings = default_settings;
+    } else if (!settings.colsFormats) {
+        settings.colsFormats = default_settings.colsFormats;
+    }
+    settings.colsFormats[element.id] = element.value;
+    setIntoLocalStorage('settings', settings);
+    await renderApp();
+};
+
+(window as any).assembleClick = async function() {
+    await assemble();
+};
+
+(window as any).stepClick = async function() {
+    await step();
+};
+
+(window as any).runClick = async function() {
+    await run();
+};
+
+(window as any).stopClick = async function() {
+    await stop();
+};
+
+(window as any).newFileOnClick = async function() {
+    await newFile();
+};
+
+(window as any).importFilesOnClick = async function() {
+    importFiles();
+};
+
+(window as any).openFileOnClick = async function() {
+    await openFile();
+};
+
+(window as any).importSampleOnClick = async function(name: string) {
+    await importSample(name);
+};
+
+(window as any).changeFileOnClick = async function(stringFileId: string) {
+    const fileId = parseInt(stringFileId);
+    await changeFile(fileId);
+};
+
+(window as any).actionsOnFileOnClick = async function(stringFileId: string) {
+    const fileId = parseInt(stringFileId);
+    actionsOnFile(fileId);
+};
+
+(window as any).closeFileOnClick = async function(stringFileId: string) {
+    const fileId = parseInt(stringFileId);
+    await closeFile(fileId);
+};
+
+(window as any).convert = function(format: string, value: number, signed: boolean = false) {
     if (format === 'decimal') {
         return value;
     }
-    if (format === 'hex') {
+    if (format === 'hexadecimal') {
         return new Binary(value, 32, signed).getHex();
     }
     if (format === 'binary') {
@@ -199,4 +216,5 @@ function convert(format: string, value: number, signed: boolean = false) {
         }
     }
     return 'undefined';
-}
+};
+

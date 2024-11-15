@@ -1,15 +1,4 @@
-<%
-    const ctx = {
-        vm,
-        state,
-        files,
-        selectedFile,
-        registers,
-        memory,
-        nextInstructionLineNumber,
-        settings
-    };
-%>
+<%console.log(ctx);%>
 
 <div class="header flex justify-between align-center">
     <div class="flex align-center">
@@ -24,11 +13,13 @@
     <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', ctx)%></div>
 </div>
 
-<div id="opened-files"><%-await renderTemplate('/app/opened-files.ejs', ctx)%></div>
-
-<div id="registers"><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
+<% if (ctx.files.length > 0) { %>
+<div id="opened-files" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/opened-files.ejs', ctx)%></div>
+<div id="console" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/console.ejs', ctx)%></div>
+<div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
 <div id="memory"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
+<%}%>
 
-<% if (files.length == 0) { %>
+<% if (ctx.files.length === 0) { %>
 <div id="welcome-page"><%-await renderTemplate('/app/welcome-page.ejs', ctx)%></div>
-<% } %>
+<%}%>

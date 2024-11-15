@@ -38,7 +38,7 @@ function renderTemplate(templatePath_1) {
             }
             return res.text();
         });
-        const data = Object.assign(Object.assign({}, ctx), { Icons });
+        const data = { ctx, Icons };
         return ejs.render(template, data, { async: true });
     });
 }

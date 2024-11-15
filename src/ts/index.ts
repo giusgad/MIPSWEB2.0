@@ -30,7 +30,7 @@ async function renderTemplate(templatePath: string, ctx = getContext()) {
         }
         return res.text();
     });
-    const data = { ...ctx, Icons };
+    const data = { ctx, Icons };
     return ejs.render(template, data, { async: true });
 }
 

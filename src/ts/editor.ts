@@ -1,5 +1,4 @@
-import {file, getSelectedFileId, updateFile} from "./files.js"
-import {state, stopExecution, vm} from "./app.js";
+import {file, getFiles, getSelectedFileId, saveFile, updateFile} from "./files.js";
 
 export type fileEditor = {
     fileId: number,
@@ -7,6 +6,33 @@ export type fileEditor = {
 }
 
 export let filesEditors: fileEditor[] = [];
+
+export function removeFileEditor(fileId: number) {
+    const fileEditorElement = document.getElementById(`file-editor-${fileId}`);
+    if (fileEditorElement) {
+        fileEditorElement.remove();
+    }
+    filesEditors = filesEditors.filter(fileEditor => fileEditor.fileId !== fileId);
+}
+
+export function showEditor(fileId: number | null) {
+
+    if (fileId !== null) {
+        for (const fileEditor of filesEditors) {
+            const id = String(fileEditor.fileId);
+            const editorElement = document.getElementById(`file-editor-${id}`);
+            if (editorElement) {
+                const isActive = id == fileId.toString();
+                editorElement.style.display = isActive ? 'block' : 'none';
+                if (isActive) {
+                    fileEditor.aceEditor.focus();
+                }
+                fileEditor.aceEditor.clearSelection();
+            }
+        }
+    } else console.error('File id is null.', fileId);
+
+}
 
 export function addFileEditor(file: file) {
 
@@ -29,105 +55,30 @@ export function addFileEditor(file: file) {
         aceEditor: aceEditor
     });
 
-    aceEditor.session.on("change", () => {
+    aceEditor.session.on("change", async () => {
         updateFile(file.id, aceEditor.getValue());
+        await saveFile(file.id);
     });
 
     showEditor(file.id);
 }
 
-export function removeFileEditor(fileId: number) {
-    const fileEditorElement = document.getElementById(`file-editor-${fileId}`);
-    if (fileEditorElement) {
-        fileEditorElement.remove();
-    }
-    filesEditors = filesEditors.filter(fileEditor => fileEditor.fileId !== fileId);
-}
-
-export function reloadEditors(files: file[], fileId: number | null) {
-    document.getElementById('files-editors')!.innerHTML = '';
-    filesEditors = [];
-    addFilesEditors(files);
-    showEditor(fileId);
-}
-
-export function addFilesEditors(files: file[]) {
+export function addFilesEditors() {
+    const files = getFiles();
     for (const file of files) {
         addFileEditor(file);
     }
 }
 
-
-export function showEditor(fileId: number | null) {
-    if (fileId !== null) {
-        for (const fileEditor of filesEditors) {
-            const id = String(fileEditor.fileId);
-            const editorElement = document.getElementById(`file-editor-${id}`);
-            if (editorElement) {
-                const isActive = id == fileId.toString();
-                editorElement.style.display = isActive ? 'block' : 'none';
-                if (isActive) {
-                    fileEditor.aceEditor.focus();
-                }
-                fileEditor.aceEditor.clearSelection();
-            }
+export function initEditors() {
+    const filesEditorsElement = document.getElementById('files-editors');
+    if (filesEditorsElement) {
+        filesEditorsElement.innerHTML = '';
+        filesEditors = [];
+        const files = getFiles();
+        if (files.length > 0) {
+            addFilesEditors();
+            showEditor(getSelectedFileId());
         }
-    }
-}
-
-export function updateEditor(): void {
-    const selectedFileId = getSelectedFileId();
-    if (selectedFileId !== null) {
-        const fileEditor = filesEditors.find(editor => editor.fileId === selectedFileId);
-        if (fileEditor) {
-            const VMState = state;
-            const aceEditor: AceAjax.Editor = fileEditor.aceEditor;
-            const cursors = document.getElementsByClassName("ace_hidden-cursors");
-            if (VMState === "edit") {
-
-                aceEditor.setOptions({
-                    readOnly: false,
-                    highlightActiveLine: true,
-                    highlightGutterLine: true
-                });
-                for (let i = 0; i < cursors.length; i++) {
-                    (cursors[i] as HTMLElement).style.display = "block";
-                }
-                let markers = aceEditor.session.getMarkers(false);
-                for (let i in markers) {
-                    if (markers[i].clazz === "next-instruction") {
-                        aceEditor.session.removeMarker(markers[i].id);
-                    }
-                }
-                aceEditor.session.clearBreakpoints();
-                aceEditor.focus();
-
-            } else if (VMState === "execute") {
-
-                aceEditor.setOptions({
-                    readOnly: true,
-                    highlightActiveLine: false,
-                    highlightGutterLine: false
-                });
-                for (let i = 0; i < cursors.length; i++) {
-                    (cursors[i] as HTMLElement).style.display = "none";
-                }
-                let markers = aceEditor.session.getMarkers(false);
-                for (let i in markers) {
-                    if (markers[i].clazz === "next-instruction") {
-                        aceEditor.session.removeMarker(markers[i].id);
-                    }
-                }
-                aceEditor.session.clearBreakpoints();
-                const nextInstructionLine = vm.nextInstructionLineNumber;
-                if (nextInstructionLine) {
-                    let Range = ace.require('ace/range').Range,
-                        range = new Range(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
-                    aceEditor.session.addMarker(range, "next-instruction", "fullLine", false);
-                    aceEditor.session.setBreakpoint(nextInstructionLine-1, "breakpoint");
-                }
-
-            }
-        }
-    }
+    } else console.error('Element with id "files-editors" not found.');
 }

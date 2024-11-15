@@ -1,10 +1,14 @@
 <div class="buttons">
-    <div class="button" onclick="newFile();">
+    <div class="button" onclick="newFileOnClick();">
         <div class="icon"><%-Icons.render('newFile')%></div>
         <div class="label">New file</div>
     </div>
-    <div class="button" onclick="importFile();">
+    <div class="button" onclick="importFilesOnClick();">
         <div class="icon"><%-Icons.render('importFile')%></div>
-        <div class="label">Import file</div>
+        <div class="label">Import files</div>
+    </div>
+    <div class="button" onclick="openFileOnClick();" style="opacity: 0.5;">
+        <div class="icon"><%-Icons.render('editFile')%></div>
+        <div class="label">Open file</div>
     </div>
 </div>

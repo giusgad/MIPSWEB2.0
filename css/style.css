@@ -21,6 +21,7 @@ body {
   transition: 0.5s opacity;
   background-color: #f2f2f7;
   pointer-events: none;
+  z-index: 1;
 }
 .spinner-bg .spinner {
   border: 2px solid #6b81a5;
@@ -32,6 +33,7 @@ body {
 }
 .wait .spinner-bg {
   opacity: 1;
+  background-color: #f2f2f7;
   pointer-events: all;
 }
 @keyframes rotating {
@@ -161,155 +163,6 @@ select {
 .buttons .button:active {
   background-color: rgba(142, 142, 147, 0.25);
 }
-#welcome-page {
-  position: absolute;
-  top: 96px;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 1;
-}
-#app {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-#app .header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background-color: #e5e5ea;
-  border-bottom: solid 1px #f2f2f7;
-}
-#app .toolbar {
-  position: absolute;
-  top: 48px;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background-color: #e5e5ea;
-  border-bottom: solid 1px #f2f2f7;
-}
-#files-editors {
-  position: absolute;
-  top: 144px;
-  left: 0;
-  width: 80%;
-  bottom: 0;
-  z-index: 0;
-}
-#files-editors.execute {
-  width: 40%;
-}
-#files-editors .file-editor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-#files-editors .file-editor .next-instruction {
-  position: absolute;
-}
-#files-editors .file-editor .breakpoint {
-  background-color: rgba(0, 122, 255, 0.5);
-}
-.next-instruction {
-  background-color: rgba(0, 122, 255, 0.125);
-}
-#opened-files {
-  position: absolute;
-  top: 96px;
-  left: 0;
-  width: 80%;
-  height: 48px;
-  z-index: 1;
-}
-#opened-files.execute {
-  width: 40%;
-}
-#opened-files .files-tabs {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #e5e5ea;
-  border-bottom: solid 1px #f2f2f7;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-#opened-files .files-tabs .file-tab {
-  height: 100%;
-  border-bottom: 2px solid #e5e5ea;
-  user-select: none;
-  display: flex;
-  padding-left: 16px;
-  transition: all 0.5s;
-}
-#opened-files .files-tabs .file-tab .file-name {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-#opened-files .files-tabs .file-tab:hover {
-  background-color: rgba(0, 122, 255, 0.05);
-}
-#opened-files .files-tabs .file-tab.active {
-  border-bottom: 2px solid rgba(0, 122, 255, 0.5);
-}
-#opened-files .files-tabs .file-tab .buttons .button {
-  margin: 0;
-  border: unset;
-}
-#opened-files .files-tabs .file-tab .buttons .button svg {
-  opacity: 0.5;
-}
-#opened-files .files-tabs .file-tab .buttons .button:hover {
-  background-color: unset;
-}
-#opened-files .files-tabs .file-tab .buttons .button:hover svg {
-  opacity: 1;
-}
-#opened-files .files-tabs .file-tab .buttons .button:active {
-  background-color: unset;
-}
-#opened-files .files-tabs .file-tab.no-hover:hover {
-  background-color: unset;
-}
-#registers {
-  position: absolute;
-  top: 96px;
-  left: 80%;
-  width: 20%;
-  bottom: 0;
-  z-index: 1;
-}
-#registers .component {
-  border-left: solid 1px #f2f2f7;
-}
-#registers.execute {
-  left: 40%;
-}
-#memory {
-  position: absolute;
-  top: 96px;
-  right: 0;
-  width: 40%;
-  bottom: 0;
-  z-index: 0;
-}
-#memory .component {
-  border-left: solid 1px #f2f2f7;
-}
 .component {
   position: absolute;
   top: 0;
@@ -361,9 +214,160 @@ select {
   padding: 2px 4px;
   border-right: 1px solid #c7c7cc;
   overflow: scroll;
+  line-height: 14px;
 }
 .table .rows .row .col:last-child {
   border-right: none;
+}
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background-color: #e5e5ea;
+  border-bottom: solid 1px #f2f2f7;
+}
+.toolbar {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background-color: #e5e5ea;
+  border-bottom: solid 1px #f2f2f7;
+}
+.file-editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.file-editor .next-instruction {
+  position: absolute;
+}
+.file-editor .breakpoint {
+  background-color: rgba(0, 122, 255, 0.5);
+}
+.next-instruction {
+  background-color: rgba(0, 122, 255, 0.125);
+}
+.files-tabs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e5ea;
+  border-bottom: solid 1px #f2f2f7;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+.files-tabs .file-tab {
+  height: 100%;
+  border-bottom: 2px solid #e5e5ea;
+  user-select: none;
+  display: flex;
+  padding-left: 16px;
+  transition: all 0.5s;
+}
+.files-tabs .file-tab .file-name {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.files-tabs .file-tab:hover {
+  background-color: rgba(0, 122, 255, 0.05);
+}
+.files-tabs .file-tab.active {
+  border-bottom: 2px solid rgba(0, 122, 255, 0.5);
+}
+.files-tabs .file-tab .buttons .button {
+  margin: 0;
+  border: unset;
+}
+.files-tabs .file-tab .buttons .button svg {
+  opacity: 0.5;
+}
+.files-tabs .file-tab .buttons .button:hover {
+  background-color: unset;
+}
+.files-tabs .file-tab .buttons .button:hover svg {
+  opacity: 1;
+}
+.files-tabs .file-tab .buttons .button:active {
+  background-color: unset;
+}
+.files-tabs .file-tab.no-hover:hover {
+  background-color: unset;
+}
+#app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+#files-editors {
+  position: absolute;
+  top: 144px;
+  left: 0;
+  width: 80%;
+  bottom: 25%;
+  z-index: 0;
+}
+#files-editors.execute {
+  width: 40%;
+}
+#opened-files {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  width: 80%;
+  height: 48px;
+  z-index: 1;
+}
+#opened-files.execute {
+  width: 40%;
+}
+#console {
+  position: absolute;
+  left: 0;
+  width: 80%;
+  height: 25%;
+  bottom: 0;
+  z-index: 1;
+  background-color: #f2f2f7;
+}
+#console.execute {
+  width: 40%;
+}
+#welcome-page {
+  position: absolute;
+  top: 96px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+#registers {
+  position: absolute;
+  top: 96px;
+  left: 80%;
+  width: 20%;
+  bottom: 0;
+  z-index: 1;
+}
+#registers.execute {
+  left: 40%;
+}
+#registers .component {
+  border-left: solid 1px #f2f2f7;
 }
 #registers .table {
   position: absolute;
@@ -381,18 +385,34 @@ select {
 #registers .table .col.value {
   width: 50%;
 }
-#memory .table {
+#memory {
+  position: absolute;
+  top: 96px;
+  right: 0;
+  width: 40%;
+  bottom: 0;
+  z-index: 0;
+}
+#memory .component {
+  border-left: solid 1px #f2f2f7;
+}
+#memory .tables {
   position: absolute;
   top: 48px;
   bottom: 0;
   right: 0;
   left: 0;
 }
-#memory .table .col.address {
-  width: 50%;
+#memory .tables .table {
+  margin-bottom: 8px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
-#memory .table .col.value {
-  width: 50%;
+#memory .tables .table .col.address {
+  width: 33%;
+}
+#memory .tables .table .col.value {
+  width: 33%;
 }
 @media only screen and (max-width: 513px) {
   .buttons .button .label {

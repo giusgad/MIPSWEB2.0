@@ -26,6 +26,7 @@ body {
   transition:0.5s opacity;
   background-color: @light-gray-5;
   pointer-events:none;
+  z-index: 1;
   .spinner {
     border:2px solid rgba(@primary-color, 1);
     border-top-color: rgba(@secondary-color, 0.25);
@@ -38,6 +39,7 @@ body {
 .wait {
   .spinner-bg {
     opacity: 1;
+    background-color: @light-gray-5;
     pointer-events:all;
   }
 }
@@ -178,166 +180,6 @@ select {
   }
 }
 
-#welcome-page {
-  position: absolute;
-  top: @header-height + @toolbar-height;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: 1;
-}
-
-#app {
-  position: absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  .header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: @header-height;
-    background-color: @light-gray-4;
-    border-bottom: solid 1px @light-gray-5;
-  }
-  .toolbar {
-    position: absolute;
-    top: @header-height;
-    left: 0;
-    right: 0;
-    height: @toolbar-height;
-    background-color: @light-gray-4;
-    border-bottom: solid 1px @light-gray-5;
-  }
-}
-
-#files-editors {
-  position: absolute;
-  top: @header-height + @toolbar-height + @opened-files-height;
-  left:0;
-  width: 80%;
-  bottom: 0;
-  z-index: 0;
-  &.execute {
-    width: 40%;
-  }
-  .file-editor {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    .next-instruction {
-      position: absolute;
-    }
-    .breakpoint {
-      background-color: rgba(@blue, 0.5);
-    }
-  }
-}
-
-.next-instruction {
-  background-color: rgba(@blue, 0.125);
-}
-
-#opened-files {
-  position: absolute;
-  top: @header-height + @toolbar-height;
-  left: 0;
-  width: 80%;
-  height: @opened-files-height;
-  z-index: 1;
-  &.execute {
-    width: 40%;
-  }
-  .files-tabs {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: @light-gray-4;
-    border-bottom: solid 1px @light-gray-5;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    .file-tab {
-      height: 100%;
-      border-bottom: @space-1 solid @light-gray-4;
-      user-select: none;
-      display: flex;
-      padding-left: @space-4;
-      transition: all 0.5s;
-      .file-name {
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      &:hover {
-        background-color: rgba(@blue, 0.05);
-      }
-      &.active {
-        border-bottom: @space-1 solid rgba(@blue, 0.5);
-      }
-      .buttons {
-        .button {
-          margin: 0;
-          border: unset;
-          svg {
-            opacity: 0.5;
-          }
-          &:hover {
-            svg {
-              opacity: 1;
-            }
-            background-color: unset;
-          }
-          &:active {
-            background-color: unset;
-          }
-        }
-      }
-      &.no-hover {
-        &:hover {
-          background-color: unset;
-        }
-      }
-    }
-  }
-}
-
-#registers {
-  position: absolute;
-  top: @header-height + @toolbar-height;
-  left: 80%;
-  width: 20%;
-  bottom: 0;
-  z-index: 1;
-  .component {
-    border-left: solid 1px @light-gray-5;
-  }
-  &.execute {
-    left: 40%;
-  }
-}
-
-#memory {
-  position: absolute;
-  top: @header-height + @toolbar-height;
-  right: 0;
-  width: 40%;
-  bottom: 0;
-  z-index: 0;
-  .component {
-    border-left: solid 1px @light-gray-5;
-  }
-}
-
 .component {
   position: absolute;
   top: 0;
@@ -387,6 +229,7 @@ select {
         padding: @space-1 @space-2;
         border-right: 1px solid @light-gray-2;
         overflow: scroll;
+        line-height: @font-size;
         &:last-child {
           border-right: none;
         }
@@ -395,7 +238,168 @@ select {
   }
 }
 
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: @header-height;
+  background-color: @light-gray-4;
+  border-bottom: solid 1px @light-gray-5;
+}
+.toolbar {
+  position: absolute;
+  top: @header-height;
+  left: 0;
+  right: 0;
+  height: @toolbar-height;
+  background-color: @light-gray-4;
+  border-bottom: solid 1px @light-gray-5;
+}
+
+.file-editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  .next-instruction {
+    position: absolute;
+  }
+  .breakpoint {
+    background-color: rgba(@blue, 0.5);
+  }
+}
+
+.next-instruction {
+  background-color: rgba(@blue, 0.125);
+}
+
+.files-tabs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: @light-gray-4;
+  border-bottom: solid 1px @light-gray-5;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  .file-tab {
+    height: 100%;
+    border-bottom: @space-1 solid @light-gray-4;
+    user-select: none;
+    display: flex;
+    padding-left: @space-4;
+    transition: all 0.5s;
+    .file-name {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    &:hover {
+      background-color: rgba(@blue, 0.05);
+    }
+    &.active {
+      border-bottom: @space-1 solid rgba(@blue, 0.5);
+    }
+    .buttons {
+      .button {
+        margin: 0;
+        border: unset;
+        svg {
+          opacity: 0.5;
+        }
+        &:hover {
+          svg {
+            opacity: 1;
+          }
+          background-color: unset;
+        }
+        &:active {
+          background-color: unset;
+        }
+      }
+    }
+    &.no-hover {
+      &:hover {
+        background-color: unset;
+      }
+    }
+  }
+}
+
+#app {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+}
+
+#files-editors {
+  position: absolute;
+  top: @header-height + @toolbar-height + @opened-files-height;
+  left:0;
+  width: @editor-width-edit;
+  bottom: 25%;
+  z-index: 0;
+  &.execute {
+    width: @editor-width-execute;
+  }
+}
+
+#opened-files {
+  position: absolute;
+  top: @header-height + @toolbar-height;
+  left: 0;
+  width: @editor-width-edit;
+  height: @opened-files-height;
+  z-index: 1;
+  &.execute {
+    width: @editor-width-execute;
+  }
+}
+
+#console {
+  position: absolute;
+  left: 0;
+  width: @editor-width-edit;
+  height: 25%;
+  bottom: 0;
+  z-index: 1;
+  background-color: @light-gray-5;
+  &.execute {
+    width: @editor-width-execute;
+  }
+}
+
+#welcome-page {
+  position: absolute;
+  top: @header-height + @toolbar-height;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+
 #registers {
+  position: absolute;
+  top: @header-height + @toolbar-height;
+  left: @editor-width-edit;
+  width: 20%;
+  bottom: 0;
+  z-index: 1;
+  &.execute {
+    left: @editor-width-execute;
+  }
+  .component {
+    border-left: solid 1px @light-gray-5;
+  }
   .table{
     position: absolute;
     top: @opened-files-height;
@@ -420,24 +424,48 @@ select {
 }
 
 #memory {
-  .table{
+  position: absolute;
+  top: @header-height + @toolbar-height;
+  right: 0;
+  width: 40%;
+  bottom: 0;
+  z-index: 0;
+  .component {
+    border-left: solid 1px @light-gray-5;
+  }
+  .tables {
     position: absolute;
     top: @opened-files-height;
     bottom: 0;
     right: 0;
     left: 0;
-    .rows {
-      //background-color: @light-gray-3;
-    }
-    .col {
-      &.address {
-        width: 50%;
-      }
-      &.value {
-        width: 50%;
+    .table {
+      margin-bottom: @space-3;
+      margin-left: @space-3;
+      margin-right: @space-3;
+      .col {
+        &.address {
+          width: 33%;
+        }
+        &.value {
+          width: 33%;
+        }
       }
     }
   }
+}
+
+
+#header-buttons {
+
+}
+
+#files-buttons {
+
+}
+
+#vm-buttons {
+
 }
 
 @media only screen and (max-width: 513px) {
@@ -449,4 +477,3 @@ select {
     }
   }
 }
-
