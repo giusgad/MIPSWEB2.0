@@ -250,6 +250,9 @@ select {
 .file-editor .breakpoint {
   background-color: rgba(0, 122, 255, 0.5);
 }
+.selected-instruction {
+  background-color: rgba(142, 142, 147, 0.125);
+}
 .next-instruction {
   background-color: rgba(0, 122, 255, 0.125);
 }

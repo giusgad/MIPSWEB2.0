@@ -1,4 +1,6 @@
 import {file, getFiles, getSelectedFileId, saveFile, updateFile} from "./files.js";
+import {getContext} from "./app.js";
+import {render} from "./index.js";
 
 export type fileEditor = {
     fileId: number,
@@ -6,6 +8,17 @@ export type fileEditor = {
 }
 
 export let filesEditors: fileEditor[] = [];
+
+export function getEditor(fileId = getSelectedFileId()) {
+    if (fileId !== null) {
+        for (const fileEditor of filesEditors) {
+            if (fileEditor.fileId === fileId) {
+                return fileEditor.aceEditor;
+            }
+        }
+    }
+    return undefined;
+}
 
 export function removeFileEditor(fileId: number) {
     const fileEditorElement = document.getElementById(`file-editor-${fileId}`);
@@ -58,6 +71,10 @@ export function addFileEditor(file: file) {
     aceEditor.session.on("change", async () => {
         updateFile(file.id, aceEditor.getValue());
         await saveFile(file.id);
+    });
+
+    aceEditor.getSession().selection.on("changeCursor", async () => {
+        await render('memory', 'app/memory.ejs', getContext());
     });
 
     showEditor(file.id);

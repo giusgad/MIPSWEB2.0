@@ -13,7 +13,7 @@ import {
     newFile,
     openFile
 } from "./files.js";
-import {initEditors} from "./editor.js";
+import {getEditor, initEditors} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
 
 export const vm = new VirtualMachine(new CPU);
@@ -82,16 +82,31 @@ export async function run() {
 
 export function getContext() {
 
-    const intervals = getIntervals();
-
     return {
         vm,
-        intervals: intervals,
+        intervals: getIntervals(),
         interfaceState: interfaceState,
+        selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
         files: getFiles(),
         selectedFile: getSelectedFile(),
         settings: getFromLocalStorage('settings')
     };
+}
+
+export function getSelectedInstructionsAddresses() {
+    let selectedInstructionsAddresses: number[] = [];
+    const editor = getEditor();
+    if (editor) {
+        const cursorPosition = editor.getCursorPosition();
+        const highlightedRow = cursorPosition.row + 1;
+
+        for (const [key, value] of vm.assembler.addressLineMap) {
+            if (value === highlightedRow) {
+                selectedInstructionsAddresses.push(key);
+            }
+        }
+    }
+    return selectedInstructionsAddresses;
 }
 
 export function getIntervals() {

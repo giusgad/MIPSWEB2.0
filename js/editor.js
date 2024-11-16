@@ -8,7 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getFiles, getSelectedFileId, saveFile, updateFile } from "./files.js";
+import { getContext } from "./app.js";
+import { render } from "./index.js";
 export let filesEditors = [];
+export function getEditor(fileId = getSelectedFileId()) {
+    if (fileId !== null) {
+        for (const fileEditor of filesEditors) {
+            if (fileEditor.fileId === fileId) {
+                return fileEditor.aceEditor;
+            }
+        }
+    }
+    return undefined;
+}
 export function removeFileEditor(fileId) {
     const fileEditorElement = document.getElementById(`file-editor-${fileId}`);
     if (fileEditorElement) {
@@ -53,6 +65,9 @@ export function addFileEditor(file) {
     aceEditor.session.on("change", () => __awaiter(this, void 0, void 0, function* () {
         updateFile(file.id, aceEditor.getValue());
         yield saveFile(file.id);
+    }));
+    aceEditor.getSession().selection.on("changeCursor", () => __awaiter(this, void 0, void 0, function* () {
+        yield render('memory', 'app/memory.ejs', getContext());
     }));
     showEditor(file.id);
 }
