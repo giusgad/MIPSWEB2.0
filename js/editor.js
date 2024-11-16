@@ -118,7 +118,9 @@ export function addFileEditor(file) {
     }));
     aceEditor.on("dblclick", () => __awaiter(this, void 0, void 0, function* () {
         renderEditor("edit");
-        yield render('memory', 'app/memory.ejs', getContext());
+        yield render('memory', 'app/memory.ejs');
+        yield render('vm-buttons', 'app/vm-buttons.ejs');
+        aceEditor.clearSelection();
     }));
     showEditor(file.id);
 }

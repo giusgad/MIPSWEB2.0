@@ -136,7 +136,9 @@ export function addFileEditor(file: file) {
 
     aceEditor.on("dblclick", async () => {
         renderEditor("edit");
-        await render('memory', 'app/memory.ejs', getContext());
+        await render('memory', 'app/memory.ejs');
+        await render('vm-buttons', 'app/vm-buttons.ejs');
+        aceEditor.clearSelection();
     });
 
     showEditor(file.id);
