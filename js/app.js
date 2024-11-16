@@ -12,7 +12,7 @@ import { CPU } from "./virtual-machine/CPU.js";
 import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
 import { default_settings } from "./settings.js";
 import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, newFile, openFile } from "./files.js";
-import { getEditor, initEditors } from "./editor.js";
+import { editorState, getEditor, initEditors, renderEditor } from "./editor.js";
 import { Binary } from "./virtual-machine/Utils.js";
 export const vm = new VirtualMachine(new CPU);
 export let interfaceState = "edit";
@@ -54,6 +54,7 @@ export function assemble() {
         const file = getSelectedFile();
         if (file) {
             vm.assemble(file.content);
+            renderEditor("execute");
             yield renderApp("execute");
         }
     });
@@ -63,18 +64,21 @@ export function stop() {
         vm.stop();
         clearMemorySelectedFormats();
         yield renderApp("edit");
+        renderEditor("edit");
     });
 }
 export function step() {
     return __awaiter(this, void 0, void 0, function* () {
         vm.step();
         yield render('app', 'app.ejs');
+        renderEditor();
     });
 }
 export function run() {
     return __awaiter(this, void 0, void 0, function* () {
         vm.run();
         yield render('app', 'app.ejs');
+        renderEditor();
     });
 }
 export function getContext() {
@@ -82,6 +86,7 @@ export function getContext() {
         vm,
         intervals: getIntervals(),
         interfaceState: interfaceState,
+        editorState: editorState,
         selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
         files: getFiles(),
         selectedFile: getSelectedFile(),

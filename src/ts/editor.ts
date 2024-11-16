@@ -1,5 +1,5 @@
 import {file, getFiles, getSelectedFileId, saveFile, updateFile} from "./files.js";
-import {getContext} from "./app.js";
+import {getContext, vm} from "./app.js";
 import {render} from "./index.js";
 
 export type fileEditor = {
@@ -8,6 +8,63 @@ export type fileEditor = {
 }
 
 export let filesEditors: fileEditor[] = [];
+
+export let editorState: "edit" | "execute" = "edit";
+
+export function renderEditor(newState: "edit" | "execute" = editorState) {
+    editorState = newState;
+    const editor = getEditor();
+    const cursors = document.getElementsByClassName("ace_cursor-layer");
+    if (editor) {
+        if (editorState === "edit") {
+
+            editor.setOptions({
+                readOnly: false,
+                highlightActiveLine: true
+            });
+
+            for (let i = 0; i < cursors.length; i++) {
+                (cursors[i] as HTMLElement).style.display = "block";
+            }
+
+            let markers = editor.session.getMarkers(false);
+            for (let i in markers) {
+                if (markers[i].clazz === "next-instruction") {
+                    editor.session.removeMarker(markers[i].id);
+                }
+            }
+            editor.session.clearBreakpoints();
+            editor.focus();
+
+        } else if (editorState === "execute") {
+
+            editor.setOptions({
+                readOnly: true,
+                highlightActiveLine: true
+            });
+
+            for (let i = 0; i < cursors.length; i++) {
+                (cursors[i] as HTMLElement).style.display = "none";
+            }
+
+            let markers = editor.session.getMarkers(false);
+            for (let i in markers) {
+                if (markers[i].clazz === "next-instruction") {
+                    editor.session.removeMarker(markers[i].id);
+                }
+            }
+            editor.session.clearBreakpoints();
+
+            const nextInstructionLine = vm.nextInstructionLineNumber;
+            if (nextInstructionLine) {
+                let Range = ace.require('ace/range').Range,
+                    range = new Range(nextInstructionLine - 1, 0, nextInstructionLine - 1, Infinity);
+                editor.session.addMarker(range, "next-instruction", "fullLine", false);
+                editor.session.setBreakpoint(nextInstructionLine - 1, "breakpoint");
+            }
+        }
+    }
+}
 
 export function getEditor(fileId = getSelectedFileId()) {
     if (fileId !== null) {
@@ -74,6 +131,11 @@ export function addFileEditor(file: file) {
     });
 
     aceEditor.getSession().selection.on("changeCursor", async () => {
+        await render('memory', 'app/memory.ejs', getContext());
+    });
+
+    aceEditor.on("dblclick", async () => {
+        renderEditor("edit");
         await render('memory', 'app/memory.ejs', getContext());
     });
 

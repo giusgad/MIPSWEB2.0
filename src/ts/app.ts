@@ -13,7 +13,7 @@ import {
     newFile,
     openFile
 } from "./files.js";
-import {getEditor, initEditors} from "./editor.js";
+import {editorState, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
 
 export const vm = new VirtualMachine(new CPU);
@@ -60,6 +60,7 @@ export async function assemble() {
     const file = getSelectedFile();
     if (file) {
         vm.assemble(file.content);
+        renderEditor("execute");
         await renderApp("execute");
     }
 }
@@ -68,16 +69,19 @@ export async function stop() {
     vm.stop();
     clearMemorySelectedFormats();
     await renderApp("edit");
+    renderEditor("edit");
 }
 
 export async function step() {
     vm.step();
     await render('app', 'app.ejs');
+    renderEditor();
 }
 
 export async function run() {
     vm.run();
     await render('app', 'app.ejs');
+    renderEditor();
 }
 
 export function getContext() {
@@ -86,6 +90,7 @@ export function getContext() {
         vm,
         intervals: getIntervals(),
         interfaceState: interfaceState,
+        editorState: editorState,
         selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
         files: getFiles(),
         selectedFile: getSelectedFile(),

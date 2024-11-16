@@ -256,6 +256,9 @@ select {
 .next-instruction {
   background-color: rgba(0, 122, 255, 0.125);
 }
+.ace_read-only .ace_cursor {
+  display: none !important;
+}
 .files-tabs {
   position: absolute;
   top: 0;

@@ -36,8 +36,8 @@
                 <div class="rows">
                     <%interval.cells.forEach((cell) => {%>
                         <%if (cell) {%>
-                            <div class="row <%if (ctx.selectedInstructionsAddresses.includes(cell.address)){%> selected-instruction <%}%>
-                                            <%if (ctx.vm.cpu.pc.getValue() === cell.address){%> next-instruction <%}%>">
+                            <div class="row <%if (ctx.selectedInstructionsAddresses.includes(cell.address) && (ctx.editorState === "execute")){%> selected-instruction <%}%>
+                                            <%if ((ctx.vm.cpu.pc.getValue() === cell.address) && (ctx.editorState === "execute")){%> next-instruction <%}%>">
                                 <div class="col address"><%=convert(addressFormat, cell.address)%></div>
                                 <div class="col value"><%=convert(valueFormat, cell.value)%></div>
                             </div>
