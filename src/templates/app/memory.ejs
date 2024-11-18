@@ -1,15 +1,18 @@
 <div class="component">
     <div class="title">Memory</div>
     <div class="tables">
-        <%ctx.intervals.forEach((interval, index) => {%>
+        <%ctx.memoryIntervals.forEach((interval, index) => {%>
             <div class="table">
                 <div class="cols-names">
+                    <div class="col labels">
+                        <div class="col-name">Labels</div>
+                    </div>
                     <div class="col address">
                         <div class="col-name">Address</div>
                         <div class="col-format">
                             <select name="col-format" id="memory-address-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
                                 <%
-                                    let addressFormat = (interval.colsFormats && interval.colsFormats.address) || "decimal";
+                                    let addressFormat = (interval.formats && interval.formats.address) || "decimal";
                                 %>
                                 <option value="decimal" <%= addressFormat === "decimal" ? "selected" : "" %>>Decimal</option>
                                 <option value="hexadecimal" <%= addressFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
@@ -22,7 +25,7 @@
                         <div class="col-format">
                             <select name="col-format" id="memory-value-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
                                 <%
-                                    let valueFormat = (interval.colsFormats && interval.colsFormats.value) || "decimal";
+                                    let valueFormat = (interval.formats && interval.formats.value) || "decimal";
                                 %>
                                 <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
                                 <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
@@ -36,8 +39,9 @@
                 <div class="rows">
                     <%interval.cells.forEach((cell) => {%>
                         <%if (cell) {%>
-                            <div class="row <%if (ctx.selectedInstructionsAddresses.includes(cell.address) && (ctx.editorState === "execute")){%> selected-instruction <%}%>
-                                            <%if ((ctx.vm.cpu.pc.getValue() === cell.address) && (ctx.editorState === "execute")){%> next-instruction <%}%>">
+                            <!-- <%if ((ctx.vm.cpu.pc.getValue() === cell.address) && (ctx.editorState === "execute")){%> next-instruction <%}%> -->
+                            <div class="row <%if (ctx.selectedInstructionsAddresses.includes(cell.address) && (ctx.editorState === "execute")){%> selected-instruction <%}%>">
+                                <div class="col labels"><%=cell.labels.join(' ')%></div>
                                 <div class="col address"><%=convert(addressFormat, cell.address)%></div>
                                 <div class="col value"><%=convert(valueFormat, cell.value)%></div>
                             </div>

@@ -138,7 +138,6 @@ export function addFileEditor(file: file) {
         renderEditor("edit");
         await render('memory', 'app/memory.ejs');
         await render('vm-buttons', 'app/vm-buttons.ejs');
-        aceEditor.clearSelection();
     });
 
     showEditor(file.id);

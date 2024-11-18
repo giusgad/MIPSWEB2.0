@@ -19,9 +19,6 @@ export class VirtualMachine {
         this.stop();
         this.assembler.assemble(program);
         this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-        /*this.assembler.labels.forEach((address, label) => {
-            console.log(`${label}: ${address.getValue()}`);
-        });*/
     }
 
     run() {
@@ -61,9 +58,10 @@ export class VirtualMachine {
     }
 
     getMemory() {
-        return Array.from(this.cpu.getMemory().entries()).map(([address, value]) => ({
+        return Array.from(this.cpu.getMemory().entries()).map(([address, value]): {address: number, value: number, labels: string[]} => ({
             address,
-            value
+            value,
+            labels: []
         }));
     }
 

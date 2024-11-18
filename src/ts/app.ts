@@ -16,6 +16,8 @@ import {
 import {editorState, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
 
+const debug = false;
+
 export const vm = new VirtualMachine(new CPU);
 
 export let interfaceState: "edit" | "execute" = "edit";
@@ -63,6 +65,11 @@ export async function assemble() {
         renderEditor("execute");
         await renderApp("execute");
     }
+    if (debug) {
+        vm.assembler.labels.forEach((address, label) => {
+            console.log(`${label}: ${address.getValue()}`);
+        });
+    }
 }
 
 export async function stop() {
@@ -88,7 +95,7 @@ export function getContext() {
 
     return {
         vm,
-        intervals: getIntervals(),
+        memoryIntervals: getMemoryIntervals(),
         interfaceState: interfaceState,
         editorState: editorState,
         selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
@@ -114,7 +121,7 @@ export function getSelectedInstructionsAddresses() {
     return selectedInstructionsAddresses;
 }
 
-export function getIntervals() {
+export function getMemoryIntervals() {
     const memory = vm.getMemory();
     if (memory.length === 0) {
         return [];
@@ -133,6 +140,24 @@ export function getIntervals() {
         }
     }
     intervals.push(extendInterval(currentInterval, intervals.length));
+
+    for (const interval of intervals) {
+        for (const cell of interval.cells) {
+            vm.assembler.labels.forEach((address, label) => {
+                const addressValue = address.getValue();
+                if ((cell.address === addressValue) || ((addressValue > cell.address) && (addressValue < cell.address + 4))) {
+                    cell.labels.push(label);
+                }
+            });
+            for (const register of vm.getRegisters()) {
+                const addressValue = register.value;
+                if ((cell.address === addressValue) || ((addressValue > cell.address) && (addressValue < cell.address + 4))) {
+                    cell.labels.push(register.name);
+                }
+            }
+        }
+    }
+
     return intervals;
 }
 
@@ -140,19 +165,19 @@ export function extendInterval(cells: any, index: number) {
     const settings = getFromLocalStorage('settings');
     const interval = {
         cells: cells,
-        colsFormats: {
+        formats: {
             address: settings.colsFormats['memory-address-format'],
             value: settings.colsFormats['memory-value-format']
         }
     };
     if ((interval.cells[0].address >= 4194304) && (interval.cells[interval.cells.length - 1].address <= 268500992)) {
-        interval.colsFormats.value = 'asm';
+        interval.formats.value = 'asm';
     }
     if (settings.colsFormats[`memory-address-format_${index}`]) {
-        interval.colsFormats.address = settings.colsFormats[`memory-address-format_${index}`];
+        interval.formats.address = settings.colsFormats[`memory-address-format_${index}`];
     }
     if (settings.colsFormats[`memory-value-format_${index}`]) {
-        interval.colsFormats.value = settings.colsFormats[`memory-value-format_${index}`];
+        interval.formats.value = settings.colsFormats[`memory-value-format_${index}`];
     }
     return interval;
 }

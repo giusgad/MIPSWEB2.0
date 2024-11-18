@@ -414,11 +414,14 @@ select {
   margin-left: 8px;
   margin-right: 8px;
 }
+#memory .tables .table .col.labels {
+  width: calc(100% / 4);
+}
 #memory .tables .table .col.address {
-  width: 33%;
+  width: calc(100% / 4);
 }
 #memory .tables .table .col.value {
-  width: 33%;
+  width: calc(100% / 4);
 }
 @media only screen and (max-width: 513px) {
   .buttons .button .label {

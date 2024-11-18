@@ -120,7 +120,6 @@ export function addFileEditor(file) {
         renderEditor("edit");
         yield render('memory', 'app/memory.ejs');
         yield render('vm-buttons', 'app/vm-buttons.ejs');
-        aceEditor.clearSelection();
     }));
     showEditor(file.id);
 }

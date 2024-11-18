@@ -452,11 +452,14 @@ select {
       margin-left: @space-3;
       margin-right: @space-3;
       .col {
+        &.labels {
+          width: calc(100% / 4);
+        }
         &.address {
-          width: 33%;
+          width: calc(100% / 4);
         }
         &.value {
-          width: 33%;
+          width: calc(100% / 4);
         }
       }
     }
