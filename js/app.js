@@ -27,6 +27,12 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
     clearMemorySelectedFormats();
     document.body.classList.remove('wait');
 }));
+function scrollConsoleToBottom() {
+    const consoleElement = document.querySelector('.console');
+    if (consoleElement) {
+        consoleElement.scrollTop = consoleElement.scrollHeight;
+    }
+}
 export function clearMemorySelectedFormats() {
     const settings = getFromLocalStorage('settings');
     if (settings) {
@@ -48,6 +54,7 @@ export function renderApp() {
             removeClass('execute', 'files-editors');
         }
         yield render('app', 'app.ejs');
+        scrollConsoleToBottom();
     });
 }
 export function assemble() {
@@ -76,14 +83,14 @@ export function stop() {
 export function step() {
     return __awaiter(this, void 0, void 0, function* () {
         vm.step();
-        yield render('app', 'app.ejs');
+        yield renderApp();
         renderEditor();
     });
 }
 export function run() {
     return __awaiter(this, void 0, void 0, function* () {
         vm.run();
-        yield render('app', 'app.ejs');
+        yield renderApp();
         renderEditor();
     });
 }

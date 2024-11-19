@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getFromLocalStorage, render, setIntoLocalStorage } from "./index.js";
+import { getFromLocalStorage, setIntoLocalStorage } from "./index.js";
 import { addFileEditor, removeFileEditor, showEditor } from "./editor.js";
 import { renderApp } from "./app.js";
 export const samples = {
@@ -52,7 +52,7 @@ export function openFile() {
             const fileContent = yield fileData.text();
             const fileId = generateUniqueId();
             const fileName = generateUniqueName(fileData.name.split(".")[0]);
-            console.log(fileHandle);
+            //console.log(fileHandle);
         }
         catch (err) {
             console.error('Errore durante l’apertura del file:', err);
@@ -121,7 +121,7 @@ export function changeFile(fileId) {
     return __awaiter(this, void 0, void 0, function* () {
         setSelectedFileId(fileId);
         showEditor(fileId);
-        yield render('app', 'app.ejs');
+        yield renderApp();
     });
 }
 export function closeFile(fileId) {
@@ -136,7 +136,7 @@ export function closeFile(fileId) {
         else {
             localStorage.removeItem('selectedFileId');
         }
-        yield render('app', 'app.ejs');
+        yield renderApp();
     });
 }
 export function importSample(name) {

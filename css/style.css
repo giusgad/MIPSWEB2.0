@@ -126,7 +126,7 @@ body {
 }
 select {
   outline: none;
-  background-color: #e5e5ea;
+  background-color: #f2f2f7;
   border-radius: 4px;
   border: 1px solid #c7c7cc;
   font-size: 12px;
@@ -169,7 +169,6 @@ select {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #e5e5ea;
 }
 .component .title {
   width: 100%;
@@ -211,6 +210,7 @@ select {
 }
 .table .rows .row .col {
   display: flex;
+  align-items: center;
   padding: 2px 4px;
   border-right: 1px solid #c7c7cc;
   overflow: scroll;
@@ -254,7 +254,7 @@ select {
   background-color: rgba(142, 142, 147, 0.125);
 }
 .next-instruction {
-  background-color: rgba(0, 122, 255, 0.125);
+  background-color: rgba(0, 122, 255, 0.125) !important;
 }
 .ace_read-only .ace_cursor {
   display: none !important;
@@ -324,11 +324,12 @@ select {
   top: 144px;
   left: 0;
   width: 80%;
-  bottom: 25%;
+  bottom: 0;
   z-index: 0;
 }
 #files-editors.execute {
   width: 40%;
+  bottom: 25%;
 }
 #opened-files {
   position: absolute;
@@ -344,14 +345,26 @@ select {
 #console {
   position: absolute;
   left: 0;
-  width: 80%;
+  width: 40%;
   height: 25%;
   bottom: 0;
   z-index: 1;
-  background-color: #f2f2f7;
+  background-color: #e5e5ea;
 }
-#console.execute {
-  width: 40%;
+.console {
+  position: absolute;
+  top: 48px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 16px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+.console .line.error {
+  color: #ff3b30;
 }
 #welcome-page {
   position: absolute;
@@ -373,7 +386,7 @@ select {
   left: 40%;
 }
 #registers .component {
-  border-left: solid 1px #f2f2f7;
+  border-left: solid 1px #e5e5ea;
 }
 #registers .table {
   position: absolute;
@@ -400,7 +413,7 @@ select {
   z-index: 0;
 }
 #memory .component {
-  border-left: solid 1px #f2f2f7;
+  border-left: solid 1px #e5e5ea;
 }
 #memory .tables {
   position: absolute;
@@ -408,6 +421,8 @@ select {
   bottom: 0;
   right: 0;
   left: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 #memory .tables .table {
   margin-bottom: 8px;
@@ -415,13 +430,29 @@ select {
   margin-right: 8px;
 }
 #memory .tables .table .col.labels {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   width: calc(100% / 4);
+}
+#memory .tables .table .col.labels .label {
+  font-size: 12px;
+  padding: 2px 4px;
+  margin-right: 2px;
+  background-color: #e5e5ea;
+  border-radius: 4px;
+}
+#memory .tables .table .col.labels .label:last-child {
+  margin-right: 0;
 }
 #memory .tables .table .col.address {
   width: calc(100% / 4);
 }
 #memory .tables .table .col.value {
   width: calc(100% / 4);
+}
+#memory .tables .table .rows .row .col {
+  min-height: 26px;
 }
 @media only screen and (max-width: 513px) {
   .buttons .button .label {

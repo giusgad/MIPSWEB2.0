@@ -25,10 +25,8 @@ export class R_Format {
             rs = cpu.registers.get(tokens[2]);
         }
         else if (instruction.params === 'SYSCALL') {
-            //console.log(`TO-DO: Assemble SYSCALL`);
         }
         else if (instruction.params === 'BREAK') {
-            //console.log(`TO-DO: Assemble BREAK`);
         }
         else if (instruction.params === 'rd') {
             rd = cpu.registers.get(tokens[1]);
@@ -101,7 +99,7 @@ export class I_Format {
             immediate.set(Number(tokens[2]));
         }
         else if (instruction.params === 'cop_fun') {
-            console.log(`TO-DO: Assemble I ${instruction.symbol} ${instruction.params}`);
+            throw new Error(`TO-DO: Assemble I ${instruction.symbol} ${instruction.params}`);
         }
         else if (instruction.params === 'rt, offset(base)') {
             rt = cpu.registers.get(tokens[1]);

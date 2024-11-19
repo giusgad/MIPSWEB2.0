@@ -1,5 +1,3 @@
-<%//console.log(ctx);%>
-
 <div class="header flex justify-between align-center">
     <div class="flex align-center">
         <div class="icon app-logo"><%-Icons.render('microchip', { fill: 'url(#gradient)' })%></div>
@@ -15,7 +13,9 @@
 
 <% if (ctx.files.length > 0) { %>
 <div id="opened-files" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/opened-files.ejs', ctx)%></div>
-<div id="console" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/console.ejs', ctx)%></div>
+<%if (ctx.interfaceState === 'execute') {%>
+<div id="console"><%-await renderTemplate('/app/console.ejs', ctx)%></div>
+<%}%>
 <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
 <div id="memory"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
 <%}%>

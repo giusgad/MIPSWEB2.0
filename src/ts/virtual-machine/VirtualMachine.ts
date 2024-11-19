@@ -1,5 +1,6 @@
 import {CPU} from "./CPU.js";
 import {Assembler} from "./Assembler.js";
+import {Console} from "./Console.js";
 
 export class VirtualMachine {
 
@@ -9,6 +10,8 @@ export class VirtualMachine {
 
     nextInstructionLineNumber?: number;
 
+    console: Console = new Console();
+
     constructor(cpu: CPU) {
         this.cpu = cpu;
         this.assembler = new Assembler(cpu);
@@ -16,9 +19,15 @@ export class VirtualMachine {
     }
 
     assemble(program: string) {
-        this.stop();
-        this.assembler.assemble(program);
-        this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+        try {
+            this.stop();
+            this.assembler.assemble(program);
+            this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+            this.console.addLine("Assemble: operation completed successfully", "success");
+        } catch (error) {
+            // @ts-ignore
+            this.console.addLine(`Assemble: ${error.message}`, "error");
+        }
     }
 
     run() {
@@ -29,10 +38,16 @@ export class VirtualMachine {
     }
 
     step() {
-        if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
-            this.cpu.execute();
-            this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-        } else {
+        try {
+            if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
+                this.cpu.execute();
+                this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+            } else {
+                this.pause();
+            }
+        } catch (error) {
+            // @ts-ignore
+            this.console.addLine(`${error.message}`, "error");
             this.pause();
         }
     }
@@ -44,6 +59,7 @@ export class VirtualMachine {
     stop() {
         this.pause();
         this.assembler.reset();
+        this.console.clear();
     }
 
     getRegisters() {

@@ -36,6 +36,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.remove('wait');
 });
 
+function scrollConsoleToBottom() {
+    const consoleElement = document.querySelector('.console');
+    if (consoleElement) {
+        consoleElement.scrollTop = consoleElement.scrollHeight;
+    }
+}
+
 export function clearMemorySelectedFormats() {
     const settings = getFromLocalStorage('settings');
     if (settings) {
@@ -56,6 +63,7 @@ export async function renderApp(newState: "edit" | "execute" = interfaceState) {
         removeClass('execute', 'files-editors');
     }
     await render('app', 'app.ejs');
+    scrollConsoleToBottom();
 }
 
 export async function assemble() {
@@ -81,13 +89,13 @@ export async function stop() {
 
 export async function step() {
     vm.step();
-    await render('app', 'app.ejs');
+    await renderApp();
     renderEditor();
 }
 
 export async function run() {
     vm.run();
-    await render('app', 'app.ejs');
+    await renderApp();
     renderEditor();
 }
 

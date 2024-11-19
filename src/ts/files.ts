@@ -56,7 +56,7 @@ export async function openFile() {
         const fileId = generateUniqueId();
         const fileName = generateUniqueName(fileData.name.split(".")[0]);
 
-        console.log(fileHandle);
+        //console.log(fileHandle);
 
     } catch (err) {
         console.error('Errore durante l’apertura del file:', err);
@@ -126,7 +126,7 @@ async function addFile(file: file) {
 export async function changeFile(fileId: number) {
     setSelectedFileId(fileId);
     showEditor(fileId);
-    await render('app', 'app.ejs');
+    await renderApp();
 }
 
 export async function closeFile(fileId: number) {
@@ -139,7 +139,7 @@ export async function closeFile(fileId: number) {
     } else {
         localStorage.removeItem('selectedFileId');
     }
-    await render('app', 'app.ejs');
+    await renderApp();
 }
 
 export async function importSample(name: string) {

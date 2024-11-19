@@ -1,1 +1,8 @@
-<div class="flex-center fullscreen" style="opacity: 0.5;">TO-DO: Console</div>
+<div class="component">
+    <div class="title">Console</div>
+    <div class="console">
+        <%ctx.vm.console.lines.forEach((line) => {%>
+            <div class="line <%if (line.type === "error") {%>error<%}%>"><%=line.text%></div>
+        <%});%>
+    </div>
+</div>

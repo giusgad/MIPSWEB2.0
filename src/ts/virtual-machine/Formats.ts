@@ -42,11 +42,11 @@ export class R_Format implements Format {
 
         } else if (instruction.params === 'SYSCALL') {
 
-            //console.log(`TO-DO: Assemble SYSCALL`);
+
 
         } else if (instruction.params === 'BREAK') {
 
-            //console.log(`TO-DO: Assemble BREAK`);
+
 
         } else if (instruction.params === 'rd') {
 
@@ -130,7 +130,7 @@ export class I_Format implements Format {
 
         } else if (instruction.params === 'cop_fun') {
 
-            console.log(`TO-DO: Assemble I ${instruction.symbol} ${instruction.params}`);
+            throw new Error(`TO-DO: Assemble I ${instruction.symbol} ${instruction.params}`);
 
         } else if (instruction.params === 'rt, offset(base)') {
 

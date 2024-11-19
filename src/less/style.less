@@ -141,7 +141,7 @@ body {
 
 select {
   outline: none;
-  background-color: @light-gray-4;
+  background-color: @light-gray-5;
   border-radius: @space-2;
   border: 1px solid @light-gray-2;
   font-size: @font-size-small;
@@ -186,7 +186,6 @@ select {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: @light-gray-4;
   .title {
     width: 100%;
     height: @opened-files-height;
@@ -226,6 +225,7 @@ select {
       }
       .col {
         display: flex;
+        align-items: center;
         padding: @space-1 @space-2;
         border-right: 1px solid @light-gray-2;
         overflow: scroll;
@@ -276,7 +276,7 @@ select {
 }
 
 .next-instruction {
-  background-color: rgba(@blue, 0.125);
+  background-color: rgba(@blue, 0.125) !important;
 }
 
 .ace_read-only .ace_cursor {
@@ -354,10 +354,11 @@ select {
   top: @header-height + @toolbar-height + @opened-files-height;
   left:0;
   width: @editor-width-edit;
-  bottom: 25%;
+  bottom: 0;
   z-index: 0;
   &.execute {
     width: @editor-width-execute;
+    bottom: 25%;
   }
 }
 
@@ -376,13 +377,28 @@ select {
 #console {
   position: absolute;
   left: 0;
-  width: @editor-width-edit;
+  width: @editor-width-execute;
   height: 25%;
   bottom: 0;
   z-index: 1;
-  background-color: @light-gray-5;
-  &.execute {
-    width: @editor-width-execute;
+  background-color: @light-gray-4;
+}
+
+.console {
+  position: absolute;
+  top: @opened-files-height;
+  left: @space-3 + @space-2;
+  right: @space-3 + @space-2;
+  bottom: @space-3 + @space-2;
+  padding: @space-4;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  .line {
+    &.error {
+        color: @red;
+    }
   }
 }
 
@@ -406,7 +422,7 @@ select {
     left: @editor-width-execute;
   }
   .component {
-    border-left: solid 1px @light-gray-5;
+    border-left: solid 1px @light-gray-4;
   }
   .table{
     position: absolute;
@@ -414,9 +430,6 @@ select {
     bottom: 0;
     right: 0;
     left: 0;
-    .rows {
-      //background-color: @light-gray-3;
-    }
     .col {
       &.number {
         width: 25%;
@@ -439,7 +452,7 @@ select {
   bottom: 0;
   z-index: 0;
   .component {
-    border-left: solid 1px @light-gray-5;
+    border-left: solid 1px @light-gray-4;
   }
   .tables {
     position: absolute;
@@ -447,13 +460,28 @@ select {
     bottom: 0;
     right: 0;
     left: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
     .table {
       margin-bottom: @space-3;
       margin-left: @space-3;
       margin-right: @space-3;
       .col {
         &.labels {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
           width: calc(100% / 4);
+          .label {
+            font-size: @font-size-small;
+            padding: @space-1 @space-2;
+            margin-right: @space-1;
+            background-color: @light-gray-4;
+            border-radius: @space-2;
+            &:last-child {
+              margin-right: 0;
+            }
+          }
         }
         &.address {
           width: calc(100% / 4);
@@ -462,10 +490,16 @@ select {
           width: calc(100% / 4);
         }
       }
+      .rows {
+        .row {
+          .col {
+            min-height: 26px;
+          }
+        }
+      }
     }
   }
 }
-
 
 #header-buttons {
 
