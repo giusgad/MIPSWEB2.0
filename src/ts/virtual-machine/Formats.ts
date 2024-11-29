@@ -186,7 +186,7 @@ export class J_Format implements Format {
             const address = assembler.resolveLabel(tokens[1]);
             target.set(address >> 2);
         } else {
-            console.error(`Istruzione J-format non gestita: ${instruction.symbol} ${instruction.params}`);
+            console.error(`Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`);
         }
 
         let code = new Binary();

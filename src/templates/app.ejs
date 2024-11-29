@@ -8,7 +8,9 @@
 
 <div class="toolbar flex justify-between align-center">
     <div id="files-buttons"><%-await renderTemplate('/app/files-buttons.ejs', ctx)%></div>
+    <% if (ctx.files.length > 0) { %>
     <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', ctx)%></div>
+    <%}%>
 </div>
 
 <% if (ctx.files.length > 0) { %>

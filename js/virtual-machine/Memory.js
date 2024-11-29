@@ -34,7 +34,7 @@ export class Memory {
         const sortedMemory = new Map();
         for (const key of sortedKeys) {
             if (key % 4 !== 0)
-                throw new Error("Memory error");
+                throw new Error(`Memory error`);
             sortedMemory.set(key, this.memory.get(key));
         }
         return sortedMemory;

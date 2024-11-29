@@ -19,14 +19,15 @@ export class VirtualMachine {
     }
 
     assemble(program: string) {
+        this.stop();
         try {
-            this.stop();
             this.assembler.assemble(program);
             this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
             this.console.addLine("Assemble: operation completed successfully", "success");
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
+            console.error(error);
         }
     }
 
@@ -48,6 +49,7 @@ export class VirtualMachine {
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`${error.message}`, "error");
+            console.error(error);
             this.pause();
         }
     }
@@ -60,6 +62,7 @@ export class VirtualMachine {
         this.pause();
         this.assembler.reset();
         this.console.clear();
+        this.nextInstructionLineNumber = undefined;
     }
 
     getRegisters() {
@@ -74,10 +77,10 @@ export class VirtualMachine {
     }
 
     getMemory() {
-        return Array.from(this.cpu.getMemory().entries()).map(([address, value]): {address: number, value: number, labels: string[]} => ({
+        return Array.from(this.cpu.getMemory().entries()).map(([address, value]): {address: number, value: number, tags: {name: string, type: string}[]} => ({
             address,
             value,
-            labels: []
+            tags: []
         }));
     }
 

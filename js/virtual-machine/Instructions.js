@@ -240,8 +240,9 @@ export class Instructions {
                 const registers = cpu.getRegisters();
                 const v0 = registers[2].binary;
                 const syscall = cpu.syscallsSet.get(v0.getValue());
-                if (!syscall)
+                if (!syscall) {
                     throw new Error(`Unknown syscall: ${v0.getValue()}`);
+                }
                 syscall.execute(cpu, {});
                 cpu.pc.set(cpu.pc.getValue() + 4);
             }
@@ -311,7 +312,10 @@ export class Instructions {
                     `);
             }
             execute(cpu, params) {
-                throw new Error(`${this.symbol} not implemented yet`);
+                const registers = cpu.getRegisters();
+                const rd = registers[params.rd.getValue()].binary;
+                rd.set(cpu.lo.getValue());
+                cpu.pc.set(cpu.pc.getValue() + 4);
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -379,7 +383,15 @@ export class Instructions {
                     `);
             }
             execute(cpu, params) {
-                throw new Error(`${this.symbol} not implemented yet`);
+                const registers = cpu.getRegisters();
+                const rs = registers[params.rs.getValue()].binary;
+                const rt = registers[params.rt.getValue()].binary;
+                const rsValue = rs.getValue();
+                const rtValue = rt.getValue();
+                const result = BigInt(rsValue) * BigInt(rtValue);
+                cpu.lo.set(Number(result & BigInt(0xFFFFFFFF)));
+                cpu.hi.set(Number((result >> BigInt(32)) & BigInt(0xFFFFFFFF)));
+                cpu.pc.set(cpu.pc.getValue() + 4);
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -413,7 +425,20 @@ export class Instructions {
                     `);
             }
             execute(cpu, params) {
-                throw new Error(`${this.symbol} not implemented yet`);
+                const registers = cpu.getRegisters();
+                const rs = registers[params.rs.getValue()].binary;
+                const rt = registers[params.rt.getValue()].binary;
+                const rsValue = rs.getValue();
+                const rtValue = rt.getValue();
+                if (rtValue === 0) {
+                    console.warn('DIV instruction: Division by zero. Result undefined.');
+                    return;
+                }
+                const quotient = Math.floor(rsValue / rtValue);
+                const remainder = rsValue % rtValue;
+                cpu.lo.set(quotient);
+                cpu.hi.set(remainder);
+                cpu.pc.set(cpu.pc.getValue() + 4);
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -515,7 +540,20 @@ export class Instructions {
                     `);
             }
             execute(cpu, params) {
-                throw new Error(`${this.symbol} not implemented yet`);
+                const registers = cpu.getRegisters();
+                const rd = registers[params.rd.getValue()].binary;
+                const rs = registers[params.rs.getValue()].binary;
+                const rt = registers[params.rt.getValue()].binary;
+                const rsValue = rs.getValue();
+                const rtValue = rt.getValue();
+                const result = rsValue + rtValue;
+                const overflow = (((rsValue > 0 && rtValue > 0) && result < 0) ||
+                    ((rsValue < 0 && rtValue < 0) && result > 0));
+                if (overflow) {
+                    throw new Error('Integer Overflow');
+                }
+                rd.set(result);
+                cpu.pc.set(cpu.pc.getValue() + 4);
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -543,18 +581,31 @@ export class Instructions {
         this.instructions.push(new class extends Instruction {
             constructor() {
                 super('SUB', 'rd, rs, rt', 'R', new Binary(0b000000, 6), new Binary(0b100010, 6), `
-                    name: "Subtract Word",
-                    purpose: "To subtract 32-bit integers. If overflow occurs, then trap.",
-                    description: "rd <- rs - rt<br>The 32-bit word value in GPR rt is subtracted from the 32-bit value in GPR rs to produce a 32-bit result. If the subtraction results in 32-bit 2's complement arithmetic overflow then the destination register is not modified and an Integer Overflow exception occurs. If it does not overflow, the 32-bit result is placed into GPR rd.",
-                    restrictions: "On 64-bit processors, if either GPR rt or GPR rs do not contain sign-extended 32-bit values (bits 63..31 equal), then the result of the operation is undefined.",
-                    operation: "if (NotWordValue(GPR[rs]) or NotWordValue(GPR[rt])) then UndefinedResult() endif<br>temp <- GPR[rs] - GPR[rt]<br>if (32_bit_arithmetic_overflow) then<br>&emsp;SignalException(IntegerOverflow)<br>else<br>&emsp;GPR[rd] <- temp<br>endif",
-                    exceptions: "Integer Overflow",
-                    programming_notes: "SUBU performs the same arithmetic operation but, does not trap on overflow.",
-                    implementation_notes: ""
-                    `);
+            name: "Subtract Word",
+            purpose: "To subtract 32-bit integers. If overflow occurs, then trap.",
+            description: "rd <- rs - rt<br>The 32-bit word value in GPR rt is subtracted from the 32-bit value in GPR rs to produce a 32-bit result. If the subtraction results in 32-bit 2's complement arithmetic overflow then the destination register is not modified and an Integer Overflow exception occurs. If it does not overflow, the 32-bit result is placed into GPR rd.",
+            restrictions: "On 64-bit processors, if either GPR rt or GPR rs do not contain sign-extended 32-bit values (bits 63..31 equal), then the result of the operation is undefined.",
+            operation: "if (NotWordValue(GPR[rs]) or NotWordValue(GPR[rt])) then UndefinedResult() endif<br>temp <- GPR[rs] - GPR[rt]<br>if (32_bit_arithmetic_overflow) then<br>&emsp;SignalException(IntegerOverflow)<br>else<br>&emsp;GPR[rd] <- temp<br>endif",
+            exceptions: "Integer Overflow",
+            programming_notes: "SUBU performs the same arithmetic operation but, does not trap on overflow.",
+            implementation_notes: ""
+            `);
             }
             execute(cpu, params) {
-                throw new Error(`${this.symbol} not implemented yet`);
+                const registers = cpu.getRegisters();
+                const rd = registers[params.rd.getValue()].binary;
+                const rs = registers[params.rs.getValue()].binary;
+                const rt = registers[params.rt.getValue()].binary;
+                const rsValue = rs.getValue();
+                const rtValue = rt.getValue();
+                const result = rsValue - rtValue;
+                const overflow = (((rsValue > 0 && rtValue < 0) && result < 0) ||
+                    ((rsValue < 0 && rtValue > 0) && result > 0));
+                if (overflow) {
+                    throw new Error('Integer Overflow');
+                }
+                rd.set(result);
+                cpu.pc.set(cpu.pc.getValue() + 4);
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -979,7 +1030,16 @@ export class Instructions {
                     `);
             }
             execute(cpu, params) {
-                throw new Error(`${this.symbol} not implemented yet`);
+                const registers = cpu.getRegisters();
+                const rs = registers[params.rs.getValue()].binary.getValue();
+                const rt = registers[params.rt.getValue()].binary.getValue();
+                const offset = Utils.fromSigned(params.immediate.getValue(), 16) << 2;
+                if (rs !== rt) {
+                    cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                }
+                else {
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -1821,6 +1881,32 @@ export class Instructions {
             expand(assembler, tokens) {
                 const params = this.mapParams(tokens);
                 return [];
+            }
+        }());
+        this.pseudoInstructions.push(new class extends PseudoInstruction {
+            constructor() {
+                super('MUL', 'rd, rs, rt');
+            }
+            expand(assembler, tokens) {
+                const params = this.mapParams(tokens);
+                return [
+                    ['mult', params['rs'], params['rt']],
+                    ['mflo', params['rd']]
+                ];
+            }
+        }());
+        this.pseudoInstructions.push(new class extends PseudoInstruction {
+            constructor() {
+                super('DIV', 'rd, rs, rt');
+            }
+            expand(assembler, tokens) {
+                const params = this.mapParams(tokens);
+                return [
+                    ['bne', params['rt'], '$zero', '1'],
+                    ['break'],
+                    ['div', params['rs'], params['rt']],
+                    ['mflo', params['rd']]
+                ];
             }
         }());
     }

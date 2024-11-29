@@ -11,12 +11,10 @@ import {
     importFiles,
     importSample,
     newFile,
-    openFile
+    openFile, samples
 } from "./files.js";
 import {editorState, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
-
-const debug = false;
 
 export const vm = new VirtualMachine(new CPU);
 
@@ -66,17 +64,22 @@ export async function renderApp(newState: "edit" | "execute" = interfaceState) {
     scrollConsoleToBottom();
 }
 
+function moveCursorToNextInstruction() {
+    const editor = getEditor();
+    if (editor) {
+        if (vm.nextInstructionLineNumber != null) {
+            editor.gotoLine(vm.nextInstructionLineNumber);
+        }
+    }
+}
+
 export async function assemble() {
     const file = getSelectedFile();
     if (file) {
         vm.assemble(file.content);
         renderEditor("execute");
+        moveCursorToNextInstruction();
         await renderApp("execute");
-    }
-    if (debug) {
-        vm.assembler.labels.forEach((address, label) => {
-            console.log(`${label}: ${address.getValue()}`);
-        });
     }
 }
 
@@ -89,6 +92,7 @@ export async function stop() {
 
 export async function step() {
     vm.step();
+    moveCursorToNextInstruction();
     await renderApp();
     renderEditor();
 }
@@ -109,7 +113,8 @@ export function getContext() {
         selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
         files: getFiles(),
         selectedFile: getSelectedFile(),
-        settings: getFromLocalStorage('settings')
+        settings: getFromLocalStorage('settings'),
+        samples: samples
     };
 }
 
@@ -151,16 +156,26 @@ export function getMemoryIntervals() {
 
     for (const interval of intervals) {
         for (const cell of interval.cells) {
+            if (cell.address === vm.cpu.textSegmentStart.getValue()) {
+                cell.tags.push({name: '.text', type: 'section'});
+            }
+            if (cell.address === vm.cpu.dataSegmentStart.getValue()) {
+                cell.tags.push({name: '.data', type: 'section'});
+            }
             vm.assembler.labels.forEach((address, label) => {
                 const addressValue = address.getValue();
                 if ((cell.address === addressValue) || ((addressValue > cell.address) && (addressValue < cell.address + 4))) {
-                    cell.labels.push(label);
+                    cell.tags.push({name: label + ':', type: 'label'});
                 }
             });
             for (const register of vm.getRegisters()) {
                 const addressValue = register.value;
                 if ((cell.address === addressValue) || ((addressValue > cell.address) && (addressValue < cell.address + 4))) {
-                    cell.labels.push(register.name);
+                    if (register.name === 'pc') {
+                        cell.tags.push({name: register.name, type: 'pc'});
+                    } else {
+                        cell.tags.push({name: register.name, type: 'register'});
+                    }
                 }
             }
         }

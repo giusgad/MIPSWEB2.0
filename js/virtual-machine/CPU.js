@@ -7,7 +7,7 @@ import { Syscalls } from "./Syscalls.js";
 export class CPU {
     constructor() {
         this.textSegmentStart = new Binary(0x00400000);
-        this.textSegmentEnd = this.textSegmentStart;
+        this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
         this.dataSegmentStart = new Binary(0x10010000);
         this.dataSegmentEnd = this.dataSegmentStart;
         this.registers = new Registers([
@@ -24,7 +24,7 @@ export class CPU {
             "$fp",
             "$ra"
         ]);
-        this.pc = this.textSegmentStart;
+        this.pc = new Binary(this.textSegmentStart.getValue());
         this.lo = new Binary();
         this.hi = new Binary();
         this.instructionsSet = new Instructions();
@@ -113,12 +113,12 @@ export class CPU {
         this.registers.reset();
         this.memory.reset();
         this.textSegmentStart = new Binary(0x00400000);
-        this.textSegmentEnd = this.textSegmentStart;
+        this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
         this.dataSegmentStart = new Binary(0x10010000);
         this.dataSegmentEnd = this.dataSegmentStart;
         this.registers.get("$gp").binary = new Binary(0x10008000);
         this.registers.get("$sp").binary = new Binary(0x7fffeffc);
-        this.pc = this.textSegmentStart;
+        this.pc = new Binary(this.textSegmentStart.getValue());
         this.lo = new Binary();
         this.hi = new Binary();
         this.halted = false;

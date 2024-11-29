@@ -147,7 +147,7 @@ export class J_Format {
             target.set(address >> 2);
         }
         else {
-            console.error(`Istruzione J-format non gestita: ${instruction.symbol} ${instruction.params}`);
+            console.error(`Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`);
         }
         let code = new Binary();
         code.setBits(opcode, 31, 26);

@@ -17,7 +17,9 @@ export class asmDirective extends Directive {
         const symbol = tokens[0];
         const pseudo = assembler.cpu.instructionsSet.getPseudoBySymbol(symbol);
 
-        if (pseudo) {
+        const args = tokens.slice(1);
+
+        if (pseudo && (args.length === pseudo.params.length)) {
             const expandedInstructions = pseudo.expand(assembler, tokens);
             for (const expandedTokens of expandedInstructions) {
                 this.assembleInstruction(expandedTokens, address, assembler, line);

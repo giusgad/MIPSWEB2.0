@@ -13,28 +13,31 @@ import { renderApp } from "./app.js";
 export const samples = {
     "sample": `
 .data
-
-int_values:  .word 10, 20, 30    
-char_values: .byte 'A', 'B', 'C' 
-buffer1:     .space 10          
-buffer2:     .space 20          
+    
+a:\t.word 10
+b:\t.word 20
 
 .text
-
+.globl main
+    
 main:
-    addiu $t1, $zero, 5     
-    move $t2, $t1            
 
-loop_start:
-    addiu $t1, $t1, -1       
-after_decrement:
-    bgtz $t1, loop_start     
-    nop                     
-
-after_loop:
-    addiu $v0, $zero, 10    
-    syscall                 
-`
+    la $s1 a
+    la $s2 b
+    
+    li $t0 100 
+    li $t1 45
+    
+    mult $t0, $t1 
+    mflo $t2
+    
+    mul $t3, $t0, $t1 
+    
+    div $t0, $t1
+    mflo $t4
+    
+    div $t5, $t0, $t1
+  `
 };
 export function openFile() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -52,7 +55,7 @@ export function openFile() {
             const fileContent = yield fileData.text();
             const fileId = generateUniqueId();
             const fileName = generateUniqueName(fileData.name.split(".")[0]);
-            //console.log(fileHandle);
+            console.log(fileHandle);
         }
         catch (err) {
             console.error('Errore durante l’apertura del file:', err);

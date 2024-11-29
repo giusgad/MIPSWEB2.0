@@ -1,11 +1,12 @@
 <div class="component">
     <div class="title">Memory</div>
+
     <div class="tables">
         <%ctx.memoryIntervals.forEach((interval, index) => {%>
             <div class="table">
                 <div class="cols-names">
-                    <div class="col labels">
-                        <div class="col-name">Labels</div>
+                    <div class="col tags">
+                        <div class="col-name"></div>
                     </div>
                     <div class="col address">
                         <div class="col-name">Address</div>
@@ -41,15 +42,28 @@
                         <%if (cell) {%>
                             <!-- <%if ((ctx.vm.cpu.pc.getValue() === cell.address) && (ctx.editorState === "execute")){%> next-instruction <%}%> -->
                             <div class="row <%if (ctx.selectedInstructionsAddresses.includes(cell.address) && (ctx.editorState === "execute")){%> selected-instruction <%}%>">
-                                <div class="col labels">
-                                    <%if (cell.labels.length > 0) {%>
-                                        <%cell.labels.forEach((label) => {%>
-                                            <div class="label <%if(label==="pc"){%> next-instruction <%}%>"><%=label%></div>
-                                        <%});%>
+
+                                <div class="col tags">
+                                    <%if (cell.tags.length > 0) {%>
+                                        <div class="static-tags">
+                                            <%cell.tags.forEach((tag) => {%>
+                                                <%if (['section', 'label'].includes(tag.type)) {%>
+                                                    <div class="tag <%=tag.type%>"><%=tag.name%></div>
+                                                <%}%>
+                                            <%});%>
+                                        </div>
+                                        <div class="dynamic-tags">
+                                            <%cell.tags.forEach((tag) => {%>
+                                                <%if (['pc', 'register'].includes(tag.type)) {%>
+                                                <div class="tag <%=tag.type%>"><%=tag.name%></div>
+                                                <%}%>
+                                            <%});%>
+                                        </div>
                                     <%}%>
                                 </div>
-                                <div class="col address"><%=convert(addressFormat, cell.address)%></div>
-                                <div class="col value"><%=convert(valueFormat, cell.value)%></div>
+
+                                <div class="col address <%if(addressFormat==='binary'){%>binary<%}%>"><%=convert(addressFormat, cell.address)%></div>
+                                <div class="col value <%if(valueFormat==='binary'){%>binary<%}%>"><%=convert(valueFormat, cell.value)%></div>
                             </div>
                         <%}%>
                     <%});%>

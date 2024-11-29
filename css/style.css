@@ -180,7 +180,6 @@ select {
 }
 .table {
   font-size: 12px;
-  padding: 0 12px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -200,24 +199,21 @@ select {
 }
 .table .rows {
   font-family: monospace;
+  border: 0.75px solid #d1d1d6;
 }
 .table .rows .row {
   display: flex;
-  border-top: 1px solid #c7c7cc;
-}
-.table .rows .row:last-child {
-  border-bottom: 1px solid #c7c7cc;
 }
 .table .rows .row .col {
+  border: 0.75px solid #d1d1d6;
   display: flex;
   align-items: center;
   padding: 2px 4px;
-  border-right: 1px solid #c7c7cc;
   overflow: scroll;
   line-height: 14px;
 }
-.table .rows .row .col:last-child {
-  border-right: none;
+.table .rows .row .col.binary {
+  font-size: 11px;
 }
 .header {
   position: absolute;
@@ -394,15 +390,17 @@ select {
   bottom: 0;
   right: 0;
   left: 0;
+  padding: 0 12px;
+  padding-bottom: 12px;
 }
 #registers .table .col.number {
-  width: 25%;
+  width: calc(100% / 100 * 11.5);
 }
 #registers .table .col.name {
-  width: 25%;
+  width: calc(100% / 100 * 17);
 }
 #registers .table .col.value {
-  width: 50%;
+  width: calc(100% / 100 * 71.5);
 }
 #memory {
   position: absolute;
@@ -419,40 +417,61 @@ select {
   position: absolute;
   top: 48px;
   bottom: 0;
-  right: 0;
   left: 0;
+  right: 0;
   overflow-y: scroll;
-  overflow-x: hidden;
 }
 #memory .tables .table {
-  margin-bottom: 8px;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin-bottom: 12px;
+  padding: 0 12px;
 }
-#memory .tables .table .col.labels {
+#memory .tables .table .rows .row .col {
+  line-height: 12px;
+  min-height: 28px;
+}
+#memory .tables .table .rows .row .col.tags .static-tags {
+  width: 50%;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: calc(100% / 4);
+  flex-wrap: wrap;
 }
-#memory .tables .table .col.labels .label {
+#memory .tables .table .rows .row .col.tags .dynamic-tags {
+  width: 50%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#memory .tables .table .rows .row .col.tags .tag {
   font-size: 12px;
-  padding: 2px 4px;
-  margin-right: 2px;
-  background-color: #e5e5ea;
   border-radius: 4px;
+  padding: 2px;
+  margin: 2px;
 }
-#memory .tables .table .col.labels .label:last-child {
-  margin-right: 0;
+#memory .tables .table .rows .row .col.tags .tag.register {
+  padding: 2px 4px;
+  font-style: italic;
+  color: #fd971e;
+  border: 1px solid #fd971e;
+}
+#memory .tables .table .rows .row .col.tags .tag.pc {
+  padding: 2px 4px;
+  font-weight: bold;
+  color: #007aff;
+  border: 1px solid #007aff;
+}
+#memory .tables .table .rows .row .col.tags .tag.section {
+  font-weight: bold;
+}
+#memory .tables .table .col.tags {
+  width: calc(100% / 100 * 31.5);
 }
 #memory .tables .table .col.address {
-  width: calc(100% / 4);
+  width: calc(100% / 100 * 34.25);
 }
 #memory .tables .table .col.value {
-  width: calc(100% / 4);
-}
-#memory .tables .table .rows .row .col {
-  min-height: 26px;
+  width: calc(100% / 100 * 34.25);
 }
 @media only screen and (max-width: 513px) {
   .buttons .button .label {

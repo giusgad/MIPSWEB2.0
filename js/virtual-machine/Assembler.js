@@ -97,11 +97,13 @@ export class Assembler {
         if (symbol.toLowerCase() === "nop")
             return new Binary();
         const instruction = this.cpu.instructionsSet.getBySymbol(symbol);
-        if (!instruction)
-            throw new Error(`Instruction ${tokens.join(' ')} not found`);
+        if (!instruction) {
+            throw new Error(`Instruction ${tokens[0].toUpperCase()} not found`);
+        }
         const format = this.cpu.getFormat(instruction.format);
-        if (!format)
+        if (!format) {
             throw new Error(`Format ${instruction.format} for instruction ${tokens.join(' ')}`);
+        }
         const code = format.assemble(tokens, instruction, this.cpu, this);
         return code;
     }
