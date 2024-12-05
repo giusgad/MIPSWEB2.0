@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getFromLocalStorage, setIntoLocalStorage } from "./index.js";
-import { addFileEditor, removeFileEditor, showEditor } from "./editor.js";
+import { getFromLocalStorage, render, setIntoLocalStorage } from "./index.js";
+import { addFileEditor, removeFileEditor, renderEditor, showEditor } from "./editor.js";
 import { renderApp } from "./app.js";
 export const samples = {
     "sample": `
@@ -125,6 +125,9 @@ export function changeFile(fileId) {
         setSelectedFileId(fileId);
         showEditor(fileId);
         yield renderApp();
+        renderEditor("edit");
+        yield render('memory', 'app/memory.ejs');
+        yield render('vm-buttons', 'app/vm-buttons.ejs');
     });
 }
 export function closeFile(fileId) {

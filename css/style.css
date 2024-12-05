@@ -171,12 +171,16 @@ select {
   bottom: 0;
 }
 .component .title {
-  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 48px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding-left: 16px;
+  margin: 0 12px;
+  border-bottom: 1px solid #e5e5ea;
 }
 .table {
   font-size: 12px;
@@ -377,6 +381,7 @@ select {
   width: 20%;
   bottom: 0;
   z-index: 1;
+  background-color: #f2f2f7;
 }
 #registers.execute {
   left: 40%;
@@ -409,6 +414,7 @@ select {
   width: 40%;
   bottom: 0;
   z-index: 0;
+  background-color: #f2f2f7;
 }
 #memory .component {
   border-left: solid 1px #e5e5ea;

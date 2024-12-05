@@ -83,6 +83,11 @@ export async function assemble() {
     }
 }
 
+export async function assembleFiles() {
+    const files = getFiles();
+    console.log(files);
+}
+
 export async function stop() {
     vm.stop();
     clearMemorySelectedFormats();
@@ -99,6 +104,7 @@ export async function step() {
 
 export async function run() {
     vm.run();
+    moveCursorToNextInstruction();
     await renderApp();
     renderEditor();
 }
@@ -219,6 +225,10 @@ export function extendInterval(cells: any, index: number) {
 
 (window as any).assembleClick = async function() {
     await assemble();
+};
+
+(window as any).assembleFilesClick = async function() {
+    await assembleFiles();
 };
 
 (window as any).stepClick = async function() {

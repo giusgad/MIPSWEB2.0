@@ -1,4 +1,4 @@
-import { Binary } from "./Utils.js";
+import {Binary, Utils} from "./Utils.js";
 
 export class Memory {
 
@@ -9,12 +9,12 @@ export class Memory {
         this.memory.set(address, value.getValue());
     }
 
-    fetchWord(wordAddress: Binary): Binary {
+    loadWord(wordAddress: Binary, signed: boolean = false): Binary {
         const value = this.memory.get(wordAddress.getValue());
         if (value !== undefined) {
-            return new Binary(value);
+            return new Binary(value, 32, signed);
         } else {
-            return new Binary();
+            return new Binary(0, 32, true);
         }
     }
 
@@ -23,7 +23,7 @@ export class Memory {
         const byteOffset = address % 4;
         const alignedAddress = address - byteOffset;
         const wordAlignedAddress = new Binary(alignedAddress);
-        let word: Binary = this.fetchWord(wordAlignedAddress);
+        let word: Binary = this.loadWord(wordAlignedAddress);
 
         const bitPosition = byteOffset * 8;
 
@@ -33,8 +33,16 @@ export class Memory {
 
     }
 
-    fetchByte(wordAddress: Binary): Binary {
-        return new Binary();
+    loadByte(wordAddress: Binary): Binary {
+        const address = wordAddress.getValue();
+        const byteOffset = address % 4;
+        const alignedAddress = address - byteOffset;
+        const wordAlignedAddress = new Binary(alignedAddress);
+        let word: Binary = this.loadWord(wordAlignedAddress);
+
+        const bitPosition = byteOffset * 8;
+
+        return word.getBits(bitPosition + 7, bitPosition, true);
     }
 
     get() {
@@ -50,5 +58,16 @@ export class Memory {
 
     reset() {
         this.memory.clear();
+    }
+
+    getString(address: Binary) {
+        let string = '';
+        let byte = this.loadByte(address);
+        while (byte.getValue() !== 0) {
+            string += String.fromCharCode(byte.getValue());
+            address.set(address.getValue() + 1);
+            byte = this.loadByte(address);
+        }
+        return string;
     }
 }

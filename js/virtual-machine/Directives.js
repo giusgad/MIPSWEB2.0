@@ -34,7 +34,7 @@ export class asmDirective extends Directive {
 export class wordDirective extends Directive {
     assemble(tokens, address, assembler, line) {
         tokens.forEach(token => {
-            let value = new Binary(0);
+            let value = new Binary(0, 32, true);
             if (!isNaN(Number(token))) {
                 value.set(Number(token));
             }

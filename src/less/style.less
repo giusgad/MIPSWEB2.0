@@ -187,12 +187,16 @@ select {
   right: 0;
   bottom: 0;
   .title {
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: @opened-files-height;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: @space-4;
+    margin: 0 (@space-3 + @space-2);
+    border-bottom: 1px solid @light-gray-4;
   }
 }
 
@@ -414,6 +418,7 @@ select {
   width: 20%;
   bottom: 0;
   z-index: 1;
+  background-color: @light-gray-5;
   &.execute {
     left: @editor-width-execute;
   }
@@ -449,6 +454,7 @@ select {
   width: 40%;
   bottom: 0;
   z-index: 0;
+  background-color: @light-gray-5;
   .component {
     border-left: solid 1px @light-gray-4;
   }

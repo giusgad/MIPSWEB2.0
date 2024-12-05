@@ -1,5 +1,5 @@
 import {getFromLocalStorage, render, setIntoLocalStorage} from "./index.js";
-import {addFileEditor, removeFileEditor, showEditor} from "./editor.js";
+import {addFileEditor, removeFileEditor, renderEditor, showEditor} from "./editor.js";
 import {renderApp} from "./app.js";
 
 export type file = {
@@ -129,6 +129,9 @@ export async function changeFile(fileId: number) {
     setSelectedFileId(fileId);
     showEditor(fileId);
     await renderApp();
+    renderEditor("edit");
+    await render('memory', 'app/memory.ejs');
+    await render('vm-buttons', 'app/vm-buttons.ejs');
 }
 
 export async function closeFile(fileId: number) {

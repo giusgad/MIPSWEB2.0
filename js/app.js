@@ -75,6 +75,12 @@ export function assemble() {
         }
     });
 }
+export function assembleFiles() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const files = getFiles();
+        console.log(files);
+    });
+}
 export function stop() {
     return __awaiter(this, void 0, void 0, function* () {
         vm.stop();
@@ -94,6 +100,7 @@ export function step() {
 export function run() {
     return __awaiter(this, void 0, void 0, function* () {
         vm.run();
+        moveCursorToNextInstruction();
         yield renderApp();
         renderEditor();
     });
@@ -210,6 +217,11 @@ window.colFormatSelectOnChange = function (element) {
 window.assembleClick = function () {
     return __awaiter(this, void 0, void 0, function* () {
         yield assemble();
+    });
+};
+window.assembleFilesClick = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield assembleFiles();
     });
 };
 window.stepClick = function () {

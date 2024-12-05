@@ -4,13 +4,14 @@ import {Binary} from "./Utils.js";
 import {Instruction, Instructions} from "./Instructions.js";
 import {Format, I_Format, J_Format, R_Format} from "./Formats.js";
 import {Syscalls} from "./Syscalls.js";
+import {VirtualMachine} from "./VirtualMachine";
 
 export class CPU {
 
     textSegmentStart: Binary = new Binary(0x00400000);
     textSegmentEnd: Binary = new Binary(this.textSegmentStart.getValue());
     dataSegmentStart: Binary = new Binary(0x10010000);
-    dataSegmentEnd: Binary = this.dataSegmentStart;
+    dataSegmentEnd: Binary = new Binary(this.dataSegmentStart.getValue());
 
     registers: Registers = new Registers(
         [
@@ -56,15 +57,15 @@ export class CPU {
         this.memory.storeWord(address, value);
     }
 
-    fetchByte(address: Binary): Binary {
-        return this.memory.fetchByte(address);
+    loadByte(address: Binary): Binary {
+        return this.memory.loadByte(address);
     }
 
-    fetchWord(address: Binary): Binary {
-        return this.memory.fetchWord(address);
+    loadWord(address: Binary): Binary {
+        return this.memory.loadWord(address);
     }
 
-    decode(instructionCode: Binary): { instruction: Instruction, params: { [key: string]: Binary }, basic: string } | undefined {
+    decode(instructionCode: Binary): { instruction: Instruction, params: { [key: string]: Binary }, basic: string } | undefined {console.log()
 
         const opcode = new Binary(instructionCode.getBits(31, 26).getValue(), 6);
 
@@ -102,18 +103,17 @@ export class CPU {
             }
         }
 
-        //console.error(`Instruction not found for code: ${instructionCode} (0x${instructionCode.getHex()})`);
         return undefined;
     }
 
-    execute() {
+    execute(vm: VirtualMachine) {
         if (this.pc <= this.textSegmentEnd) {
-            const instructionCode = this.memory.fetchWord(this.pc);
+            const instructionCode = this.memory.loadWord(this.pc);
             const decodedInstruction = this.decode(instructionCode);
             if (decodedInstruction) {
                 const instruction = decodedInstruction.instruction;
                 if (instruction) {
-                    instruction.execute(this, decodedInstruction.params);
+                    instruction.execute(this, decodedInstruction.params, vm);
                 }
             }
         } else {
@@ -139,7 +139,7 @@ export class CPU {
         this.textSegmentStart = new Binary(0x00400000);
         this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
         this.dataSegmentStart = new Binary(0x10010000);
-        this.dataSegmentEnd = this.dataSegmentStart;
+        this.dataSegmentEnd = new Binary(this.dataSegmentStart.getValue());
         this.registers.get("$gp")!.binary = new Binary(0x10008000);
         this.registers.get("$sp")!.binary = new Binary(0x7fffeffc);
         this.pc = new Binary(this.textSegmentStart.getValue());

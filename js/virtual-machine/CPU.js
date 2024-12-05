@@ -9,7 +9,7 @@ export class CPU {
         this.textSegmentStart = new Binary(0x00400000);
         this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
         this.dataSegmentStart = new Binary(0x10010000);
-        this.dataSegmentEnd = this.dataSegmentStart;
+        this.dataSegmentEnd = new Binary(this.dataSegmentStart.getValue());
         this.registers = new Registers([
             "$zero",
             "$at",
@@ -44,14 +44,15 @@ export class CPU {
     storeWord(address, value) {
         this.memory.storeWord(address, value);
     }
-    fetchByte(address) {
-        return this.memory.fetchByte(address);
+    loadByte(address) {
+        return this.memory.loadByte(address);
     }
-    fetchWord(address) {
-        return this.memory.fetchWord(address);
+    loadWord(address) {
+        return this.memory.loadWord(address);
     }
     decode(instructionCode) {
         var _a;
+        console.log();
         const opcode = new Binary(instructionCode.getBits(31, 26).getValue(), 6);
         let funct = undefined;
         if (opcode.getValue() === 0) {
@@ -82,17 +83,16 @@ export class CPU {
                 return { instruction: foundInstruction, params, basic };
             }
         }
-        //console.error(`Instruction not found for code: ${instructionCode} (0x${instructionCode.getHex()})`);
         return undefined;
     }
-    execute() {
+    execute(vm) {
         if (this.pc <= this.textSegmentEnd) {
-            const instructionCode = this.memory.fetchWord(this.pc);
+            const instructionCode = this.memory.loadWord(this.pc);
             const decodedInstruction = this.decode(instructionCode);
             if (decodedInstruction) {
                 const instruction = decodedInstruction.instruction;
                 if (instruction) {
-                    instruction.execute(this, decodedInstruction.params);
+                    instruction.execute(this, decodedInstruction.params, vm);
                 }
             }
         }
@@ -115,7 +115,7 @@ export class CPU {
         this.textSegmentStart = new Binary(0x00400000);
         this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
         this.dataSegmentStart = new Binary(0x10010000);
-        this.dataSegmentEnd = this.dataSegmentStart;
+        this.dataSegmentEnd = new Binary(this.dataSegmentStart.getValue());
         this.registers.get("$gp").binary = new Binary(0x10008000);
         this.registers.get("$sp").binary = new Binary(0x7fffeffc);
         this.pc = new Binary(this.textSegmentStart.getValue());

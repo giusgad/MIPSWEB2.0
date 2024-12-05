@@ -49,7 +49,7 @@ export class wordDirective extends Directive {
     assemble(tokens: string[], address: Binary, assembler: Assembler, line: number) {
 
         tokens.forEach(token => {
-            let value: Binary = new Binary(0);
+            let value: Binary = new Binary(0, 32, true);
             if (!isNaN(Number(token))) {
                 value.set(Number(token));
             } else if ((token.startsWith('"') && token.endsWith('"')) || (token.startsWith("'") && token.endsWith("'"))) {

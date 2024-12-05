@@ -41,7 +41,7 @@ export class VirtualMachine {
     step() {
         try {
             if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
-                this.cpu.execute();
+                this.cpu.execute(this);
                 this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
             } else {
                 this.pause();
