@@ -68,6 +68,7 @@ export class VirtualMachine {
         this.assembler.reset();
         this.console.clear();
         this.nextInstructionLineNumber = undefined;
+        this.lastChangedRegister = undefined;
     }
     getRegisters() {
         const registers = [];

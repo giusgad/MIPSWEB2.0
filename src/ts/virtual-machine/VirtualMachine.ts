@@ -12,6 +12,8 @@ export class VirtualMachine {
 
     nextInstructionLineNumber?: number;
 
+    lastChangedRegister?: number;
+
     console: Console = new Console();
 
     constructor(cpu: CPU) {
@@ -67,6 +69,7 @@ export class VirtualMachine {
         this.assembler.reset();
         this.console.clear();
         this.nextInstructionLineNumber = undefined;
+        this.lastChangedRegister = undefined;
     }
 
     getRegisters() {

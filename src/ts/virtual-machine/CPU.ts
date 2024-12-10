@@ -113,7 +113,17 @@ export class CPU {
             if (decodedInstruction) {
                 const instruction = decodedInstruction.instruction;
                 if (instruction) {
+                    const oldRegisters = this.registers.copy();
+
                     await instruction.execute(this, decodedInstruction.params, vm);
+
+                    let changedRegister: number | undefined = undefined;
+                    for (let i = 0; i < this.registers.registers.length; i++) {
+                        if (!this.registers.registers[i].binary.equals(oldRegisters.registers[i].binary)) {
+                            changedRegister = i;
+                        }
+                    }
+                    vm.lastChangedRegister = changedRegister;
                 }
             }
         } else {

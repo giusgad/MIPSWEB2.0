@@ -15,6 +15,12 @@ document.addEventListener('input', (event) => {
         target.style.height = target.scrollHeight + 'px';
     }
 });
+document.addEventListener('click', (event) => {
+    const consoleInput = document.getElementById('console-input');
+    if (consoleInput) {
+        consoleInput.focus();
+    }
+});
 export function watchingConsole() {
     const consoleInput = document.getElementById('console-input');
     if (consoleInput) {

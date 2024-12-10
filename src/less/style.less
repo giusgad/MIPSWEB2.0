@@ -415,6 +415,9 @@ select {
     resize: none;
     overflow: hidden;
   }
+  &.waiting-input {
+    box-shadow: 0 0 6px rgba(@gray, 0.5);
+  }
 }
 
 #welcome-page {
@@ -448,6 +451,11 @@ select {
     left: 0;
     padding: 0 @space-3 + @space-2;
     padding-bottom: @space-3 + @space-2;
+    .row {
+      &.last-changed {
+        background-color: rgba(@orange, 0.1875);
+      }
+    }
     .col {
       &.number {
         width: calc(100% / 100 * 11.5);

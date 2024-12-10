@@ -100,4 +100,14 @@ export class Binary {
         const asciiArray = Utils.toAscii(this.binary, this.length);
         return asciiArray.join(' ');
     }
+    copy() {
+        return new Binary(this.binary, this.length, this.signed);
+    }
+    equals(binary) {
+        if (this.length !== binary.length)
+            return false;
+        if (this.signed !== binary.signed)
+            return false;
+        return this.binary === binary.binary;
+    }
 }

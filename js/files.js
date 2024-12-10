@@ -40,6 +40,7 @@ main:
     div $t5, $t0, $t1
   `,
     "nextInt": `
+
 \t.data
 msg1:\t.asciiz "Inserire numero intero: "\t
 msg2:\t.asciiz "Intero successivo: "
@@ -66,6 +67,7 @@ main:
 \tsyscall\t\t\t
 
 \tli $v0 10 # exit
+\tsyscall
   `
 };
 export function openFile() {

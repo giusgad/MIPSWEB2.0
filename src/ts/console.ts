@@ -8,6 +8,13 @@ document.addEventListener('input', (event) => {
     }
 });
 
+document.addEventListener('click', (event) => {
+    const consoleInput = document.getElementById('console-input');
+    if (consoleInput) {
+        consoleInput.focus();
+    }
+});
+
 export function watchingConsole() {
     const consoleInput = document.getElementById('console-input');
     if (consoleInput) {

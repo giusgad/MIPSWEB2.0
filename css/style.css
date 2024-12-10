@@ -383,6 +383,9 @@ select {
   resize: none;
   overflow: hidden;
 }
+.console.waiting-input {
+  box-shadow: 0 0 6px rgba(142, 142, 147, 0.5);
+}
 #welcome-page {
   position: absolute;
   top: 96px;
@@ -414,6 +417,9 @@ select {
   left: 0;
   padding: 0 12px;
   padding-bottom: 12px;
+}
+#registers .table .row.last-changed {
+  background-color: rgba(255, 149, 0, 0.1875);
 }
 #registers .table .col.number {
   width: calc(100% / 100 * 11.5);

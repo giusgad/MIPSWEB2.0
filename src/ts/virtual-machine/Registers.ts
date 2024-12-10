@@ -21,6 +21,18 @@ export class Registers {
         }
     }
 
+    copy(): Registers {
+        const registers = new Registers([]);
+        for (let register of this.registers) {
+            registers.registers.push({
+                name: register.name,
+                number: register.number,
+                binary: register.binary.copy()
+            });
+        }
+        return registers;
+    }
+
     get(name: string): register | undefined {
         if (!name) {
             return undefined;
