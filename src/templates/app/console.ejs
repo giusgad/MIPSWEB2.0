@@ -2,7 +2,14 @@
     <div class="title">Console</div>
     <div class="console">
         <%ctx.vm.console.lines.forEach((line) => {%>
-            <div class="line <%if (line.type === "error") {%>error<%}%>"><%=line.text%></div>
+            <div class="line <%if (line.type === "error") {%>error<%}%>">
+                <%=line.text%>
+                <% if (line.waitingInput) {%>
+                    <% if (line.waitingInput) {%>
+                        <textarea id="console-input" name="input" autofocus autocomplete="off"></textarea>
+                    <%}%>
+                <%}%>
+            </div>
         <%});%>
     </div>
 </div>

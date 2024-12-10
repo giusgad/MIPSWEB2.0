@@ -1,5 +1,16 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
+import { moveCursorToNextInstruction } from "../app.js";
+import { renderEditor } from "../editor.js";
 export class VirtualMachine {
     constructor(cpu) {
         this.console = new Console();
@@ -12,7 +23,7 @@ export class VirtualMachine {
         try {
             this.assembler.assemble(program);
             this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-            this.console.addLine("Assemble: operation completed successfully", "success");
+            //this.console.addLine("Assemble: operation completed successfully", "success");
         }
         catch (error) {
             // @ts-ignore
@@ -21,27 +32,33 @@ export class VirtualMachine {
         }
     }
     run() {
-        this.running = true;
-        while (this.running && !this.cpu.isHalted()) {
-            this.step();
-        }
+        return __awaiter(this, void 0, void 0, function* () {
+            this.running = true;
+            while (this.running && !this.cpu.isHalted()) {
+                yield this.step();
+                moveCursorToNextInstruction();
+                renderEditor();
+            }
+        });
     }
     step() {
-        try {
-            if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
-                this.cpu.execute(this);
-                this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
+                    yield this.cpu.execute(this);
+                    this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+                }
+                else {
+                    this.pause();
+                }
             }
-            else {
+            catch (error) {
+                // @ts-ignore
+                this.console.addLine(`${error.message}`, "error");
+                console.error(error);
                 this.pause();
             }
-        }
-        catch (error) {
-            // @ts-ignore
-            this.console.addLine(`${error.message}`, "error");
-            console.error(error);
-            this.pause();
-        }
+        });
     }
     pause() {
         this.running = false;

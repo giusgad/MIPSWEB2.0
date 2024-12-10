@@ -1,6 +1,7 @@
 import {CPU} from "./CPU";
 import {Binary} from "./Utils.js";
 import {VirtualMachine} from "./VirtualMachine.js";
+import {renderApp} from "../app.js";
 
 export abstract class Syscall {
 
@@ -37,7 +38,15 @@ export class Syscalls {
                 );
             }
             execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
-                throw new Error(`${this.name} not implemented yet`);
+
+                const address = cpu.registers.get('$a0');
+                if (address) {
+                    const int = address.binary.getValue();
+                    vm.console.addLine(int.toString(), "success");
+                }
+
+                cpu.pc.set(cpu.pc.getValue() + 4);
+
             }
         });
 
@@ -88,8 +97,17 @@ export class Syscalls {
                     "READ_INT", 5
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
-                throw new Error(`${this.name} not implemented yet`);
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
+
+                vm.cpu.halt();
+                const input = await vm.console.getInput();
+                vm.cpu.resume();
+                const value = parseInt(input);
+                if (isNaN(value)) throw new Error(`Invalid input: ${input}`);
+                const v0 = vm.cpu.getRegisters()[2].binary;
+                v0.set(value);
+                cpu.pc.set(cpu.pc.getValue() + 4);
+
             }
         });
 
@@ -145,7 +163,9 @@ export class Syscalls {
             }
             execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
 
-                cpu.halt();
+                vm.cpu.halt();
+
+                vm.cpu.pc.set(vm.cpu.pc.getValue() + 4);
 
             }
         });

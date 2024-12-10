@@ -15,6 +15,7 @@ import {
 } from "./files.js";
 import {editorState, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
+import {scrollConsoleToBottom, watchingConsole} from "./console.js";
 
 export const vm = new VirtualMachine(new CPU);
 
@@ -33,13 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.body.classList.remove('wait');
 });
-
-function scrollConsoleToBottom() {
-    const consoleElement = document.querySelector('.console');
-    if (consoleElement) {
-        consoleElement.scrollTop = consoleElement.scrollHeight;
-    }
-}
 
 export function clearMemorySelectedFormats() {
     const settings = getFromLocalStorage('settings');
@@ -62,9 +56,10 @@ export async function renderApp(newState: "edit" | "execute" = interfaceState) {
     }
     await render('app', 'app.ejs');
     scrollConsoleToBottom();
+    watchingConsole();
 }
 
-function moveCursorToNextInstruction() {
+export function moveCursorToNextInstruction() {
     const editor = getEditor();
     if (editor) {
         if (vm.nextInstructionLineNumber != null) {
@@ -96,17 +91,15 @@ export async function stop() {
 }
 
 export async function step() {
-    vm.step();
+    await vm.step();
     moveCursorToNextInstruction();
     await renderApp();
     renderEditor();
 }
 
 export async function run() {
-    vm.run();
-    moveCursorToNextInstruction();
+    await vm.run();
     await renderApp();
-    renderEditor();
 }
 
 export function getContext() {

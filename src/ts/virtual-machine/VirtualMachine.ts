@@ -1,6 +1,8 @@
 import {CPU} from "./CPU.js";
 import {Assembler} from "./Assembler.js";
 import {Console} from "./Console.js";
+import {moveCursorToNextInstruction, renderApp} from "../app.js";
+import {renderEditor} from "../editor.js";
 
 export class VirtualMachine {
 
@@ -23,7 +25,7 @@ export class VirtualMachine {
         try {
             this.assembler.assemble(program);
             this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-            this.console.addLine("Assemble: operation completed successfully", "success");
+            //this.console.addLine("Assemble: operation completed successfully", "success");
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
@@ -31,17 +33,19 @@ export class VirtualMachine {
         }
     }
 
-    run() {
+    async run() {
         this.running = true;
         while (this.running && !this.cpu.isHalted()) {
-            this.step();
+            await this.step();
+            moveCursorToNextInstruction();
+            renderEditor();
         }
     }
 
-    step() {
+    async step() {
         try {
             if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
-                this.cpu.execute(this);
+                await this.cpu.execute(this);
                 this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
             } else {
                 this.pause();

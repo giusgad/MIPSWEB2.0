@@ -14,6 +14,7 @@ import { default_settings } from "./settings.js";
 import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, newFile, openFile, samples } from "./files.js";
 import { editorState, getEditor, initEditors, renderEditor } from "./editor.js";
 import { Binary } from "./virtual-machine/Utils.js";
+import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 export const vm = new VirtualMachine(new CPU);
 export let interfaceState = "edit";
 document.body.classList.add('wait');
@@ -26,12 +27,6 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
     clearMemorySelectedFormats();
     document.body.classList.remove('wait');
 }));
-function scrollConsoleToBottom() {
-    const consoleElement = document.querySelector('.console');
-    if (consoleElement) {
-        consoleElement.scrollTop = consoleElement.scrollHeight;
-    }
-}
 export function clearMemorySelectedFormats() {
     const settings = getFromLocalStorage('settings');
     if (settings) {
@@ -54,9 +49,10 @@ export function renderApp() {
         }
         yield render('app', 'app.ejs');
         scrollConsoleToBottom();
+        watchingConsole();
     });
 }
-function moveCursorToNextInstruction() {
+export function moveCursorToNextInstruction() {
     const editor = getEditor();
     if (editor) {
         if (vm.nextInstructionLineNumber != null) {
@@ -91,7 +87,7 @@ export function stop() {
 }
 export function step() {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.step();
+        yield vm.step();
         moveCursorToNextInstruction();
         yield renderApp();
         renderEditor();
@@ -99,10 +95,8 @@ export function step() {
 }
 export function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.run();
-        moveCursorToNextInstruction();
+        yield vm.run();
         yield renderApp();
-        renderEditor();
     });
 }
 export function getContext() {

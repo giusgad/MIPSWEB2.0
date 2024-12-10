@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Registers } from "./Registers.js";
 import { Memory } from "./Memory.js";
 import { Binary } from "./Utils.js";
@@ -86,22 +95,27 @@ export class CPU {
         return undefined;
     }
     execute(vm) {
-        if (this.pc <= this.textSegmentEnd) {
-            const instructionCode = this.memory.loadWord(this.pc);
-            const decodedInstruction = this.decode(instructionCode);
-            if (decodedInstruction) {
-                const instruction = decodedInstruction.instruction;
-                if (instruction) {
-                    instruction.execute(this, decodedInstruction.params, vm);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.pc <= this.textSegmentEnd) {
+                const instructionCode = this.memory.loadWord(this.pc);
+                const decodedInstruction = this.decode(instructionCode);
+                if (decodedInstruction) {
+                    const instruction = decodedInstruction.instruction;
+                    if (instruction) {
+                        yield instruction.execute(this, decodedInstruction.params, vm);
+                    }
                 }
             }
-        }
-        else {
-            this.halt();
-        }
+            else {
+                this.halt();
+            }
+        });
     }
     getFormat(format) {
         return this.formats.get(format);
+    }
+    resume() {
+        this.halted = false;
     }
     halt() {
         this.halted = true;

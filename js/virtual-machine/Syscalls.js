@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 export class Syscall {
     constructor(name, code) {
         this.name = name;
@@ -18,7 +27,12 @@ export class Syscalls {
                 super("PRINT_INT", 1);
             }
             execute(cpu, params, vm) {
-                throw new Error(`${this.name} not implemented yet`);
+                const address = cpu.registers.get('$a0');
+                if (address) {
+                    const int = address.binary.getValue();
+                    vm.console.addLine(int.toString(), "success");
+                }
+                cpu.pc.set(cpu.pc.getValue() + 4);
             }
         });
         this.syscalls.push(new class extends Syscall {
@@ -55,7 +69,17 @@ export class Syscalls {
                 super("READ_INT", 5);
             }
             execute(cpu, params, vm) {
-                throw new Error(`${this.name} not implemented yet`);
+                return __awaiter(this, void 0, void 0, function* () {
+                    vm.cpu.halt();
+                    const input = yield vm.console.getInput();
+                    vm.cpu.resume();
+                    const value = parseInt(input);
+                    if (isNaN(value))
+                        throw new Error(`Invalid input: ${input}`);
+                    const v0 = vm.cpu.getRegisters()[2].binary;
+                    v0.set(value);
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                });
             }
         });
         this.syscalls.push(new class extends Syscall {
@@ -95,7 +119,8 @@ export class Syscalls {
                 super("EXIT", 10);
             }
             execute(cpu, params, vm) {
-                cpu.halt();
+                vm.cpu.halt();
+                vm.cpu.pc.set(vm.cpu.pc.getValue() + 4);
             }
         });
         this.syscalls.push(new class extends Syscall {

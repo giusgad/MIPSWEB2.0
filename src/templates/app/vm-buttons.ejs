@@ -1,6 +1,6 @@
 <div class="buttons">
     <% if (ctx.interfaceState === "execute") { %>
-        <% if ((ctx.vm.nextInstructionLineNumber !== undefined) && (ctx.editorState === "execute")) { %>
+        <% if ((ctx.vm.nextInstructionLineNumber !== undefined) && (ctx.editorState === "execute") && (!ctx.vm.cpu.isHalted())) { %>
         <div class="button" onclick="stepClick();">
             <div class="icon"><%-Icons.render('step')%></div>
             <div class="label">Step</div>

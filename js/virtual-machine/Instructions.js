@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Binary, Utils } from "./Utils.js";
 export class Instruction {
     constructor(symbol, params, format, opcode, funct) {
@@ -154,13 +163,15 @@ export class Instructions {
                 super('SYSCALL', 'SYSCALL', 'R', new Binary(0b000000, 6), new Binary(0b001100, 6));
             }
             execute(cpu, params, vm) {
-                const registers = cpu.getRegisters();
-                const v0 = registers[2].binary;
-                const syscall = cpu.syscallsSet.get(v0.getValue());
-                if (!syscall) {
-                    throw new Error(`Unknown syscall: ${v0.getValue()}`);
-                }
-                syscall.execute(cpu, {}, vm);
+                return __awaiter(this, void 0, void 0, function* () {
+                    const registers = cpu.getRegisters();
+                    const v0 = registers[2].binary;
+                    const syscall = cpu.syscallsSet.get(v0.getValue());
+                    if (!syscall) {
+                        throw new Error(`Unknown syscall: ${v0.getValue()}`);
+                    }
+                    yield syscall.execute(cpu, {}, vm);
+                });
             }
         }());
         this.instructions.push(new class extends Instruction {

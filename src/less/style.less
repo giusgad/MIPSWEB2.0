@@ -396,9 +396,24 @@ select {
   flex-direction: column;
   overflow-y: scroll;
   .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
     &.error {
         color: @red;
     }
+  }
+  textarea {
+    border: none;
+    outline: none;
+    font-family: 'Prompt', sans-serif;
+    font-size: @font-size;
+    color: @dark-gray-2;
+    width: 100%;
+    padding: 0;
+    resize: none;
+    overflow: hidden;
   }
 }
 

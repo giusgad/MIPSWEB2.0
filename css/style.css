@@ -363,8 +363,25 @@ select {
   flex-direction: column;
   overflow-y: scroll;
 }
+.console .line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
 .console .line.error {
   color: #ff3b30;
+}
+.console textarea {
+  border: none;
+  outline: none;
+  font-family: 'Prompt', sans-serif;
+  font-size: 14px;
+  color: #48484a;
+  width: 100%;
+  padding: 0;
+  resize: none;
+  overflow: hidden;
 }
 #welcome-page {
   position: absolute;

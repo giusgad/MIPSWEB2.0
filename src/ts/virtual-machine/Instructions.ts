@@ -211,7 +211,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b001100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const v0 = registers[2].binary;
@@ -221,7 +221,7 @@ export class Instructions {
                     throw new Error(`Unknown syscall: ${v0.getValue()}`);
                 }
 
-                syscall.execute(cpu, {}, vm);
+                await syscall.execute(cpu, {}, vm);
 
             }
         }());

@@ -106,14 +106,14 @@ export class CPU {
         return undefined;
     }
 
-    execute(vm: VirtualMachine) {
+    async execute(vm: VirtualMachine) {
         if (this.pc <= this.textSegmentEnd) {
             const instructionCode = this.memory.loadWord(this.pc);
             const decodedInstruction = this.decode(instructionCode);
             if (decodedInstruction) {
                 const instruction = decodedInstruction.instruction;
                 if (instruction) {
-                    instruction.execute(this, decodedInstruction.params, vm);
+                    await instruction.execute(this, decodedInstruction.params, vm);
                 }
             }
         } else {
@@ -123,6 +123,10 @@ export class CPU {
 
     getFormat(format: string) {
         return this.formats.get(format);
+    }
+
+    resume(): void {
+        this.halted = false;
     }
 
     halt(): void {
