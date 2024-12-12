@@ -21,7 +21,6 @@ export const vm = new VirtualMachine(new CPU);
 
 export let interfaceState: "edit" | "execute" = "edit";
 
-document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', async () => {
 
     if (!getFromLocalStorage("settings")) {
@@ -31,8 +30,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await renderApp();
     initEditors();
     clearMemorySelectedFormats();
-
-    document.body.classList.remove('wait');
 });
 
 export function clearMemorySelectedFormats() {

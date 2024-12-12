@@ -12,6 +12,13 @@ import { getContext, vm } from "./app.js";
 import { render } from "./index.js";
 export let filesEditors = [];
 export let editorState = "edit";
+export function fixEditorResize() {
+    const editor = getEditor();
+    if (editor) {
+        editor.resize(); // Aggiorna l'editor dopo modifiche di layout
+        editor.renderer.updateFull(true); // Aggiorna forzatamente il rendering
+    }
+}
 export function renderEditor(newState = editorState) {
     editorState = newState;
     const editor = getEditor();

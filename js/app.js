@@ -17,7 +17,6 @@ import { Binary } from "./virtual-machine/Utils.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 export const vm = new VirtualMachine(new CPU);
 export let interfaceState = "edit";
-document.body.classList.add('wait');
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     if (!getFromLocalStorage("settings")) {
         setIntoLocalStorage("settings", default_settings);
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
     yield renderApp();
     initEditors();
     clearMemorySelectedFormats();
-    document.body.classList.remove('wait');
 }));
 export function clearMemorySelectedFormats() {
     const settings = getFromLocalStorage('settings');

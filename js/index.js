@@ -31,7 +31,10 @@ export function render(id_1, templatePath_1) {
 }
 window.renderTemplate = renderTemplate;
 function renderTemplate(templatePath_1) {
-    return __awaiter(this, arguments, void 0, function* (templatePath, ctx = getContext()) {
+    return __awaiter(this, arguments, void 0, function* (templatePath, ctx = undefined) {
+        document.body.classList.add('wait');
+        if (!ctx)
+            ctx = getContext();
         const template = yield fetch(`src/templates/${templatePath}`).then(res => {
             if (!res.ok) {
                 throw new Error(`No template found: "src/templates/${templatePath}"`);
@@ -39,7 +42,9 @@ function renderTemplate(templatePath_1) {
             return res.text();
         });
         const data = { ctx, Icons };
-        return ejs.render(template, data, { async: true });
+        const result = ejs.render(template, data, { async: true });
+        document.body.classList.remove('wait');
+        return result;
     });
 }
 export function addClass(className, id) {
