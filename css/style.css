@@ -203,13 +203,13 @@ select {
 }
 .table .rows {
   font-family: monospace;
-  border: 0.75px solid #d1d1d6;
+  border: 0.25px solid #d1d1d6;
 }
 .table .rows .row {
   display: flex;
 }
 .table .rows .row .col {
-  border: 0.75px solid #d1d1d6;
+  border: 0.25px solid #d1d1d6;
   display: flex;
   align-items: center;
   padding: 2px 4px;

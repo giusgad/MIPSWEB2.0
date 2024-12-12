@@ -1,6 +1,8 @@
 import {CPU} from "./CPU.js";
 import {Assembler} from "./Assembler.js";
 import {Console} from "./Console.js";
+import {moveCursorToNextInstruction} from "../app.js";
+import {renderEditor} from "../editor.js";
 
 export class VirtualMachine {
 
@@ -45,6 +47,15 @@ export class VirtualMachine {
             this.console.addLine(`${error.message}`, "error");
             console.error(error);
             this.pause();
+        }
+    }
+
+    async run() {
+        this.running = true;
+        while (this.running && !this.cpu.isHalted()) {
+            await this.step();
+            moveCursorToNextInstruction();
+            renderEditor();
         }
     }
 

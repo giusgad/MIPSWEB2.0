@@ -180,13 +180,26 @@ export function importSample(name) {
     return __awaiter(this, void 0, void 0, function* () {
         const fileId = generateUniqueId();
         const fileName = generateUniqueName(name);
+        const fileContent = yield fetch(`resources/samples/${name}.asm`).then(res => {
+            if (!res.ok) {
+                throw new Error(`No sample file found: "resources/samples/${name}.asm"`);
+            }
+            return res.text();
+        });
         const fileToAdd = {
             id: fileId,
             name: fileName,
             type: "asm",
-            content: samples[name]
+            content: fileContent
         };
         yield addFile(fileToAdd);
+    });
+}
+export function importSamples(names) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const name of names) {
+            yield importSample(name);
+        }
     });
 }
 export function newFile() {

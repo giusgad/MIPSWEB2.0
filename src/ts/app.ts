@@ -9,7 +9,7 @@ import {
     getFiles,
     getSelectedFile,
     importFiles,
-    importSample,
+    importSample, importSamples,
     newFile,
     openFile, samples
 } from "./files.js";
@@ -99,10 +99,8 @@ export async function step() {
 }
 
 export async function run() {
-    vm.running = true;
-    while (vm.running && !vm.cpu.isHalted()) {
-        await step();
-    }
+    await vm.run();
+    await renderApp();
 }
 
 export function getContext() {
@@ -254,6 +252,11 @@ export function extendInterval(cells: any, index: number) {
 (window as any).importSampleOnClick = async function(name: string) {
     await importSample(name);
 };
+
+(window as any).importSamplesOnClick = async function(names: string[]) {
+    await importSamples(names);
+};
+
 
 (window as any).changeFileOnClick = async function(stringFileId: string) {
     const fileId = parseInt(stringFileId);

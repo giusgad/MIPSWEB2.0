@@ -181,13 +181,25 @@ export async function closeFile(fileId: number) {
 export async function importSample(name: string) {
     const fileId = generateUniqueId();
     const fileName = generateUniqueName(name);
+    const fileContent = await fetch(`resources/samples/${name}.asm`).then(res => {
+        if (!res.ok) {
+            throw new Error(`No sample file found: "resources/samples/${name}.asm"`);
+        }
+        return res.text();
+    });
     const fileToAdd: file = {
         id: fileId,
         name: fileName,
         type: "asm",
-        content: samples[name]
+        content: fileContent
     };
     await addFile(fileToAdd);
+}
+
+export async function importSamples(names: string[]) {
+    for (const name of names) {
+        await importSample(name);
+    }
 }
 
 export async function newFile() {

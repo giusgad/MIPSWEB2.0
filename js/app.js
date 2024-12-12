@@ -11,7 +11,7 @@ import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
 import { CPU } from "./virtual-machine/CPU.js";
 import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
 import { default_settings } from "./settings.js";
-import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, newFile, openFile, samples } from "./files.js";
+import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, importSamples, newFile, openFile, samples } from "./files.js";
 import { editorState, getEditor, initEditors, renderEditor } from "./editor.js";
 import { Binary } from "./virtual-machine/Utils.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
@@ -96,10 +96,8 @@ export function step() {
 }
 export function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.running = true;
-        while (vm.running && !vm.cpu.isHalted()) {
-            yield step();
-        }
+        yield vm.run();
+        yield renderApp();
     });
 }
 export function getContext() {
@@ -254,6 +252,11 @@ window.openFileOnClick = function () {
 window.importSampleOnClick = function (name) {
     return __awaiter(this, void 0, void 0, function* () {
         yield importSample(name);
+    });
+};
+window.importSamplesOnClick = function (names) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield importSamples(names);
     });
 };
 window.changeFileOnClick = function (stringFileId) {

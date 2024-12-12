@@ -9,6 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
+import { moveCursorToNextInstruction } from "../app.js";
+import { renderEditor } from "../editor.js";
 export class VirtualMachine {
     constructor(cpu) {
         this.console = new Console();
@@ -44,6 +46,16 @@ export class VirtualMachine {
                 this.console.addLine(`${error.message}`, "error");
                 console.error(error);
                 this.pause();
+            }
+        });
+    }
+    run() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.running = true;
+            while (this.running && !this.cpu.isHalted()) {
+                yield this.step();
+                moveCursorToNextInstruction();
+                renderEditor();
             }
         });
     }
