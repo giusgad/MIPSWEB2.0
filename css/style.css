@@ -480,9 +480,9 @@ select {
 }
 #memory .tables .table .rows .row .col.tags .tag.register {
   padding: 2px 4px;
-  font-style: italic;
   color: #fd971e;
   border: 1px solid #fd971e;
+  font-weight: bold;
 }
 #memory .tables .table .rows .row .col.tags .tag.pc {
   padding: 2px 4px;

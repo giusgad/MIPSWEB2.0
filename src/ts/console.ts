@@ -8,10 +8,12 @@ document.addEventListener('input', (event) => {
     }
 });
 
-document.addEventListener('click', (event) => {
-    const consoleInput = document.getElementById('console-input');
-    if (consoleInput) {
-        consoleInput.focus();
+document.addEventListener('click', () => {
+    if (vm.console.state === 'waitingInput') {
+        const consoleInput = document.getElementById('console-input');
+        if (consoleInput) {
+            consoleInput.focus();
+        }
     }
 });
 

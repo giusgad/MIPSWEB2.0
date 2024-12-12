@@ -69,6 +69,7 @@ export function moveCursorToNextInstruction() {
 }
 
 export async function assemble() {
+    await vm.stop();
     const file = getSelectedFile();
     if (file) {
         vm.assemble(file.content);
@@ -84,7 +85,7 @@ export async function assembleFiles() {
 }
 
 export async function stop() {
-    vm.stop();
+    await vm.stop();
     clearMemorySelectedFormats();
     await renderApp("edit");
     renderEditor("edit");
@@ -98,8 +99,10 @@ export async function step() {
 }
 
 export async function run() {
-    await vm.run();
-    await renderApp();
+    vm.running = true;
+    while (vm.running && !vm.cpu.isHalted()) {
+        await step();
+    }
 }
 
 export function getContext() {

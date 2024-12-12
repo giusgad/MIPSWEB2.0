@@ -107,7 +107,8 @@ export class CPU {
                         let changedRegister = undefined;
                         for (let i = 0; i < this.registers.registers.length; i++) {
                             if (!this.registers.registers[i].binary.equals(oldRegisters.registers[i].binary)) {
-                                changedRegister = i;
+                                changedRegister = this.registers.registers[i].name;
+                                break;
                             }
                         }
                         vm.lastChangedRegister = changedRegister;

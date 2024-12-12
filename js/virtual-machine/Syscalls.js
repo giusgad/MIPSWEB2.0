@@ -74,12 +74,13 @@ export class Syscalls {
                     const input = yield vm.console.getInput();
                     vm.cpu.resume();
                     const value = parseInt(input);
-                    if (value && isNaN(value))
-                        throw new Error(`Invalid input: ${input}`);
                     if (value) {
                         const v0 = vm.cpu.getRegisters()[2].binary;
                         v0.set(value);
                         cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
+                    else {
+                        throw new Error(`Invalid input: ${input}`);
                     }
                 });
             }

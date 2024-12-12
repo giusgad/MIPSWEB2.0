@@ -18,9 +18,12 @@ export class Console {
         this.lines.push({ text: text + '\n', type, waitingInput: false });
     }
     clear() {
-        this.lines = [];
-        this.state = 'ready';
-        this.input = '';
+        return __awaiter(this, void 0, void 0, function* () {
+            this.state = 'ready';
+            yield new Promise(resolve => setTimeout(resolve, 200));
+            this.lines = [];
+            this.input = '';
+        });
     }
     getInput() {
         return __awaiter(this, void 0, void 0, function* () {

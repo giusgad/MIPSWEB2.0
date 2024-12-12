@@ -9,8 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
-import { moveCursorToNextInstruction } from "../app.js";
-import { renderEditor } from "../editor.js";
 export class VirtualMachine {
     constructor(cpu) {
         this.console = new Console();
@@ -19,7 +17,6 @@ export class VirtualMachine {
         this.running = false;
     }
     assemble(program) {
-        this.stop();
         try {
             this.assembler.assemble(program);
             this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
@@ -30,16 +27,6 @@ export class VirtualMachine {
             this.console.addLine(`Assemble: ${error.message}`, "error");
             console.error(error);
         }
-    }
-    run() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.running = true;
-            while (this.running && !this.cpu.isHalted()) {
-                yield this.step();
-                moveCursorToNextInstruction();
-                renderEditor();
-            }
-        });
     }
     step() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -64,11 +51,13 @@ export class VirtualMachine {
         this.running = false;
     }
     stop() {
-        this.pause();
-        this.assembler.reset();
-        this.console.clear();
-        this.nextInstructionLineNumber = undefined;
-        this.lastChangedRegister = undefined;
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.console.clear();
+            this.lastChangedRegister = undefined;
+            this.pause();
+            this.assembler.reset();
+            this.nextInstructionLineNumber = undefined;
+        });
     }
     getRegisters() {
         const registers = [];

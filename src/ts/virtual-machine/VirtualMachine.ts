@@ -1,8 +1,6 @@
 import {CPU} from "./CPU.js";
 import {Assembler} from "./Assembler.js";
 import {Console} from "./Console.js";
-import {moveCursorToNextInstruction, renderApp} from "../app.js";
-import {renderEditor} from "../editor.js";
 
 export class VirtualMachine {
 
@@ -12,7 +10,7 @@ export class VirtualMachine {
 
     nextInstructionLineNumber?: number;
 
-    lastChangedRegister?: number;
+    lastChangedRegister?: string;
 
     console: Console = new Console();
 
@@ -23,7 +21,6 @@ export class VirtualMachine {
     }
 
     assemble(program: string) {
-        this.stop();
         try {
             this.assembler.assemble(program);
             this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
@@ -32,15 +29,6 @@ export class VirtualMachine {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
             console.error(error);
-        }
-    }
-
-    async run() {
-        this.running = true;
-        while (this.running && !this.cpu.isHalted()) {
-            await this.step();
-            moveCursorToNextInstruction();
-            renderEditor();
         }
     }
 
@@ -64,12 +52,12 @@ export class VirtualMachine {
         this.running = false;
     }
 
-    stop() {
+    async stop() {
+        await this.console.clear();
+        this.lastChangedRegister = undefined;
         this.pause();
         this.assembler.reset();
-        this.console.clear();
         this.nextInstructionLineNumber = undefined;
-        this.lastChangedRegister = undefined;
     }
 
     getRegisters() {

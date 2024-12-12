@@ -1,4 +1,4 @@
-import {renderApp} from "../app.js";
+import {vm, renderApp} from "../app.js";
 
 type ConsoleLine = { text: string, type: "success" | "error", waitingInput?: boolean };
 
@@ -12,9 +12,10 @@ export class Console {
         this.lines.push({ text: text + '\n', type, waitingInput: false });
     }
 
-    clear() {
-        this.lines = [];
+    async clear() {
         this.state = 'ready';
+        await new Promise(resolve => setTimeout(resolve, 200));
+        this.lines = [];
         this.input = '';
     }
 

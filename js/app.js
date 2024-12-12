@@ -62,6 +62,7 @@ export function moveCursorToNextInstruction() {
 }
 export function assemble() {
     return __awaiter(this, void 0, void 0, function* () {
+        yield vm.stop();
         const file = getSelectedFile();
         if (file) {
             vm.assemble(file.content);
@@ -79,7 +80,7 @@ export function assembleFiles() {
 }
 export function stop() {
     return __awaiter(this, void 0, void 0, function* () {
-        vm.stop();
+        yield vm.stop();
         clearMemorySelectedFormats();
         yield renderApp("edit");
         renderEditor("edit");
@@ -95,8 +96,10 @@ export function step() {
 }
 export function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield vm.run();
-        yield renderApp();
+        vm.running = true;
+        while (vm.running && !vm.cpu.isHalted()) {
+            yield step();
+        }
     });
 }
 export function getContext() {
