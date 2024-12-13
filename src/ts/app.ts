@@ -13,7 +13,7 @@ import {
     newFile,
     openFile, samples
 } from "./files.js";
-import {editorState, getEditor, initEditors, renderEditor} from "./editor.js";
+import {editorState, filesEditors, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
 import {scrollConsoleToBottom, watchingConsole} from "./console.js";
 
@@ -54,6 +54,10 @@ export async function renderApp(newState: "edit" | "execute" = interfaceState) {
     await render('app', 'app.ejs');
     scrollConsoleToBottom();
     watchingConsole();
+    for (const fileEditor of filesEditors) {
+        const editor = fileEditor.aceEditor;
+        editor.resize();
+    }
 }
 
 export function moveCursorToNextInstruction() {

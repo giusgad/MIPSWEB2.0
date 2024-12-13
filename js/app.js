@@ -12,7 +12,7 @@ import { CPU } from "./virtual-machine/CPU.js";
 import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
 import { default_settings } from "./settings.js";
 import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, importSamples, newFile, openFile, samples } from "./files.js";
-import { editorState, getEditor, initEditors, renderEditor } from "./editor.js";
+import { editorState, filesEditors, getEditor, initEditors, renderEditor } from "./editor.js";
 import { Binary } from "./virtual-machine/Utils.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 export const vm = new VirtualMachine(new CPU);
@@ -48,6 +48,10 @@ export function renderApp() {
         yield render('app', 'app.ejs');
         scrollConsoleToBottom();
         watchingConsole();
+        for (const fileEditor of filesEditors) {
+            const editor = fileEditor.aceEditor;
+            editor.resize();
+        }
     });
 }
 export function moveCursorToNextInstruction() {
