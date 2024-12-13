@@ -45,7 +45,16 @@ export function renderApp() {
         else {
             removeClass('execute', 'files-editors');
         }
+        let memoryTables = document.getElementById('memory-tables');
+        let scrollTop = 0;
+        if (memoryTables) {
+            scrollTop = memoryTables.scrollTop;
+        }
         yield render('app', 'app.ejs');
+        memoryTables = document.getElementById('memory-tables');
+        if (memoryTables) {
+            //memoryTables.scrollTop = scrollTop;
+        }
         scrollConsoleToBottom();
         watchingConsole();
         for (const fileEditor of filesEditors) {

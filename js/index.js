@@ -32,7 +32,6 @@ export function render(id_1, templatePath_1) {
 window.renderTemplate = renderTemplate;
 function renderTemplate(templatePath_1) {
     return __awaiter(this, arguments, void 0, function* (templatePath, ctx = undefined) {
-        document.body.classList.add('wait');
         if (!ctx)
             ctx = getContext();
         const template = yield fetch(`src/templates/${templatePath}`).then(res => {
@@ -43,7 +42,6 @@ function renderTemplate(templatePath_1) {
         });
         const data = { ctx, Icons };
         const result = ejs.render(template, data, { async: true });
-        document.body.classList.remove('wait');
         return result;
     });
 }

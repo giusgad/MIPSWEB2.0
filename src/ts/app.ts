@@ -9,9 +9,11 @@ import {
     getFiles,
     getSelectedFile,
     importFiles,
-    importSample, importSamples,
+    importSample,
+    importSamples,
     newFile,
-    openFile, samples
+    openFile,
+    samples
 } from "./files.js";
 import {editorState, filesEditors, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
@@ -45,19 +47,34 @@ export function clearMemorySelectedFormats() {
 }
 
 export async function renderApp(newState: "edit" | "execute" = interfaceState) {
+
     interfaceState = newState;
     if (interfaceState === "execute") {
         addClass('execute', 'files-editors');
     } else {
         removeClass('execute', 'files-editors');
     }
+
+    let memoryTables = document.getElementById('memory-tables');
+    let scrollTop = 0;
+    if (memoryTables) {
+        scrollTop = memoryTables.scrollTop;
+    }
+
     await render('app', 'app.ejs');
+
+    memoryTables = document.getElementById('memory-tables');
+    if (memoryTables) {
+        //memoryTables.scrollTop = scrollTop;
+    }
+
     scrollConsoleToBottom();
     watchingConsole();
     for (const fileEditor of filesEditors) {
         const editor = fileEditor.aceEditor;
         editor.resize();
     }
+
 }
 
 export function moveCursorToNextInstruction() {
