@@ -9,67 +9,6 @@ export type file = {
     content: string;
 };
 
-export const samples: { [name: string]: string } = {
-    "mulDiv": `
-
-.data
-    
-a:\t.word 10
-b:\t.word 20
-
-.text
-.globl main
-    
-main:
-
-    la $s1 a
-    la $s2 b
-    
-    li $t0 100
-    li $t1 45
-    
-    mult $t0, $t1
-    mflo $t2
-    
-    mul $t3, $t0, $t1 
-    
-    div $t0, $t1
-    mflo $t4
-    
-    div $t5, $t0, $t1
-  `,
-    "nextInt": `
-
-\t.data
-msg1:\t.asciiz "Inserire numero intero: "\t
-msg2:\t.asciiz "Intero successivo: "
-
-\t.text
-\t.globl main
-main:
-\tli $v0 4 # selezione di print_string (codice = 4)
-\tla $a0 msg1\t# $a0 = indirizzo di msg1
-\tsyscall
-
-\tli $v0 5 # Selezione read_int (codice = 5)
-\tsyscall\t
-\tmove $t0 $v0 # sposto il risultato in $t0
-
-\tli $v0 4 # selezione di print_string
-\tla $a0 msg2 # $a0 = indirizzo di string2
-\tsyscall\t\t\t
-\t
-\taddi $t0 $t0 1 # $t0+=1
-
-\tli $v0 1 # selezione di print_int (codice = 1)
-\tadd $a0 $zero $t0 # $a0 = $t0
-\tsyscall\t\t\t
-
-\tli $v0 10 # exit
-\tsyscall
-  `
-};
-
 export async function openFile() {
 
     try {

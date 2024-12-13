@@ -11,7 +11,7 @@ import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
 import { CPU } from "./virtual-machine/CPU.js";
 import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
 import { default_settings } from "./settings.js";
-import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, importSamples, newFile, openFile, samples } from "./files.js";
+import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, importSamples, newFile, openFile } from "./files.js";
 import { editorState, filesEditors, getEditor, initEditors, renderEditor } from "./editor.js";
 import { Binary } from "./virtual-machine/Utils.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
@@ -120,8 +120,7 @@ export function getContext() {
         selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
         files: getFiles(),
         selectedFile: getSelectedFile(),
-        settings: getFromLocalStorage('settings'),
-        samples: samples
+        settings: getFromLocalStorage('settings')
     };
 }
 export function getSelectedInstructionsAddresses() {

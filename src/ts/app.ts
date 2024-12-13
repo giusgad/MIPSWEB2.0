@@ -12,8 +12,7 @@ import {
     importSample,
     importSamples,
     newFile,
-    openFile,
-    samples
+    openFile
 } from "./files.js";
 import {editorState, filesEditors, getEditor, initEditors, renderEditor} from "./editor.js";
 import {Binary} from "./virtual-machine/Utils.js";
@@ -131,8 +130,7 @@ export function getContext() {
         selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
         files: getFiles(),
         selectedFile: getSelectedFile(),
-        settings: getFromLocalStorage('settings'),
-        samples: samples
+        settings: getFromLocalStorage('settings')
     };
 }
 
