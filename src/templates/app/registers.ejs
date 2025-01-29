@@ -20,12 +20,13 @@
         </div>
         <div class="rows">
             <%ctx.vm.getRegisters().forEach((register) => {%>
-            <div class="row <% if ((ctx.vm.lastChangedRegister) && (ctx.vm.lastChangedRegister === register.name)) { %> last-changed <% } %>">
-                <div class="col number"><%=register.number%></div>
-                <div class="col name"><%=register.name%></div>
-                <div class="col value <%if(valueFormat==='binary'){%>binary<%}%>"><%=convert(valueFormat, register.value, true)%></div>
-            </div>
+                <div class="row <% if ((ctx.vm.lastChangedRegister) && (ctx.vm.lastChangedRegister === register.name)) { %> last-changed <% } %>">
+                    <div class="col number"><%=register.number%></div>
+                    <div class="col name"><%=register.name%></div>
+                    <div class="col value <%if(valueFormat==='binary'){%>binary<%}%>"><%=convert(valueFormat, register.value, true)%></div>
+                </div>
             <%});%>
         </div>
     </div>
 </div>
+

@@ -101,7 +101,7 @@ export class Binary {
         return asciiArray.join(' ');
     }
     copy() {
-        return new Binary(this.binary, this.length, this.signed);
+        return new Binary(this.getValue(), this.length, this.signed);
     }
     equals(binary) {
         if (this.length !== binary.length)

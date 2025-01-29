@@ -1,0 +1,16 @@
+<div class="popover">
+    <div class="buttons">
+        <div class="button" onclick="exportFileOnClick('<%=ctx.file.id%>');">
+            <div class="icon gray-4"><%-Icons.render('exportFile')%></div>
+            <div class="label">Export</div>
+        </div>
+        <div class="button" onclick="showFormOnClick('rename-file-form', JSON.stringify({ fileId: '<%=ctx.file.id%>', fileName: '<%=ctx.file.name%>', fileType: '<%=ctx.file.type%>' }));">
+            <div class="icon gray-4"><%-Icons.render('edit')%></div>
+            <div class="label">Rename</div>
+        </div>
+        <div class="button" onclick="deleteFileOnClick('<%=ctx.file.id%>');">
+            <div class="icon red"><%-Icons.render('bin')%></div>
+            <div class="label red">Delete</div>
+        </div>
+    </div>
+</div>

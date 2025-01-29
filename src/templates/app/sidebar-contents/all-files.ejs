@@ -1,0 +1,18 @@
+<div class="sidebar-content">
+    <div class="title">Files</div>
+    <div id="all-files" class="all-files sortable">
+        <%ctx.files.forEach((file) => {%>
+        <div class="file-container" ondblclick="openFileOnDbClick('<%=file.id%>', this)">
+            <div class="file <%if(file.opened){%>opened<%}%> <%if((ctx.selectedFile) && (ctx.selectedFile.id === file.id)){%>selected<%}%>">
+                <div class="icon gray-4"><%-Icons.render('file')%></div>
+                <div class="name"><%=file.name%>.<%=file.type%></div>
+            </div>
+            <div class="buttons">
+                <div class="button toggle-button" onClick="showFilePopoverOnClick('<%=file.id%>', this)">
+                    <div class="icon gray-4"><%-Icons.render('dots')%></div>
+                </div>
+            </div>
+        </div>
+        <%});%>
+    </div>
+</div>

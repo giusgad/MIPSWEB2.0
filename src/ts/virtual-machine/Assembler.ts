@@ -1,140 +1,208 @@
-import {Binary} from "./Utils.js";
 import {CPU} from "./CPU.js";
-import {asciizDirective, asmDirective, byteDirective, Directive, spaceDirective, wordDirective} from "./Directives.js";
+import {file} from "../files.js";
+import {Binary} from "./Utils.js";
+import {
+    asciizDirective,
+    asmDirective,
+    byteDirective,
+    Directive,
+    globlDirective,
+    spaceDirective,
+    wordDirective
+} from "./Directives.js";
 
 export class Assembler {
 
     cpu: CPU;
-    labels: Map<string, Binary> = new Map<string, Binary>();
-
-    textSegmentAddress: Binary;
-    dataSegmentAddress: Binary;
-
-    section: ".text" | ".data" = ".text";
     directives: Map<string, Directive> = new Map<string, Directive>([
         [".asm", new asmDirective()],
         [".word", new wordDirective()],
-        [".byte", new byteDirective()],
-        [".space", new spaceDirective()],
+        [".globl", new globlDirective()],
         [".asciiz", new asciizDirective()],
+        [".byte", new byteDirective()],
+        [".space", new spaceDirective()]
     ]);
-    directive: Directive = this.directives.get(".asm")!;
 
-    addressLineMap: Map<number, number> = new Map<number, number>();
+    dataSegmentStart: Binary = new Binary(0x10010000);
+    dataSegmentEnd: Binary = new Binary(this.dataSegmentStart.getValue());
+    textSegmentStart: Binary = new Binary(0x00400000);
+    textSegmentEnd: Binary = new Binary(this.textSegmentStart.getValue());
+
+    addressEditorsPositions: Map<number, {fileId: number, lineNumber: number}> = new Map<number, {fileId: number; lineNumber: number}>();
+    allLabels: Map<string, Binary | undefined> = new Map<string, Binary | undefined>();
 
     constructor(cpu: CPU) {
         this.cpu = cpu;
+    }
 
-        this.textSegmentAddress = new Binary(this.cpu.textSegmentStart.getValue());
-        this.dataSegmentAddress = new Binary(this.cpu.dataSegmentStart.getValue());
+    assembleFiles(files: file[]) {
+
+        this.reset();
+
+        const globals: Map<string, Binary | undefined> = new Map<string, Binary | undefined>();
+        const labels: Map<number, Map<string, Binary | undefined>> = new Map<number, Map<string, Binary | undefined>>();
+
+        for (const file of files) {
+            labels.set(file.id, new Map<string, Binary | undefined>());
+            this.assembleFile(file, globals, labels.get(file.id)!);
+        }
+
+        this.dataSegmentEnd.set(this.dataSegmentStart.getValue());
+        this.textSegmentEnd.set(this.textSegmentStart.getValue());
+
+        for (const file of files) {
+            this.assembleFile(file, globals, labels.get(file.id)!, true);
+        }
+
+        this.cpu.registers.get("$gp")!.binary = new Binary(0x10008000);
+        this.cpu.registers.get("$sp")!.binary = new Binary(0x7fffeffc);
+
+        if (globals.has("main")) {
+            this.cpu.pc.set(globals.get("main")!.getValue());
+        } else {
+            this.cpu.pc.set(this.textSegmentStart.getValue());
+        }
+
+        const allLabels = new Map<string, Binary | undefined>();
+        labels.forEach((value, key) => {
+            value.forEach((value, key) => {
+                if (value) {
+                    allLabels.set(key, value);
+                }
+            });
+        });
+
+        this.allLabels = allLabels;
 
     }
 
-    assemble(program: string, withLabels: boolean = false): void {
-        const lines = program.split('\n');
+    assembleFile(file: file, globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, withLabels: boolean = false) {
+
+        let section: ".text" | ".data" = ".text";
+        let directive: Directive = this.directives.get(".asm")!;
+        let address: Binary = new Binary(this.textSegmentEnd.getValue());
+
+        const lines = file.content.split('\n');
         for (let i = 0; i < lines.length; i++) {
-
-            let line = lines[i].trim();
+            const line = lines[i].trim();
+            const lineNumber = i + 1;
             if (line === '' || line.startsWith('#')) continue;
-
             let tokens = this.tokenize(line);
             if (tokens.length === 0) continue;
 
-            if (tokens[0] === '.text') {
-                this.section = ".text";
-                this.directive = this.directives.get(".asm")!;
-                this.textSegmentAddress.set(this.cpu.textSegmentEnd.getValue());
+            if (tokens[0] === '.data') {
+
+                section = '.data';
+                directive = this.directives.get(".word")!;
+                address = new Binary(this.dataSegmentEnd.getValue());
                 continue;
-            } else if (tokens[0] === '.data') {
-                this.section = ".data";
-                this.directive = this.directives.get(".word")!;
-                this.dataSegmentAddress.set(this.cpu.dataSegmentEnd.getValue());
+
+            } else if (tokens[0] === '.text') {
+
+                section = '.text';
+                directive = this.directives.get(".asm")!;
+                address = new Binary(this.textSegmentEnd.getValue());
                 continue;
+
             }
 
             if (tokens[0].endsWith(':')) {
+
                 const label = tokens[0].slice(0, -1);
+                labels.set(label, new Binary(address.getValue()));
                 if (!withLabels) {
-                    if (this.labels.has(label)) {
-                        throw new Error(`Duplicate label: ${label}`);
-                    }
-                    if (this.section === ".text") {
-                        this.labels.set(label, new Binary(this.textSegmentAddress.getValue()));
-                    } else {
-                        this.labels.set(label, new Binary(this.dataSegmentAddress.getValue()));
+                    if (globals.has(label)) {
+                        if (globals.get(label) === undefined) {
+                            globals.set(label, new Binary(address.getValue()));
+                        } else {
+                            throw new Error(`Label ${label} already defined`);
+                        }
                     }
                 }
                 tokens.shift();
                 if (tokens.length === 0) continue;
+
             }
 
-            if (tokens[0] === ".globl") continue;
-            const directive = this.directives.get(tokens[0]);
-            if (directive) {
-                this.directive = directive;
+            if (this.directives.get(tokens[0])) {
+
+                directive = this.directives.get(tokens[0])!;
+
                 tokens.shift();
-            }
 
-            tokens = this.directive.tokenize(tokens);
+                if ((directive instanceof globlDirective) && (!withLabels)) {
+                    directive.assemble(directive.tokenize(tokens), globals, labels, address, this, {fileId: file.id, lineNumber: lineNumber});
+                }
+
+            }
 
             if (withLabels) {
-                if (this.section === ".text") {
-                    this.directive.assemble(tokens, this.textSegmentAddress, this, i + 1);
-                } else {
-                    this.directive.assemble(tokens, this.dataSegmentAddress, this, i + 1);
+                if (!(directive instanceof globlDirective)) {
+                    directive.assemble(directive.tokenize(tokens), globals, labels, address, this, {fileId: file.id, lineNumber: lineNumber});
                 }
             } else {
-                if (this.section === ".text") {
-                    this.textSegmentAddress.set(this.textSegmentAddress.getValue() + 4);
-                } else {
-                    this.dataSegmentAddress.set(this.dataSegmentAddress.getValue() + this.directive.size(tokens));
-                }
+                address.set(address.getValue() + directive.size(tokens));
             }
+
+            if (section === '.data') {
+                this.dataSegmentEnd.set(address.getValue());
+                directive = this.directives.get(".word")!;
+            } else if (section === '.text') {
+                this.textSegmentEnd.set(address.getValue());
+                directive = this.directives.get(".asm")!;
+            }
+
         }
 
-        if (withLabels) {
-            this.cpu.textSegmentEnd.set(this.textSegmentAddress.getValue());
-            this.cpu.dataSegmentEnd.set(this.dataSegmentAddress.getValue());
-        } else {
-            this.textSegmentAddress = new Binary(this.cpu.textSegmentStart.getValue());
-            this.dataSegmentAddress = new Binary(this.cpu.dataSegmentStart.getValue());
-            this.section = ".text";
-            this.directive = this.directives.get(".asm")!;
-            this.assemble(program, true);
-        }
+        globals.forEach((value, key) => {
+            if (value === undefined) {
+                globals.delete(key);
+            }
+        });
+
     }
 
-    assembleInstruction(tokens: string[]): Binary {
-
+    assembleInstruction(tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): Binary {
         const symbol = tokens[0];
         if (symbol.toLowerCase() === "nop") return new Binary();
-
         const instruction = this.cpu.instructionsSet.getBySymbol(symbol);
         if (!instruction) {
             throw new Error(`Instruction ${tokens[0].toUpperCase()} not found`);
         }
-
         const format = this.cpu.getFormat(instruction.format);
         if (!format) {
             throw new Error(`Format ${instruction.format} for instruction ${tokens.join(' ')}`);
         }
-
-        const code = format.assemble(tokens, instruction, this.cpu, this);
+        const code = format.assemble(tokens, instruction, this.cpu, this, globals, labels, address);
         return code;
     }
 
-    resolveLabel(token: string): number {
+    resolveLabel(token: string, globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary, absolute: boolean = false): number {
 
         if (!isNaN(Number(token))) {
             return Number(token);
         }
 
-        const labelAddress = this.labels.get(token);
-        if (!labelAddress) {
-            throw new Error(`Label ${token} non trovata.`);
+        let labelAddress = undefined;
+
+        if (labels.has(token)) {
+            if (labels.get(token)) {
+                labelAddress = labels.get(token)!;
+            } else {
+                if (globals.has(token)) {
+                    labelAddress = globals.get(token)!;
+                }
+            }
         }
 
-        return ((labelAddress.getValue() - (this.textSegmentAddress.getValue() + 4)) >> 2);
+        if (labelAddress === undefined) { throw new Error(`Label ${token} not found`); }
+
+        if (absolute) {
+            return (labelAddress.getValue() >>> 2) & 0x03FFFFFF;
+        } else {
+            return ((labelAddress.getValue() - (address.getValue() + 4)) >> 2);
+        }
+
     }
 
     tokenize(line: string): string[] {
@@ -143,13 +211,11 @@ export class Assembler {
     }
 
     reset() {
-        this.labels.clear();
         this.cpu.reset();
-        this.textSegmentAddress = new Binary(this.cpu.textSegmentStart.getValue());
-        this.dataSegmentAddress = new Binary(this.cpu.dataSegmentStart.getValue());
-        this.section = ".text";
-        this.directive = this.directives.get(".asm")!;
-        this.addressLineMap.clear();
+        this.dataSegmentEnd.set(this.dataSegmentStart.getValue());
+        this.textSegmentEnd.set(this.textSegmentStart.getValue());
+        this.addressEditorsPositions = new Map<number, {fileId: number; lineNumber: number}>();
+        this.allLabels = new Map<string, Binary | undefined>();
     }
 
 }

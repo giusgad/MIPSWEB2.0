@@ -1,0 +1,52 @@
+.ace_editor {
+  background-color: var(--rgb-gray-11) !important;
+}
+.ace_gutter-layer {
+  background-color: var(--rgb-gray-10) !important;
+}
+.ace_active-line {
+  background-color: var(--rgb-gray-7) !important;
+  opacity: 0.2 !important;
+}
+.ace_selection {
+  background-color: var(--rgb-blue) !important;
+  opacity: 0.2 !important;
+}
+.ace_print-margin {
+  background-color: var(--rgb-gray-10) !important;
+}
+.ace_gutter-cell {
+  color: var(--rgb-gray-4) !important;
+}
+.ace_gutter-active-line {
+  background-color: var(--rgb-gray-9) !important;
+}
+.ace_section {
+  color: var(--rgb-ace-section) !important;
+}
+.ace_tag {
+  color: var(--rgb-gray-2) !important;
+}
+.ace_modifier {
+  color: var(--rgb-ace-modifier) !important;
+}
+.ace_string {
+  color: var(--rgb-ace-string) !important;
+}
+.ace_function {
+  color: var(--rgb-ace-function) !important;
+}
+.ace_variable {
+  color: var(--rgb-ace-variable) !important;
+  font-style: normal !important;
+}
+.ace_numeric {
+  color: var(--rgb-gray-2) !important;
+}
+.ace_comment {
+  color: var(--rgb-gray-7) !important;
+  font-style: normal !important;
+}
+.ace_text-layer {
+  color: var(--rgb-gray-2) !important;
+}

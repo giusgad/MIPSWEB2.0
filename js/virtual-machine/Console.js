@@ -49,4 +49,9 @@ export class Console {
             yield renderApp();
         });
     }
+    reset() {
+        this.lines = [];
+        this.state = 'ready';
+        this.input = '';
+    }
 }

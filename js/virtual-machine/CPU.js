@@ -7,18 +7,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Registers } from "./Registers.js";
-import { Memory } from "./Memory.js";
-import { Binary } from "./Utils.js";
 import { Instructions } from "./Instructions.js";
 import { I_Format, J_Format, R_Format } from "./Formats.js";
+import { Registers } from "./Registers.js";
+import { Binary } from "./Utils.js";
+import { Memory } from "./Memory.js";
 import { Syscalls } from "./Syscalls.js";
 export class CPU {
     constructor() {
-        this.textSegmentStart = new Binary(0x00400000);
-        this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
-        this.dataSegmentStart = new Binary(0x10010000);
-        this.dataSegmentEnd = new Binary(this.dataSegmentStart.getValue());
+        this.instructionsSet = new Instructions();
+        this.syscallsSet = new Syscalls();
+        this.formats = new Map();
+        this.memory = new Memory();
         this.registers = new Registers([
             "$zero",
             "$at",
@@ -33,35 +33,16 @@ export class CPU {
             "$fp",
             "$ra"
         ]);
-        this.pc = new Binary(this.textSegmentStart.getValue());
+        this.pc = new Binary();
         this.lo = new Binary();
         this.hi = new Binary();
-        this.instructionsSet = new Instructions();
-        this.syscallsSet = new Syscalls();
-        this.formats = new Map();
-        this.memory = new Memory();
         this.halted = false;
-        this.registers.get("$gp").binary = new Binary(0x10008000);
-        this.registers.get("$sp").binary = new Binary(0x7fffeffc);
         this.formats.set('R', new R_Format());
         this.formats.set('I', new I_Format());
         this.formats.set('J', new J_Format());
     }
-    storeByte(address, value) {
-        this.memory.storeByte(address, value);
-    }
-    storeWord(address, value) {
-        this.memory.storeWord(address, value);
-    }
-    loadByte(address) {
-        return this.memory.loadByte(address);
-    }
-    loadWord(address) {
-        return this.memory.loadWord(address);
-    }
     decode(instructionCode) {
         var _a;
-        console.log();
         const opcode = new Binary(instructionCode.getBits(31, 26).getValue(), 6);
         let funct = undefined;
         if (opcode.getValue() === 0) {
@@ -96,7 +77,7 @@ export class CPU {
     }
     execute(vm) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.pc <= this.textSegmentEnd) {
+            if (this.pc <= vm.assembler.textSegmentEnd) {
                 const instructionCode = this.memory.loadWord(this.pc);
                 const decodedInstruction = this.decode(instructionCode);
                 if (decodedInstruction) {
@@ -120,8 +101,13 @@ export class CPU {
             }
         });
     }
-    getFormat(format) {
-        return this.formats.get(format);
+    reset() {
+        this.memory.reset();
+        this.registers.reset();
+        this.pc.set(0);
+        this.lo.set(0);
+        this.hi.set(0);
+        this.halted = false;
     }
     resume() {
         this.halted = false;
@@ -132,19 +118,20 @@ export class CPU {
     isHalted() {
         return this.halted;
     }
-    reset() {
-        this.registers.reset();
-        this.memory.reset();
-        this.textSegmentStart = new Binary(0x00400000);
-        this.textSegmentEnd = new Binary(this.textSegmentStart.getValue());
-        this.dataSegmentStart = new Binary(0x10010000);
-        this.dataSegmentEnd = new Binary(this.dataSegmentStart.getValue());
-        this.registers.get("$gp").binary = new Binary(0x10008000);
-        this.registers.get("$sp").binary = new Binary(0x7fffeffc);
-        this.pc = new Binary(this.textSegmentStart.getValue());
-        this.lo = new Binary();
-        this.hi = new Binary();
-        this.halted = false;
+    storeByte(address, value) {
+        this.memory.storeByte(address, value);
+    }
+    storeWord(address, value) {
+        this.memory.storeWord(address, value);
+    }
+    loadByte(address) {
+        return this.memory.loadByte(address);
+    }
+    loadWord(address) {
+        return this.memory.loadWord(address);
+    }
+    getFormat(format) {
+        return this.formats.get(format);
     }
     getRegisters() {
         return this.registers.registers;

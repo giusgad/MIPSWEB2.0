@@ -1,4 +1,5 @@
-import {vm} from "./app.js";
+import {vm} from "./virtual-machine.js";
+
 
 document.addEventListener('input', (event) => {
     const target = event.target as HTMLTextAreaElement;

@@ -1,3 +1,4 @@
+
 export class Utils {
 
     static toHex(value: number, bits: number = 32): string {
@@ -123,7 +124,7 @@ export class Binary {
     }
 
     copy(): Binary {
-        return new Binary(this.binary, this.length, this.signed);
+        return new Binary(this.getValue(), this.length, this.signed);
     }
 
     equals(binary: Binary): boolean {

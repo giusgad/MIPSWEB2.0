@@ -1,18 +1,18 @@
-import {Binary, Utils} from "./Utils.js";
+import {Binary} from "./Utils.js";
 
 export class Memory {
 
-    private memory: Map<number, number> = new Map<number, number>();
+    private memory: Map<number, Binary> = new Map<number, Binary>();
 
     storeWord(wordAddress: Binary, value: Binary) {
         let address = wordAddress.getValue();
-        this.memory.set(address, value.getValue());
+        this.memory.set(address, value);
     }
 
     loadWord(wordAddress: Binary, signed: boolean = false): Binary {
         const value = this.memory.get(wordAddress.getValue());
         if (value !== undefined) {
-            return new Binary(value, 32, signed);
+            return new Binary(value.getValue(), 32, signed);
         } else {
             return new Binary(0, 32, true);
         }
@@ -47,7 +47,7 @@ export class Memory {
 
     get() {
         const sortedKeys = Array.from(this.memory.keys()).sort((a, b) => a - b);
-        const sortedMemory = new Map<number, number>();
+        const sortedMemory = new Map<number, Binary>();
 
         for (const key of sortedKeys) {
             if (key % 4 !== 0) throw new Error(`Memory error`);

@@ -1,8 +1,9 @@
 import {CPU} from "./CPU.js";
+import {file} from "../files.js";
 import {Assembler} from "./Assembler.js";
 import {Console} from "./Console.js";
-import {moveCursorToNextInstruction} from "../app.js";
-import {renderEditor} from "../editor.js";
+import {Binary} from "./Utils.js";
+import {renderApp} from "../app.js";
 
 export class VirtualMachine {
 
@@ -10,35 +11,54 @@ export class VirtualMachine {
     assembler: Assembler;
     running: boolean;
 
-    nextInstructionLineNumber?: number;
+    nextInstructionEditorPosition: {fileId: number, lineNumber: number} | undefined;
 
     lastChangedRegister?: string;
 
     console: Console = new Console();
 
+    private asyncToken: number = 0;
+
     constructor(cpu: CPU) {
         this.cpu = cpu;
-        this.assembler = new Assembler(cpu);
+        this.assembler = new Assembler(this.cpu);
         this.running = false;
     }
 
-    assemble(program: string) {
+    assemble(files: file[]) {
+        this.stop();
         try {
-            this.assembler.assemble(program);
-            this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-            //this.console.addLine("Assemble: operation completed successfully", "success");
+            this.assembler.assembleFiles(files);
+            this.nextInstructionEditorPosition = this.assembler.addressEditorsPositions.get(this.cpu.pc.getValue());
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
             console.error(error);
         }
+
+    }
+
+    stop() {
+        this.reset();
+    }
+
+    reset() {
+        this.cpu.reset();
+        this.assembler.reset();
+        this.running = false;
+        this.nextInstructionEditorPosition = undefined;
+        this.lastChangedRegister = undefined;
+        this.console.reset();
+        this.asyncToken++;
     }
 
     async step() {
         try {
-            if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
+            if (!this.cpu.isHalted() && this.nextInstructionEditorPosition !== undefined) {
                 await this.cpu.execute(this);
-                this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+                if (!this.cpu.isHalted()) {
+                    this.nextInstructionEditorPosition = this.assembler.addressEditorsPositions.get(this.cpu.pc.getValue());
+                }
             } else {
                 this.pause();
             }
@@ -54,8 +74,6 @@ export class VirtualMachine {
         this.running = true;
         while (this.running && !this.cpu.isHalted()) {
             await this.step();
-            moveCursorToNextInstruction();
-            renderEditor();
         }
     }
 
@@ -63,12 +81,11 @@ export class VirtualMachine {
         this.running = false;
     }
 
-    async stop() {
-        await this.console.clear();
-        this.lastChangedRegister = undefined;
+    async exit() {
+        this.cpu.halt();
         this.pause();
-        this.assembler.reset();
-        this.nextInstructionLineNumber = undefined;
+        this.nextInstructionEditorPosition = undefined;
+        await renderApp("execute");
     }
 
     getRegisters() {
@@ -83,11 +100,15 @@ export class VirtualMachine {
     }
 
     getMemory() {
-        return Array.from(this.cpu.getMemory().entries()).map(([address, value]): {address: number, value: number, tags: {name: string, type: string}[]} => ({
+        return Array.from(this.cpu.getMemory().entries()).map(([address, binary]): {address: number, binary: Binary, tags: {name: string, type: string}[]} => ({
             address,
-            value,
+            binary: binary,
             tags: []
         }));
+    }
+
+    getCurrentAsyncToken(): number {
+        return this.asyncToken;
     }
 
 }

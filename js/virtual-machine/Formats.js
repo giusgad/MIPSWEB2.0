@@ -1,6 +1,6 @@
 import { Binary } from "./Utils.js";
 export class R_Format {
-    assemble(tokens, instruction, cpu, assembler) {
+    assemble(tokens, instruction, cpu, assembler, globals, labels, address) {
         const opcode = instruction.opcode;
         const funct = instruction.funct;
         let rs = cpu.registers.get('$zero');
@@ -66,7 +66,7 @@ export class R_Format {
     }
 }
 export class I_Format {
-    assemble(tokens, instruction, cpu, assembler) {
+    assemble(tokens, instruction, cpu, assembler, globals, labels, address) {
         const opcode = instruction.opcode;
         let rs = cpu.registers.get('$zero');
         let rt = cpu.registers.get('$zero');
@@ -74,12 +74,12 @@ export class I_Format {
         if (instruction.params === 'rs, rt, offset') {
             rs = cpu.registers.get(tokens[1]);
             rt = cpu.registers.get(tokens[2]);
-            const offset = assembler.resolveLabel(tokens[3]);
+            const offset = assembler.resolveLabel(tokens[3], globals, labels, address);
             immediate.set(offset);
         }
         else if (instruction.params === 'rs, offset') {
             rs = cpu.registers.get(tokens[1]);
-            const offset = assembler.resolveLabel(tokens[2]);
+            const offset = assembler.resolveLabel(tokens[2], globals, labels, address);
             immediate.set(offset);
         }
         else if (instruction.params === 'rt, rs, immediate') {
@@ -139,12 +139,12 @@ export class I_Format {
     }
 }
 export class J_Format {
-    assemble(tokens, instruction, cpu, assembler) {
+    assemble(tokens, instruction, cpu, assembler, globals, labels, address) {
         const opcode = instruction.opcode;
         const target = new Binary(0, 26);
         if (instruction.params === 'target') {
-            const address = assembler.resolveLabel(tokens[1]);
-            target.set(address >> 2);
+            const targetAddress = assembler.resolveLabel(tokens[1], globals, labels, address, true);
+            target.set(targetAddress);
         }
         else {
             console.error(`Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`);
@@ -156,7 +156,7 @@ export class J_Format {
     }
     disassemble(instruction, instructionCode) {
         const opcode = instructionCode.getBits(31, 26);
-        const target = new Binary(instructionCode.getBits(25, 0).getValue() << 2, 26);
+        const target = new Binary(instructionCode.getBits(25, 0).getValue(), 26);
         return { opcode, target };
     }
 }

@@ -1,0 +1,18 @@
+<div class="form">
+    <div class="text">Rename file "<%=ctx.fileName%>".</div>
+    <div class="input">
+        <input type="text" id="new-file-name" name="new-file-name" value="<%=ctx.fileName%>" required autocomplete="off" onkeydown="
+        if(event.key === 'Enter') { renameFileOnClick('<%=ctx.fileId%>'); }
+        ">
+    </div>
+    <div class="buttons">
+        <div class="button default" onclick="hideFormOnClick();">
+            <div class="icon gray-4"><%-Icons.render('x')%></div>
+            <div class="label">Cancel</div>
+        </div>
+        <div class="button default" onclick="renameFileOnClick('<%=ctx.fileId%>')">
+            <div class="icon gray-4"><%-Icons.render('edit')%></div>
+            <div class="label">Rename</div>
+        </div>
+    </div>
+</div>

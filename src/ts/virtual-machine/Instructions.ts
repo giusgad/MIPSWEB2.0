@@ -1,7 +1,7 @@
 import {Binary, Utils} from "./Utils.js";
 import {CPU} from "./CPU.js";
-import {Assembler} from "./Assembler";
-import {VirtualMachine} from "./VirtualMachine";
+import {Assembler} from "./Assembler.js";
+import {VirtualMachine} from "./VirtualMachine.js";
 
 export abstract class Instruction {
 
@@ -76,7 +76,7 @@ export abstract class PseudoInstruction {
         return paramMap;
     }
 
-    abstract expand(assebler: Assembler, tokens: string[]): string[][];
+    abstract expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][];
 }
 
 export class Instructions {
@@ -114,7 +114,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b000000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rd =  registers[params.rd!.getValue()].binary;
@@ -134,7 +134,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b000010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -145,7 +145,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b000011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -156,7 +156,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b000100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -167,7 +167,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b000110, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -178,7 +178,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b000111, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -189,8 +189,13 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b001000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
-                throw new Error(`${this.symbol} not implemented yet`);
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
+
+                const registers = cpu.getRegisters();
+                const rs = registers[params.rs.getValue()].binary.getValue();
+
+                cpu.pc.set(rs);
+
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -200,7 +205,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b001001, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -232,7 +237,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b001101, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -243,7 +248,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b010000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -254,7 +259,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b010001, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -265,7 +270,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b010010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rd =  registers[params.rd!.getValue()].binary;
@@ -283,7 +288,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b010011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -294,7 +299,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b010100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -305,7 +310,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b010111, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -316,7 +321,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rs = registers[params.rs!.getValue()].binary;
@@ -340,7 +345,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011001, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -351,7 +356,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rs = registers[params.rs.getValue()].binary;
@@ -382,7 +387,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -393,7 +398,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -404,7 +409,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011101, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -415,7 +420,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011110, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -426,7 +431,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b011111, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -437,7 +442,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 const registers = cpu.getRegisters();
                 const rd = registers[params.rd!.getValue()].binary;
                 const rs = registers[params.rs!.getValue()].binary;
@@ -468,7 +473,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100001, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rd = registers[params.rd!.getValue()].binary;
@@ -488,7 +493,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 const registers = cpu.getRegisters();
                 const rd = registers[params.rd!.getValue()].binary;
                 const rs = registers[params.rs!.getValue()].binary;
@@ -519,7 +524,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -530,7 +535,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -541,7 +546,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100101, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -552,7 +557,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100110, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -563,7 +568,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b100111, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -574,7 +579,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b101010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -585,7 +590,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b101011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -596,7 +601,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b101100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -607,7 +612,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b101101, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -618,7 +623,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b110000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -629,7 +634,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b110001, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -640,7 +645,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b110010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -651,7 +656,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b110011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -662,7 +667,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b110100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -673,7 +678,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b110110, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -684,7 +689,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b111000, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -695,7 +700,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b111010, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -706,7 +711,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b111011, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -717,7 +722,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b111100, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -728,7 +733,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b111110, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -739,7 +744,7 @@ export class Instructions {
                     new Binary(0b000000, 6), new Binary(0b111111, 6)
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -750,7 +755,7 @@ export class Instructions {
                     new Binary(0b000010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -761,8 +766,16 @@ export class Instructions {
                     new Binary(0b000011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
-                throw new Error(`${this.symbol} not implemented yet`);
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
+
+                const registers = cpu.getRegisters();
+                const target = params.target.getValue();
+
+                registers[31].binary.set(cpu.pc.getValue() + 4);
+
+                const newPC = (cpu.pc.getValue() & 0xF0000000) | (target << 2);
+                cpu.pc.set(newPC);
+
             }
         }());
         this.instructions.push(new class extends Instruction {
@@ -772,7 +785,7 @@ export class Instructions {
                     new Binary(0b000100, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -783,7 +796,7 @@ export class Instructions {
                     new Binary(0b000101, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 const registers = cpu.getRegisters();
                 const rs = registers[params.rs!.getValue()].binary.getValue();
                 const rt = registers[params.rt!.getValue()].binary.getValue();
@@ -803,7 +816,7 @@ export class Instructions {
                     new Binary(0b000110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -814,7 +827,7 @@ export class Instructions {
                     new Binary(0b000111, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rs =  registers[params.rs!.getValue()].binary;
@@ -835,7 +848,7 @@ export class Instructions {
                     new Binary(0b001000, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 const registers = cpu.getRegisters();
                 const rt = registers[params.rt!.getValue()].binary;
                 const rs = registers[params.rs!.getValue()].binary;
@@ -864,7 +877,7 @@ export class Instructions {
                     new Binary(0b001001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rt = registers[params.rt!.getValue()].binary;
@@ -884,7 +897,7 @@ export class Instructions {
                     new Binary(0b001010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -895,7 +908,7 @@ export class Instructions {
                     new Binary(0b001011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -906,7 +919,7 @@ export class Instructions {
                     new Binary(0b001100, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -917,7 +930,7 @@ export class Instructions {
                     new Binary(0b001101, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rt = registers[params.rt!.getValue()].binary;
@@ -937,7 +950,7 @@ export class Instructions {
                     new Binary(0b001110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -948,7 +961,7 @@ export class Instructions {
                     new Binary(0b001111, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rt = registers[params.rt!.getValue()].binary;
@@ -967,7 +980,7 @@ export class Instructions {
                     new Binary(0b010000, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -978,7 +991,7 @@ export class Instructions {
                     new Binary(0b010001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -989,7 +1002,7 @@ export class Instructions {
                     new Binary(0b010010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1000,7 +1013,7 @@ export class Instructions {
                     new Binary(0b010011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1011,7 +1024,7 @@ export class Instructions {
                     new Binary(0b010100, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1022,7 +1035,7 @@ export class Instructions {
                     new Binary(0b010101, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1033,7 +1046,7 @@ export class Instructions {
                     new Binary(0b010110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1044,7 +1057,7 @@ export class Instructions {
                     new Binary(0b010111, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1055,7 +1068,7 @@ export class Instructions {
                     new Binary(0b011000, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1066,7 +1079,7 @@ export class Instructions {
                     new Binary(0b011001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1077,7 +1090,7 @@ export class Instructions {
                     new Binary(0b100000, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1088,7 +1101,7 @@ export class Instructions {
                     new Binary(0b100001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1099,7 +1112,7 @@ export class Instructions {
                     new Binary(0b100010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1110,7 +1123,7 @@ export class Instructions {
                     new Binary(0b100011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rt = registers[params.rt!.getValue()].binary;
@@ -1131,7 +1144,7 @@ export class Instructions {
                     new Binary(0b100100, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1142,7 +1155,7 @@ export class Instructions {
                     new Binary(0b100101, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1153,7 +1166,7 @@ export class Instructions {
                     new Binary(0b100110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1164,7 +1177,7 @@ export class Instructions {
                     new Binary(0b101000, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1175,7 +1188,7 @@ export class Instructions {
                     new Binary(0b101001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1186,7 +1199,7 @@ export class Instructions {
                     new Binary(0b101010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1197,7 +1210,7 @@ export class Instructions {
                     new Binary(0b101011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const registers = cpu.getRegisters();
                 const rt = registers[params.rt!.getValue()].binary;
@@ -1218,7 +1231,7 @@ export class Instructions {
                     new Binary(0b101110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1229,7 +1242,7 @@ export class Instructions {
                     new Binary(0b110001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1240,7 +1253,7 @@ export class Instructions {
                     new Binary(0b110010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1251,7 +1264,7 @@ export class Instructions {
                     new Binary(0b110011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1262,7 +1275,7 @@ export class Instructions {
                     new Binary(0b110101, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1273,7 +1286,7 @@ export class Instructions {
                     new Binary(0b110110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1284,7 +1297,7 @@ export class Instructions {
                     new Binary(0b111000, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1295,7 +1308,7 @@ export class Instructions {
                     new Binary(0b111001, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1306,7 +1319,7 @@ export class Instructions {
                     new Binary(0b111010, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1317,7 +1330,7 @@ export class Instructions {
                     new Binary(0b111011, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1328,7 +1341,7 @@ export class Instructions {
                     new Binary(0b111101, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1339,7 +1352,7 @@ export class Instructions {
                     new Binary(0b111110, 6), undefined,
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.symbol} not implemented yet`);
             }
         }());
@@ -1352,7 +1365,7 @@ export class Instructions {
             constructor() {
                 super('MOVE', 'rd, rs');
             }
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [
                     ['addu', params['rd'], '$zero', params['rs']]
@@ -1363,7 +1376,7 @@ export class Instructions {
             constructor() {
                 super('LI', 'rd, immediate');
             }
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 const immediate = parseInt(params['immediate']);
 
@@ -1391,16 +1404,16 @@ export class Instructions {
             constructor() {
                 super('LA', 'rd, label');
             }
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 const label = params['label'];
-                const address = assembler.labels.get(label);
-                if (address === undefined) {
+                const labelAddress = labels.get(label)?.getValue();
+                if (labelAddress === undefined) {
                     throw new Error(`Label "${label}" not found.`);
                 }
 
-                const upper = Utils.fromSigned((address.getValue() >>> 16) & 0xFFFF, 16);
-                const lower = address.getValue() & 0xFFFF;
+                const upper = Utils.fromSigned((labelAddress >>> 16) & 0xFFFF, 16);
+                const lower = labelAddress & 0xFFFF;
 
                 return [
                     ['lui', '$at', `${upper}`],
@@ -1413,7 +1426,7 @@ export class Instructions {
             constructor() {
                 super('BLT', 'rs, rt, label');
             }
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [];
             }
@@ -1423,7 +1436,7 @@ export class Instructions {
                 super('BLE', 'rs, rt, label');
             }
 
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [];
             }
@@ -1433,7 +1446,7 @@ export class Instructions {
                 super('BGT', 'rs, rt, label');
             }
 
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [];
             }
@@ -1443,7 +1456,7 @@ export class Instructions {
                 super('BGE', 'rs, rt, label');
             }
 
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [];
             }
@@ -1453,7 +1466,7 @@ export class Instructions {
                 super('MUL', 'rd, rs, rt');
             }
 
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [
                     ['mult', params['rs'], params['rt']],
@@ -1467,7 +1480,7 @@ export class Instructions {
                 super('DIV', 'rd, rs, rt');
             }
 
-            expand(assembler: Assembler, tokens: string[]): string[][] {
+            expand(assebler: Assembler, tokens: string[], globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): string[][] {
                 const params = this.mapParams(tokens);
                 return [
                     ['bne', params['rt'], '$zero', '1'],

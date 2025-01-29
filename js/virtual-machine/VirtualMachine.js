@@ -9,20 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
-import { moveCursorToNextInstruction } from "../app.js";
-import { renderEditor } from "../editor.js";
+import { renderApp } from "../app.js";
 export class VirtualMachine {
     constructor(cpu) {
         this.console = new Console();
+        this.asyncToken = 0;
         this.cpu = cpu;
-        this.assembler = new Assembler(cpu);
+        this.assembler = new Assembler(this.cpu);
         this.running = false;
     }
-    assemble(program) {
+    assemble(files) {
+        this.stop();
         try {
-            this.assembler.assemble(program);
-            this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
-            //this.console.addLine("Assemble: operation completed successfully", "success");
+            this.assembler.assembleFiles(files);
+            this.nextInstructionEditorPosition = this.assembler.addressEditorsPositions.get(this.cpu.pc.getValue());
         }
         catch (error) {
             // @ts-ignore
@@ -30,12 +30,26 @@ export class VirtualMachine {
             console.error(error);
         }
     }
+    stop() {
+        this.reset();
+    }
+    reset() {
+        this.cpu.reset();
+        this.assembler.reset();
+        this.running = false;
+        this.nextInstructionEditorPosition = undefined;
+        this.lastChangedRegister = undefined;
+        this.console.reset();
+        this.asyncToken++;
+    }
     step() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (!this.cpu.isHalted() && this.nextInstructionLineNumber !== undefined) {
+                if (!this.cpu.isHalted() && this.nextInstructionEditorPosition !== undefined) {
                     yield this.cpu.execute(this);
-                    this.nextInstructionLineNumber = this.assembler.addressLineMap.get(this.cpu.pc.getValue());
+                    if (!this.cpu.isHalted()) {
+                        this.nextInstructionEditorPosition = this.assembler.addressEditorsPositions.get(this.cpu.pc.getValue());
+                    }
                 }
                 else {
                     this.pause();
@@ -54,21 +68,18 @@ export class VirtualMachine {
             this.running = true;
             while (this.running && !this.cpu.isHalted()) {
                 yield this.step();
-                moveCursorToNextInstruction();
-                renderEditor();
             }
         });
     }
     pause() {
         this.running = false;
     }
-    stop() {
+    exit() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.console.clear();
-            this.lastChangedRegister = undefined;
+            this.cpu.halt();
             this.pause();
-            this.assembler.reset();
-            this.nextInstructionLineNumber = undefined;
+            this.nextInstructionEditorPosition = undefined;
+            yield renderApp("execute");
         });
     }
     getRegisters() {
@@ -82,10 +93,13 @@ export class VirtualMachine {
         return registers;
     }
     getMemory() {
-        return Array.from(this.cpu.getMemory().entries()).map(([address, value]) => ({
+        return Array.from(this.cpu.getMemory().entries()).map(([address, binary]) => ({
             address,
-            value,
+            binary: binary,
             tags: []
         }));
+    }
+    getCurrentAsyncToken() {
+        return this.asyncToken;
     }
 }

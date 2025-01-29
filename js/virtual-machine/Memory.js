@@ -5,12 +5,12 @@ export class Memory {
     }
     storeWord(wordAddress, value) {
         let address = wordAddress.getValue();
-        this.memory.set(address, value.getValue());
+        this.memory.set(address, value);
     }
     loadWord(wordAddress, signed = false) {
         const value = this.memory.get(wordAddress.getValue());
         if (value !== undefined) {
-            return new Binary(value, 32, signed);
+            return new Binary(value.getValue(), 32, signed);
         }
         else {
             return new Binary(0, 32, true);

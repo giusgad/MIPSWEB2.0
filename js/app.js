@@ -7,304 +7,90 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
-import { CPU } from "./virtual-machine/CPU.js";
-import { addClass, getFromLocalStorage, removeClass, render, setIntoLocalStorage } from "./index.js";
-import { default_settings } from "./settings.js";
-import { actionsOnFile, changeFile, closeFile, getFiles, getSelectedFile, importFiles, importSample, importSamples, newFile, openFile } from "./files.js";
-import { editorState, filesEditors, getEditor, initEditors, renderEditor } from "./editor.js";
-import { Binary } from "./virtual-machine/Utils.js";
+import { addLoader, initLoaders, removeLoader } from "./loaders.js";
+import { Colors } from "./lib/Colors.js";
+import { Icons } from "./lib/Icons.js";
+import { initEditors, renderEditors } from "./editors.js";
+import { render } from "./rendering.js";
+import { initSortables } from "./sortable.js";
+import { hideFilePopover } from "./popovers.js";
+import './buttons.js';
+import './drag.js';
+import './settings.js';
+import { getFromStorage, scrollSelectedIntoView, setIntoStorage } from "./utils.js";
+import { clearMemorySelectedFormats, default_settings } from "./settings.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
-export const vm = new VirtualMachine(new CPU);
+import { endDrag } from "./drag.js";
+let online = false;
+initLoaders();
+if (navigator.onLine) {
+    online = true;
+}
 export let interfaceState = "edit";
+export let editorState = "edit";
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
-    if (!getFromLocalStorage("settings")) {
-        setIntoLocalStorage("settings", default_settings);
+    Colors.init();
+    Icons.init();
+    if (!online) {
+        yield renderErrorPage('No Internet connection');
+        document.body.style.opacity = '1';
+        return;
     }
-    yield renderApp();
-    initEditors();
-    clearMemorySelectedFormats();
-}));
-export function clearMemorySelectedFormats() {
-    const settings = getFromLocalStorage('settings');
-    if (settings) {
-        for (const key in settings.colsFormats) {
-            if (key.startsWith('memory-address-format_') || key.startsWith('memory-value-format_')) {
-                delete settings.colsFormats[key];
-            }
+    try {
+        if (!getFromStorage("local", "settings")) {
+            setIntoStorage("local", "settings", default_settings);
         }
-        setIntoLocalStorage('settings', settings);
+        clearMemorySelectedFormats();
+        initEditors();
+        yield renderApp();
     }
+    catch (error) {
+        console.error(error);
+        yield renderErrorPage('Error rendering the app');
+    }
+    document.body.style.opacity = '1';
+}));
+window.addEventListener('online', () => {
+    window.location.reload();
+});
+window.addEventListener('offline', () => {
+    window.location.reload();
+});
+window.addEventListener('resize', () => {
+    hideFilePopover();
+});
+window.addEventListener("storage", (event) => __awaiter(void 0, void 0, void 0, function* () {
+    if (event.storageArea === localStorage) {
+        console.log(`Key: ${event.key}`);
+        console.log(`Old value: ${event.oldValue}`);
+        console.log(`new value: ${event.newValue}`);
+        yield renderApp();
+        window.location.reload();
+    }
+}));
+function renderErrorPage(errorMessage) {
+    return __awaiter(this, void 0, void 0, function* () {
+        document.getElementById('editors').style.display = 'none';
+        initLoaders();
+        addLoader('renderErrorPage');
+        yield render('app', 'error-page.ejs', { errorMessage });
+        removeLoader('renderErrorPage');
+    });
 }
 export function renderApp() {
-    return __awaiter(this, arguments, void 0, function* (newState = interfaceState) {
-        interfaceState = newState;
-        if (interfaceState === "execute") {
-            addClass('execute', 'files-editors');
-        }
-        else {
-            removeClass('execute', 'files-editors');
-        }
-        let memoryTables = document.getElementById('memory-tables');
-        let scrollTop = 0;
-        if (memoryTables) {
-            scrollTop = memoryTables.scrollTop;
-        }
+    return __awaiter(this, arguments, void 0, function* (newInterfaceState = interfaceState, newEditorState = editorState) {
+        addLoader('renderApp');
+        interfaceState = newInterfaceState;
+        editorState = newEditorState;
+        renderEditors();
         yield render('app', 'app.ejs');
-        memoryTables = document.getElementById('memory-tables');
-        if (memoryTables) {
-            //memoryTables.scrollTop = scrollTop;
-        }
         scrollConsoleToBottom();
         watchingConsole();
-        for (const fileEditor of filesEditors) {
-            const editor = fileEditor.aceEditor;
-            editor.resize();
-        }
+        initSortables();
+        hideFilePopover();
+        scrollSelectedIntoView('files-tabs');
+        scrollSelectedIntoView('all-files');
+        endDrag();
+        removeLoader('renderApp');
     });
 }
-export function moveCursorToNextInstruction() {
-    const editor = getEditor();
-    if (editor) {
-        if (vm.nextInstructionLineNumber != null) {
-            editor.gotoLine(vm.nextInstructionLineNumber);
-        }
-    }
-}
-export function assemble() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield vm.stop();
-        const file = getSelectedFile();
-        if (file) {
-            vm.assemble(file.content);
-            renderEditor("execute");
-            moveCursorToNextInstruction();
-            yield renderApp("execute");
-        }
-    });
-}
-export function assembleFiles() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const files = getFiles();
-        console.log(files);
-    });
-}
-export function stop() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield vm.stop();
-        clearMemorySelectedFormats();
-        yield renderApp("edit");
-        renderEditor("edit");
-    });
-}
-export function step() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield vm.step();
-        moveCursorToNextInstruction();
-        yield renderApp();
-        renderEditor();
-    });
-}
-export function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield vm.run();
-        yield renderApp();
-    });
-}
-export function getContext() {
-    return {
-        vm,
-        memoryIntervals: getMemoryIntervals(),
-        interfaceState: interfaceState,
-        editorState: editorState,
-        selectedInstructionsAddresses: getSelectedInstructionsAddresses(),
-        files: getFiles(),
-        selectedFile: getSelectedFile(),
-        settings: getFromLocalStorage('settings')
-    };
-}
-export function getSelectedInstructionsAddresses() {
-    let selectedInstructionsAddresses = [];
-    const editor = getEditor();
-    if (editor) {
-        const cursorPosition = editor.getCursorPosition();
-        const highlightedRow = cursorPosition.row + 1;
-        for (const [key, value] of vm.assembler.addressLineMap) {
-            if (value === highlightedRow) {
-                selectedInstructionsAddresses.push(key);
-            }
-        }
-    }
-    return selectedInstructionsAddresses;
-}
-export function getMemoryIntervals() {
-    const memory = vm.getMemory();
-    if (memory.length === 0) {
-        return [];
-    }
-    const intervals = [];
-    let currentInterval = [memory[0]];
-    for (let i = 1; i < memory.length; i++) {
-        const currentCell = memory[i];
-        const previousCell = memory[i - 1];
-        if (currentCell.address - previousCell.address <= 4) {
-            currentInterval.push(currentCell);
-        }
-        else {
-            intervals.push(extendInterval(currentInterval, intervals.length));
-            currentInterval = [currentCell];
-        }
-    }
-    intervals.push(extendInterval(currentInterval, intervals.length));
-    for (const interval of intervals) {
-        for (const cell of interval.cells) {
-            if (cell.address === vm.cpu.textSegmentStart.getValue()) {
-                cell.tags.push({ name: '.text', type: 'section' });
-            }
-            if (cell.address === vm.cpu.dataSegmentStart.getValue()) {
-                cell.tags.push({ name: '.data', type: 'section' });
-            }
-            vm.assembler.labels.forEach((address, label) => {
-                const addressValue = address.getValue();
-                if ((cell.address === addressValue) || ((addressValue > cell.address) && (addressValue < cell.address + 4))) {
-                    cell.tags.push({ name: label + ':', type: 'label' });
-                }
-            });
-            for (const register of vm.getRegisters()) {
-                const addressValue = register.value;
-                if ((cell.address === addressValue) || ((addressValue > cell.address) && (addressValue < cell.address + 4))) {
-                    if (register.name === 'pc') {
-                        cell.tags.push({ name: register.name, type: 'pc' });
-                    }
-                    else {
-                        cell.tags.push({ name: register.name, type: 'register' });
-                    }
-                }
-            }
-        }
-    }
-    return intervals;
-}
-export function extendInterval(cells, index) {
-    const settings = getFromLocalStorage('settings');
-    const interval = {
-        cells: cells,
-        formats: {
-            address: settings.colsFormats['memory-address-format'],
-            value: settings.colsFormats['memory-value-format']
-        }
-    };
-    if ((interval.cells[0].address >= 4194304) && (interval.cells[interval.cells.length - 1].address <= 268500992)) {
-        interval.formats.value = 'asm';
-    }
-    if (settings.colsFormats[`memory-address-format_${index}`]) {
-        interval.formats.address = settings.colsFormats[`memory-address-format_${index}`];
-    }
-    if (settings.colsFormats[`memory-value-format_${index}`]) {
-        interval.formats.value = settings.colsFormats[`memory-value-format_${index}`];
-    }
-    return interval;
-}
-window.colFormatSelectOnChange = function (element) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let settings = getFromLocalStorage("settings");
-        if (!settings) {
-            settings = default_settings;
-        }
-        else if (!settings.colsFormats) {
-            settings.colsFormats = default_settings.colsFormats;
-        }
-        settings.colsFormats[element.id] = element.value;
-        setIntoLocalStorage('settings', settings);
-        yield renderApp();
-    });
-};
-window.assembleClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield assemble();
-    });
-};
-window.assembleFilesClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield assembleFiles();
-    });
-};
-window.stepClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield step();
-    });
-};
-window.runClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield run();
-    });
-};
-window.stopClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield stop();
-    });
-};
-window.newFileOnClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield newFile();
-    });
-};
-window.importFilesOnClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        importFiles();
-    });
-};
-window.openFileOnClick = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield openFile();
-    });
-};
-window.importSampleOnClick = function (name) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield importSample(name);
-    });
-};
-window.importSamplesOnClick = function (names) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield importSamples(names);
-    });
-};
-window.changeFileOnClick = function (stringFileId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const fileId = parseInt(stringFileId);
-        yield changeFile(fileId);
-    });
-};
-window.actionsOnFileOnClick = function (stringFileId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const fileId = parseInt(stringFileId);
-        actionsOnFile(fileId);
-    });
-};
-window.closeFileOnClick = function (stringFileId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const fileId = parseInt(stringFileId);
-        yield closeFile(fileId);
-    });
-};
-window.convert = function (format, value, signed = false) {
-    if (format === 'decimal') {
-        return value;
-    }
-    if (format === 'hexadecimal') {
-        return new Binary(value, 32, signed).getHex();
-    }
-    if (format === 'binary') {
-        return new Binary(value, 32, signed).getBinary();
-    }
-    if (format === 'ascii') {
-        return new Binary(value, 32, signed).getAscii();
-    }
-    if (format === 'asm') {
-        const decodedInstruction = vm.cpu.decode(new Binary(value));
-        if (decodedInstruction) {
-            return decodedInstruction.basic;
-        }
-    }
-    return 'undefined';
-};

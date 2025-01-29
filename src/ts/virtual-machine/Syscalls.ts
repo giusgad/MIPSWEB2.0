@@ -1,7 +1,6 @@
-import {CPU} from "./CPU";
+import {CPU} from "./CPU.js";
 import {Binary} from "./Utils.js";
 import {VirtualMachine} from "./VirtualMachine.js";
-import {renderApp} from "../app.js";
 
 export abstract class Syscall {
 
@@ -13,7 +12,7 @@ export abstract class Syscall {
         this.code = code;
     }
 
-    abstract execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void;
+    abstract execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void>;
 
 }
 
@@ -37,7 +36,7 @@ export class Syscalls {
                     "PRINT_INT", 1
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const address = cpu.registers.get('$a0');
                 if (address) {
@@ -56,7 +55,7 @@ export class Syscalls {
                     "PRINT_FLOAT", 2
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -67,7 +66,7 @@ export class Syscalls {
                     "PRINT_DOUBLE", 3
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -78,7 +77,7 @@ export class Syscalls {
                     "PRINT_STRING", 4
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
                 const address = cpu.registers.get('$a0');
                 if (address) {
@@ -99,8 +98,15 @@ export class Syscalls {
             }
             async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
 
+                const currentAsyncToken = vm.getCurrentAsyncToken();
+
                 vm.cpu.halt();
                 const input: string = await vm.console.getInput();
+
+                if (currentAsyncToken !== vm.getCurrentAsyncToken()) {
+                    return;
+                }
+
                 vm.cpu.resume();
                 const value = parseInt(input);
                 if (value) {
@@ -120,7 +126,7 @@ export class Syscalls {
                     "READ_FLOAT", 6
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -131,7 +137,7 @@ export class Syscalls {
                     "READ_DOUBLE", 7
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -142,7 +148,7 @@ export class Syscalls {
                     "READ_STRING", 8
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -153,7 +159,7 @@ export class Syscalls {
                     "SBRK", 9
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -164,12 +170,8 @@ export class Syscalls {
                     "EXIT", 10
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
-
-                vm.cpu.halt();
-
-                vm.cpu.pc.set(vm.cpu.pc.getValue() + 4);
-
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
+                await vm.exit();
             }
         });
 
@@ -179,7 +181,7 @@ export class Syscalls {
                     "PRINT_CHARACTER", 11
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -190,7 +192,7 @@ export class Syscalls {
                     "READ_CHARACTER", 12
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -201,7 +203,7 @@ export class Syscalls {
                     "OPEN_FILE", 13
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -212,7 +214,7 @@ export class Syscalls {
                     "READ_FROM_FILE", 14
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -223,7 +225,7 @@ export class Syscalls {
                     "WRITE_TO_FILE", 15
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -234,7 +236,7 @@ export class Syscalls {
                     "CLOSE_FILE", 16
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -245,7 +247,7 @@ export class Syscalls {
                     "EXIT2", 17
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -256,7 +258,7 @@ export class Syscalls {
                     "TIME", 30
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -267,7 +269,7 @@ export class Syscalls {
                     "MIDI_OUT", 31
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -278,7 +280,7 @@ export class Syscalls {
                     "SLEEP", 32
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -289,7 +291,7 @@ export class Syscalls {
                     "MIDI_OUT_SYNC", 33
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -300,7 +302,7 @@ export class Syscalls {
                     "PRINT_HEX", 34
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -311,7 +313,7 @@ export class Syscalls {
                     "PRINT_BINARY", 35
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -322,7 +324,7 @@ export class Syscalls {
                     "PRINT_UNSIGNED", 36
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -333,7 +335,7 @@ export class Syscalls {
                     "SET_SEED", 40
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -344,7 +346,7 @@ export class Syscalls {
                     "RANDOM_INT", 41
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -355,7 +357,7 @@ export class Syscalls {
                     "RANDOM_INT_RANGE", 42
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -366,7 +368,7 @@ export class Syscalls {
                     "RANDOM_FLOAT", 43
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -377,7 +379,7 @@ export class Syscalls {
                     "RANDOM_DOUBLE", 44
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -388,7 +390,7 @@ export class Syscalls {
                     "CONFIRM_DIALOG", 50
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -399,7 +401,7 @@ export class Syscalls {
                     "INPUT_DIALOG_INT", 51
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -410,7 +412,7 @@ export class Syscalls {
                     "INPUT_DIALOG_FLOAT", 52
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -421,7 +423,7 @@ export class Syscalls {
                     "INPUT_DIALOG_DOUBLE", 53
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -432,7 +434,7 @@ export class Syscalls {
                     "INPUT_DIALOG_STRING", 54
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -443,7 +445,7 @@ export class Syscalls {
                     "MESSAGE_DIALOG", 55
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -454,7 +456,7 @@ export class Syscalls {
                     "MESSAGE_DIALOG_INT", 56
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -465,7 +467,7 @@ export class Syscalls {
                     "MESSAGE_DIALOG_FLOAT", 57
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -476,7 +478,7 @@ export class Syscalls {
                     "MESSAGE_DIALOG_DOUBLE", 58
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });
@@ -487,7 +489,7 @@ export class Syscalls {
                     "MESSAGE_DIALOG_STRING", 59
                 );
             }
-            execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine) : void {
+            async execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine): Promise<void> {
                 throw new Error(`${this.name} not implemented yet`);
             }
         });

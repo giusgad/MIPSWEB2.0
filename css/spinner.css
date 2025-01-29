@@ -1,0 +1,31 @@
+.spinner-bg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: 0.5s opacity;
+  background-color: var(--rgb-gray-11);
+  pointer-events: none;
+  z-index: 3000;
+}
+.spinner-bg .spinner {
+  border: 2px solid var(--rgb-app-color);
+  border-top-color: var(--rgb-gray-8);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  animation: rotating 1s linear infinite;
+}
+.loading .spinner-bg {
+  opacity: 1;
+  background-color: var(--rgb-gray-11);
+  pointer-events: all;
+}
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

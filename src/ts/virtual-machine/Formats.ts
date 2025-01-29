@@ -1,16 +1,16 @@
-import {Binary, Utils} from "./Utils.js";
+import {Binary} from "./Utils.js";
 import {Instruction} from "./Instructions.js";
 import {CPU} from "./CPU.js";
-import {register} from "./Registers.js";
 import {Assembler} from "./Assembler.js";
+import {register} from "./Registers.js";
 
 export interface Format {
-    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler): Binary;
+    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler, globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): Binary;
     disassemble(instruction: Instruction, instructionCode: Binary): { [key: string]: Binary };
 }
 
 export class R_Format implements Format {
-    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler): Binary {
+    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler, globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): Binary {
 
         const opcode: Binary = instruction.opcode!;
         const funct: Binary = instruction.funct!;
@@ -90,10 +90,11 @@ export class R_Format implements Format {
         const funct = instructionCode.getBits(5, 0);
         return { opcode, rs, rt, rd, shamt, funct };
     }
+
 }
 
 export class I_Format implements Format {
-    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler): Binary {
+    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler, globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): Binary {
 
         const opcode: Binary = instruction.opcode!;
         let rs = cpu.registers.get('$zero');
@@ -104,13 +105,13 @@ export class I_Format implements Format {
 
             rs = cpu.registers.get(tokens[1]);
             rt = cpu.registers.get(tokens[2]);
-            const offset = assembler.resolveLabel(tokens[3]);
+            const offset = assembler.resolveLabel(tokens[3], globals, labels, address);
             immediate.set(offset);
 
         } else if (instruction.params === 'rs, offset') {
 
             rs = cpu.registers.get(tokens[1]);
-            const offset = assembler.resolveLabel(tokens[2]);
+            const offset = assembler.resolveLabel(tokens[2], globals, labels, address);
             immediate.set(offset);
 
         } else if (instruction.params === 'rt, rs, immediate') {
@@ -177,14 +178,14 @@ export class I_Format implements Format {
 }
 
 export class J_Format implements Format {
-    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler): Binary {
+    assemble(tokens: string[], instruction: Instruction, cpu: CPU, assembler: Assembler, globals: Map<string, Binary | undefined>, labels: Map<string, Binary | undefined>, address: Binary): Binary {
 
         const opcode: Binary = instruction.opcode!;
         const target = new Binary(0, 26);
 
         if (instruction.params === 'target') {
-            const address = assembler.resolveLabel(tokens[1]);
-            target.set(address >> 2);
+            const targetAddress = assembler.resolveLabel(tokens[1], globals, labels, address, true);
+            target.set(targetAddress);
         } else {
             console.error(`Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`);
         }
@@ -197,7 +198,7 @@ export class J_Format implements Format {
 
     disassemble(instruction: Instruction, instructionCode: Binary): { [key: string]: Binary } {
         const opcode = instructionCode.getBits(31, 26);
-        const target = new Binary(instructionCode.getBits(25, 0).getValue() << 2, 26);
+        const target = new Binary(instructionCode.getBits(25, 0).getValue(), 26);
         return { opcode, target };
     }
 

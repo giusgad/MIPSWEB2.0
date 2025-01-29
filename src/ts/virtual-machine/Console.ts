@@ -1,4 +1,4 @@
-import {vm, renderApp} from "../app.js";
+import {renderApp} from "../app.js";
 
 type ConsoleLine = { text: string, type: "success" | "error", waitingInput?: boolean };
 
@@ -39,6 +39,12 @@ export class Console {
         this.addLine(input, 'success');
         this.state = 'ready';
         await renderApp();
+    }
+
+    reset() {
+        this.lines = [];
+        this.state = 'ready';
+        this.input = '';
     }
 
 }

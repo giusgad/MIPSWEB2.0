@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { vm } from "./app.js";
+import { vm } from "./virtual-machine.js";
 document.addEventListener('input', (event) => {
     const target = event.target;
     if (target && target.id === 'console-input') {
