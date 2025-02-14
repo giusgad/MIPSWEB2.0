@@ -56,8 +56,8 @@
                                     </div>
                                     <%}%>
                                 </div>
-                                <div class="col address <%if(addressFormat==='binary'){%>binary<%}%>"><%=convert(addressFormat, cell.address)%></div>
-                                <div class="col value <%if(valueFormat==='binary'){%>binary<%}%>"><%=convert(valueFormat, cell.binary.getValue())%></div>
+                                <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
+                                <div class="col value <%=valueFormat%>"><%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(valueFormat, cell.binary.getValue())%></div>
                             </div>
                         <%}%>
                     <%});%>

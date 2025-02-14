@@ -1,11 +1,15 @@
 export class Utils {
     static toHex(value, bits = 32) {
         const hex = (value >>> 0).toString(16).padStart(Math.ceil(bits / 4), '0');
-        return '0x' + hex;
+        return hex;
     }
     static toBinary(value, bits = 32) {
         const binary = (value >>> 0).toString(2).padStart(bits, '0');
-        return binary;
+        const parts = [];
+        for (let i = 0; i < bits; i += 8) {
+            parts.push(binary.substring(i, i + 8));
+        }
+        return parts.join(' ');
     }
     static toAscii(value, bits) {
         if (bits <= 0 || bits % 8 !== 0) {
