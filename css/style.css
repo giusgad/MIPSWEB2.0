@@ -823,7 +823,7 @@ body {
 }
 .next-instruction {
   position: absolute;
-  background-color: var(--rgba-blue-20) !important;
+  background-color: var(--rgba-blue-10) !important;
 }
 select {
   outline: none;
