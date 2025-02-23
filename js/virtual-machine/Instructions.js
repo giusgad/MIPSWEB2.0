@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Binary, Utils } from "./Utils.js";
+import { getFromStorage } from "../utils.js";
 export class Instruction {
     constructor(symbol, params, format, opcode, funct) {
         this.symbol = symbol;
@@ -16,8 +17,9 @@ export class Instruction {
         this.opcode = opcode;
         this.funct = funct;
     }
-    basic(params) {
+    basic(params, registers) {
         var _a, _b, _c, _d, _e, _f, _g;
+        const registersFormat = getFromStorage("local", "settings").colsFormats['registers-name-format'];
         const paramsNames = this.params.split(',').map(p => p.trim());
         const paramValues = [];
         for (const name of paramsNames) {
@@ -28,7 +30,7 @@ export class Instruction {
             }
             else if (['rs', 'rt', 'rd'].includes(name)) {
                 const regValue = (_c = params[name]) === null || _c === void 0 ? void 0 : _c.getValue();
-                paramValues.push(`$${regValue}`);
+                paramValues.push(`${registers.getRegisterFormat(regValue, registersFormat, registers)}`);
             }
             else if (name === 'immediate' || name === 'offset') {
                 const immediateValue = (_d = params['immediate']) === null || _d === void 0 ? void 0 : _d.getValue();

@@ -70,7 +70,7 @@ export class CPU {
 
                 let params = format.disassemble(foundInstruction, instructionCode);
 
-                const basic = foundInstruction.basic(params);
+                const basic = foundInstruction.basic(params, this.registers);
                 return { instruction: foundInstruction, params, basic };
             }
         }

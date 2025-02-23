@@ -457,20 +457,23 @@ body {
 .table .cols-names {
   display: flex;
 }
-.table .cols-names .col-name {
+.table .cols-names .col {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.table .cols-names .col .col-name {
   display: flex;
   padding: 4px;
   transition: all 0.5s;
   overflow: scroll;
 }
-.table .cols-names .col-format {
+.table .cols-names .col .col-format {
   display: flex;
-  padding-bottom: 8px;
-  padding-top: 0;
+  padding: 6px;
 }
 .table .rows {
   font-family: monospace;
-  background-color: var(--rgb-gray-10);
 }
 .table .rows .row {
   display: flex;
@@ -484,7 +487,12 @@ body {
   line-height: 14px;
 }
 .table .rows .row .col.binary {
-  font-size: 9px;
+  font-size: 10px;
+}
+.table .rows .row .col.binary .bytes {
+  display: inline-block;
+  transform: scale(0.8, 1);
+  transform-origin: top left;
 }
 .component {
   position: absolute;
@@ -528,17 +536,20 @@ body {
   padding: 0 12px;
   padding-bottom: 12px;
 }
-#registers .component .table .row.last-changed {
-  background-color: var(--rgba-ace-variable-20);
+#registers .component .table .col-format {
+  padding-left: 0;
 }
-#registers .component .table .col.number {
-  width: calc(100% / 100 * 11.5);
+#registers .component .table .row {
+  background-color: var(--rgb-gray-10);
+}
+#registers .component .table .row.last-changed .col.value {
+  color: var(--rgb-ace-variable);
 }
 #registers .component .table .col.name {
-  width: calc(100% / 100 * 17);
+  width: calc(100% / 100 * 40);
 }
 #registers .component .table .col.value {
-  width: calc(100% / 100 * 71.5);
+  width: calc(100% / 100 * 60);
 }
 #memory .component {
   background-color: var(--rgb-gray-11);
@@ -558,6 +569,15 @@ body {
 #memory .component .tables .table {
   margin-bottom: 12px;
   padding: 0 12px;
+}
+#memory .component .tables .table .cols-names .col {
+  background-color: transparent !important;
+}
+#memory .component .tables .table .rows .row.selected-instruction .col.address {
+  background-color: var(--rgb-gray-9) !important;
+}
+#memory .component .tables .table .rows .row.selected-instruction .col.value {
+  background-color: var(--rgb-gray-9) !important;
 }
 #memory .component .tables .table .rows .row .col {
   line-height: 12px;
@@ -600,13 +620,16 @@ body {
   color: var(--rgb-ace-section);
 }
 #memory .component .tables .table .col.tags {
-  width: calc(100% / 100 * 31.5);
+  width: calc(100% / 100 * 25);
+  border-bottom: 1px solid var(--rgb-gray-10);
 }
 #memory .component .tables .table .col.address {
-  width: calc(100% / 100 * 34.25);
+  width: calc(100% / 100 * 30);
+  background-color: var(--rgb-gray-10);
 }
 #memory .component .tables .table .col.value {
-  width: calc(100% / 100 * 34.25);
+  width: calc(100% / 100 * 45);
+  background-color: var(--rgb-gray-10);
 }
 .console {
   position: absolute;
@@ -801,9 +824,6 @@ body {
 .next-instruction {
   position: absolute;
   background-color: var(--rgba-blue-20) !important;
-}
-.selected-instruction {
-  background-color: var(--rgb-gray-9) !important;
 }
 select {
   outline: none;

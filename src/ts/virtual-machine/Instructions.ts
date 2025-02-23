@@ -2,6 +2,8 @@ import {Binary, Utils} from "./Utils.js";
 import {CPU} from "./CPU.js";
 import {Assembler} from "./Assembler.js";
 import {VirtualMachine} from "./VirtualMachine.js";
+import {getFromStorage} from "../utils.js";
+import {Registers} from "./Registers.js";
 
 export abstract class Instruction {
 
@@ -21,7 +23,10 @@ export abstract class Instruction {
 
     abstract execute(cpu: CPU, params: { [key: string]: Binary }, vm: VirtualMachine | undefined): void;
 
-    basic(params: { [key: string]: Binary }): string {
+    basic(params: { [key: string]: Binary }, registers: Registers): string {
+
+        const registersFormat = getFromStorage("local", "settings").colsFormats['registers-name-format'];
+
         const paramsNames = this.params.split(',').map(p => p.trim());
         const paramValues: string[] = [];
 
@@ -32,7 +37,7 @@ export abstract class Instruction {
                 paramValues.push(`${offsetValue}($${rsValue})`);
             } else if (['rs', 'rt', 'rd'].includes(name)) {
                 const regValue = params[name]?.getValue();
-                paramValues.push(`$${regValue}`);
+                paramValues.push(`${registers.getRegisterFormat(regValue, registersFormat, registers)}`);
             } else if (name === 'immediate' || name === 'offset') {
                 const immediateValue = params['immediate']?.getValue();
                 paramValues.push(immediateValue !== undefined ? immediateValue.toString() : '0');

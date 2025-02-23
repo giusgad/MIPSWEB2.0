@@ -60,4 +60,12 @@ export class Registers {
         }
     }
 
+    getRegisterFormat(number: number, format: string, registers: Registers) {
+        if (format === 'number') {
+            return '$' + number;
+        } else {
+            return registers.registers[number].name;
+        }
+    }
+
 }

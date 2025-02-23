@@ -92,7 +92,9 @@ export function getMemoryIntervals() {
                         cell.tags.push({ name: register.name, type: 'pc' });
                     }
                     else {
-                        cell.tags.push({ name: register.name, type: 'register' });
+                        if (register.number) {
+                            cell.tags.push({ name: vm.cpu.registers.getRegisterFormat(register.number, getFromStorage("local", "settings").colsFormats['registers-name-format'], vm.cpu.registers), type: 'register' });
+                        }
                     }
                 }
             }

@@ -18,9 +18,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 export const default_settings = {
     theme: 'auto',
     colsFormats: {
+        'registers-name-format': 'name',
         'registers-value-format': 'decimal',
         'memory-address-format': 'hexadecimal',
-        'memory-value-format': 'decimal'
+        'memory-value-format': 'decimal',
     }
 };
 export function clearMemorySelectedFormats() {

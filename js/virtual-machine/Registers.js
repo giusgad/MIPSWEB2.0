@@ -44,4 +44,12 @@ export class Registers {
             register.binary.set(0);
         }
     }
+    getRegisterFormat(number, format, registers) {
+        if (format === 'number') {
+            return '$' + number;
+        }
+        else {
+            return registers.registers[number].name;
+        }
+    }
 }

@@ -14,7 +14,6 @@
                                 %>
                                 <option value="decimal" <%= addressFormat === "decimal" ? "selected" : "" %>>Decimal</option>
                                 <option value="hexadecimal" <%= addressFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                                <option value="binary" <%= addressFormat === "binary" ? "selected" : "" %>>Binary</option>
                             </select>
                         </div>
                     </div>
@@ -28,7 +27,7 @@
                                 <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
                                 <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
                                 <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
-                                <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>Text</option>
+                                <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
                                 <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>MIPS Instruction</option>
                             </select>
                         </div>
@@ -56,8 +55,13 @@
                                     </div>
                                     <%}%>
                                 </div>
+
+
+
                                 <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
                                 <div class="col value <%=valueFormat%>"><%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(valueFormat, cell.binary.getValue())%></div>
+
+
                             </div>
                         <%}%>
                     <%});%>

@@ -2,8 +2,17 @@
     <div class="title">Registers</div>
     <div class="table">
         <div class="cols-names">
-            <div class="col number"><div class="col-name"></div></div>
-            <div class="col name"><div class="col-name">Name</div></div>
+            <div class="col name">
+                <div class="col-format">
+                    <select name="col-format" id="registers-name-format" onchange="colFormatSelectOnChange(this)">
+                        <%
+                        let nameFormat = (ctx.settings.colsFormats && ctx.settings.colsFormats['registers-name-format']) || "name";
+                        %>
+                        <option value="name" <%= nameFormat === "name" ? "selected" : "" %>>Name</option>
+                        <option value="number" <%= nameFormat === "number" ? "selected" : "" %>>Number</option>
+                    </select>
+                </div>
+            </div>
             <div class="col value">
                 <div class="col-name">Value</div>
                 <div class="col-format">
@@ -13,7 +22,6 @@
                         %>
                         <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
                         <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                        <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
                     </select>
                 </div>
             </div>
@@ -21,9 +29,19 @@
         <div class="rows">
             <%ctx.vm.getRegisters().forEach((register) => {%>
                 <div class="row <% if ((ctx.vm.lastChangedRegister) && (ctx.vm.lastChangedRegister === register.name)) { %> last-changed <% } %>">
-                    <div class="col number"><%=register.number%></div>
-                    <div class="col name"><%=register.name%></div>
-                    <div class="col value <%=valueFormat%>"><%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(valueFormat, register.value, true)%></div>
+                    <div class="col name">
+                        <% if ((nameFormat === 'number') && (!['pc', 'hi', 'lo'].includes(register.name))) { %>
+                        $<%=register.number%>
+                        <% } else { %>
+                        <%=register.name%>
+                        <% } %>
+                    </div>
+                    <div class="col value <%=valueFormat%>">
+                        <%if (valueFormat === 'hexadecimal'){%>
+                            <div style="opacity: 0.5; font-size: 10px">0x</div>
+                        <%}%>
+                        <%=convert(valueFormat, register.value, true)%>
+                    </div>
                 </div>
             <%});%>
         </div>

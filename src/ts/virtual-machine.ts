@@ -1,4 +1,4 @@
-import {changeFile, file} from "./files.js";
+import {changeFile, file, getOpenedFiles} from "./files.js";
 import {VirtualMachine} from "./virtual-machine/VirtualMachine.js";
 import {CPU} from "./virtual-machine/CPU.js";
 import {renderApp} from "./app.js";
@@ -81,7 +81,9 @@ export function getMemoryIntervals() {
                     if (register.name === 'pc') {
                         cell.tags.push({name: register.name, type: 'pc'});
                     } else {
-                        cell.tags.push({name: register.name, type: 'register'});
+                        if (register.number) {
+                            cell.tags.push({name: vm.cpu.registers.getRegisterFormat(register.number, getFromStorage("local", "settings").colsFormats['registers-name-format'], vm.cpu.registers), type: 'register'});
+                        }
                     }
                 }
             }
