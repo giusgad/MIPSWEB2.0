@@ -34,7 +34,7 @@ export abstract class Instruction {
             if (name.includes('(') && name.includes(')')) {
                 const offsetValue = params['immediate']?.getValue() || 0;
                 const rsValue = params['rs']?.getValue();
-                paramValues.push(`${offsetValue}($${rsValue})`);
+                paramValues.push(`${offsetValue}(${registers.getRegisterFormat(rsValue, registersFormat, registers)})`);
             } else if (['rs', 'rt', 'rd'].includes(name)) {
                 const regValue = params[name]?.getValue();
                 paramValues.push(`${registers.getRegisterFormat(regValue, registersFormat, registers)}`);

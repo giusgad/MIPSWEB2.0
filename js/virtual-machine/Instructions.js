@@ -26,7 +26,7 @@ export class Instruction {
             if (name.includes('(') && name.includes(')')) {
                 const offsetValue = ((_a = params['immediate']) === null || _a === void 0 ? void 0 : _a.getValue()) || 0;
                 const rsValue = (_b = params['rs']) === null || _b === void 0 ? void 0 : _b.getValue();
-                paramValues.push(`${offsetValue}($${rsValue})`);
+                paramValues.push(`${offsetValue}(${registers.getRegisterFormat(rsValue, registersFormat, registers)})`);
             }
             else if (['rs', 'rt', 'rd'].includes(name)) {
                 const regValue = (_c = params[name]) === null || _c === void 0 ? void 0 : _c.getValue();
