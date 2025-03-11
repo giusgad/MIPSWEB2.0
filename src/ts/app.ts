@@ -61,14 +61,9 @@ window.addEventListener('resize', () => {
     hideFilePopover();
 });
 
-window.addEventListener("storage", async (event: StorageEvent) => {
-    if (event.storageArea === localStorage) {
-        console.log(`Key: ${event.key}`);
-        console.log(`Old value: ${event.oldValue}`);
-        console.log(`new value: ${event.newValue}`);
-        await renderApp();
-        window.location.reload();
-    }
+window.addEventListener("focus", async () => {
+    initEditors();
+    await renderApp();
 });
 
 async function renderErrorPage(errorMessage: string) {

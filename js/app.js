@@ -59,14 +59,9 @@ window.addEventListener('offline', () => {
 window.addEventListener('resize', () => {
     hideFilePopover();
 });
-window.addEventListener("storage", (event) => __awaiter(void 0, void 0, void 0, function* () {
-    if (event.storageArea === localStorage) {
-        console.log(`Key: ${event.key}`);
-        console.log(`Old value: ${event.oldValue}`);
-        console.log(`new value: ${event.newValue}`);
-        yield renderApp();
-        window.location.reload();
-    }
+window.addEventListener("focus", () => __awaiter(void 0, void 0, void 0, function* () {
+    initEditors();
+    yield renderApp();
 }));
 function renderErrorPage(errorMessage) {
     return __awaiter(this, void 0, void 0, function* () {

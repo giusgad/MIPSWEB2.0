@@ -10,7 +10,7 @@
 }
 .ace_selection {
   background-color: var(--rgb-blue) !important;
-  opacity: 0.1 !important;
+  opacity: 0.2 !important;
 }
 .ace_print-margin {
   background-color: var(--rgb-gray-10) !important;
