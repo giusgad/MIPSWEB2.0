@@ -6,7 +6,7 @@
   "scripts": {
     "watch:less": "less-watch-compiler src/less css",
     "watch:ts": "npx tsc --watch",
-    "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\""
+    "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\" \"npx http-server . -p 8080 -c-1\""
   },
   "repository": {
     "type": "git",
