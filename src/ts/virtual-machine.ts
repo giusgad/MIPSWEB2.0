@@ -95,7 +95,7 @@ export function getMemoryIntervals() {
                 name: vm.cpu.registers.getRegisterFormat(
                   register.number,
                   getFromStorage("local", "settings").colsFormats[
-                    "registers-name-format"
+                  "registers-name-format"
                   ],
                   vm.cpu.registers,
                 ),
@@ -117,6 +117,7 @@ export function extendInterval(cells: any, index: number) {
     formats: {
       address: settings.colsFormats["memory-address-format"],
       value: settings.colsFormats["memory-value-format"],
+      valueGranularity: settings.colsFormats["memory-value-granularity"],
     },
   };
   if (
@@ -130,13 +131,18 @@ export function extendInterval(cells: any, index: number) {
       settings.colsFormats[`memory-address-format_${index}`];
   }
   if (settings.colsFormats[`memory-value-format_${index}`]) {
+    console.log("SET FORMAT");
     interval.formats.value =
       settings.colsFormats[`memory-value-format_${index}`];
+  }
+  if (settings.colsFormats[`memory-value-granularity_${index}`]) {
+    interval.formats.valueGranularity =
+      settings.colsFormats[`memory-value-granularity_${index}`];
   }
   return interval;
 }
 
-(window as any).convert = function (format: string, value: number) {
+(window as any).convert = function(format: string, value: number) {
   const signed = value <= 0;
   switch (format) {
     case "decimal":

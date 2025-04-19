@@ -74,7 +74,7 @@ export class Utils {
   }
 
   static asUnsignedValue(value: number): number {
-    return number;
+    return value;
   }
 }
 

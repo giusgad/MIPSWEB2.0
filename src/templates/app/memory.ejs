@@ -31,6 +31,18 @@
                                 <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>MIPS Instruction</option>
                             </select>
                         </div>
+                        <div class="col-format">
+                            <select name="col-format" id="memory-value-granularity_<%=index%>" onchange="colFormatSelectOnChange(this)">
+                                <%
+                            console.log(interval.formats)
+                                    let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
+                            console.log(valueGranularity)
+                                %>
+                                <option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option>
+                                <option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option>
+                                <option value="byte" <%= valueGranularity === "byte" ? "selected" : "" %>>Byte</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="rows">
@@ -56,12 +68,14 @@
                                     <%}%>
                                 </div>
 
-
-
                                 <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
-                                <div class="col value <%=valueFormat%>"><%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(valueFormat, cell.binary.getValue())%></div>
-
-
+                                <% if (valueGranularity == 'half') {%>
+                                    <p>Half half</p>
+                                <%} else if (valueGranularity == 'byte') {%>
+                                    <p>Byte Byte Byte Byte</p>
+                                <%} else {%>
+                                    <div class="col value <%=valueFormat%>"><%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(valueFormat, cell.binary.getValue())%></div>
+                                <%}%>
                             </div>
                         <%}%>
                     <%});%>
