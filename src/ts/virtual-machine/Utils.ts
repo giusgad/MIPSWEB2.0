@@ -4,7 +4,6 @@ export class Utils {
     return hex;
   }
 
-  //TODO: adjust number of leading zeroes
   static toBinary(value: number, bits: number = 32): string {
     const binary = (value >>> 0).toString(2).padStart(bits, "0");
 

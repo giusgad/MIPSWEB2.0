@@ -1,99 +1,104 @@
 <div class="component">
-    <div class="title">Memory</div>
-    <div class="tables">
-        <%ctx.memoryIntervals.forEach((interval, index) => {%>
-            <div class="table">
-                <div class="cols-names">
-                    <div class="col tags"><div class="col-name"></div></div>
-                    <div class="col address">
-                        <div class="col-name">Address</div>
-                        <div class="col-format">
-                            <select name="col-format" id="memory-address-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
-                                <%
-                                    let addressFormat = (interval.formats && interval.formats.address) || "decimal";
-                                %>
-                                <option value="decimal" <%= addressFormat === "decimal" ? "selected" : "" %>>Decimal</option>
-                                <option value="hexadecimal" <%= addressFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col value">
-                        <div class="col-name">Value</div>
-                        <div class="col-format">
-                            <select name="col-format" id="memory-value-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
-                                <%
-                                    let valueFormat = (interval.formats && interval.formats.value) || "decimal";
-                                %>
-                                <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
-                                <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                                <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
-                                <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
-                                <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>MIPS Instruction</option>
-                            </select>
-                        </div>
-                        <div class="col-format">
-                            <select name="col-format" id="memory-value-granularity_<%=index%>" onchange="colFormatSelectOnChange(this)">
-                                <%
-                                    let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
-                                %>
-                                <option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option>
-                                <option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option>
-                                <option value="byte" <%= valueGranularity === "byte" ? "selected" : "" %>>Byte</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="rows">
-                    <%interval.cells.forEach((cell) => {%>
-                        <%if (cell) {%>
-                            <div class="row <%if (ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')){%> selected-instruction <%}%>">
-                                <div class="col tags">
-                                    <%if (cell.tags.length > 0) {%>
-                                    <div class="static-tags">
-                                        <%cell.tags.forEach((tag) => {%>
-                                        <%if (['section', 'label'].includes(tag.type)) {%>
-                                        <div class="tag <%=tag.type%>"><%=tag.name%></div>
-                                        <%}%>
-                                        <%});%>
-                                    </div>
-                                    <div class="dynamic-tags">
-                                        <%cell.tags.forEach((tag) => {%>
-                                        <%if (['pc', 'register'].includes(tag.type)) {%>
-                                        <div class="tag <%=tag.type%>"><%=tag.name%></div>
-                                        <%}%>
-                                        <%});%>
-                                    </div>
-                                    <%}%>
-                                </div>
-
-                                <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
-                                <% if (valueGranularity == 'half') {%>
-                                    <%let parts = [cell.binary.getBits(31,16), cell.binary.getBits(15,0)]
-                                    for (let part of parts) {%>
-                                        <div class="col value <%=valueFormat%>">
-                                            <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
-                                            <%=convert(valueFormat, part.binary, 16)%>
-                                        </div>
-                                    <%}%>
-                                <%} else if (valueGranularity == 'byte') {%>
-                                    <%let parts = [cell.binary.getBits(31,24), cell.binary.getBits(23,16), cell.binary.getBits(15,8), cell.binary.getBits(7,0)]
-                                    for (let part of parts) {%>
-                                        <div class="col value <%=valueFormat%>">
-                                            <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
-                                            <%=convert(valueFormat, part.binary, 8)%>
-                                        </div>
-                                    <%}%>
-                                <%} else {%>
-                                    <div class="col value <%=valueFormat%>">
-                                        <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
-                                        <%=convert(valueFormat, cell.binary.binary)%>
-                                    </div>
-                                <%}%>
-                            </div>
-                        <%}%>
-                    <%});%>
-                </div>
+  <div class="title">Memory</div>
+  <div class="tables">
+    <%ctx.memoryIntervals.forEach((interval, index) => {%>
+      <div class="table">
+        <div class="cols-names">
+          <div class="col tags"><div class="col-name"></div></div>
+          <div class="col address">
+            <div class="col-name">Address</div>
+            <div class="col-format">
+              <select name="col-format" id="memory-address-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
+                <%
+                  let addressFormat = (interval.formats && interval.formats.address) || "decimal";
+                %>
+                <option value="decimal" <%= addressFormat === "decimal" ? "selected" : "" %>>Decimal</option>
+                <option value="hexadecimal" <%= addressFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
+              </select>
             </div>
-        <%});%>
-    </div>
+          </div>
+          <div class="col value">
+            <div class="col-name">Value</div>
+            <div class="col-format">
+              <select name="col-format" id="memory-value-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
+                <%
+                  let valueFormat = (interval.formats && interval.formats.value) || "decimal";
+                %>
+                <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
+                <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
+                <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
+                <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
+                <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>MIPS Instruction</option>
+              </select>
+            </div>
+            <div class="col-format">
+              <select name="col-format" id="memory-value-granularity_<%=index%>" onchange="colFormatSelectOnChange(this)">
+                <%
+                  let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
+                %>
+                <option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option>
+                <option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option>
+                <option value="byte" <%= valueGranularity === "byte" ? "selected" : "" %>>Byte</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="rows">
+          <%interval.cells.forEach((cell) => {%>
+            <%if (cell) {%>
+              <div class="row <%if (ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')){%> selected-instruction <%}%>">
+                <div class="col tags">
+                  <%if (cell.tags.length > 0) {%>
+                  <div class="static-tags">
+                    <%cell.tags.forEach((tag) => {%>
+                    <%if (['section', 'label'].includes(tag.type)) {%>
+                    <div class="tag <%=tag.type%>"><%=tag.name%></div>
+                    <%}%>
+                    <%});%>
+                  </div>
+                  <div class="dynamic-tags">
+                    <%cell.tags.forEach((tag) => {%>
+                    <%if (['pc', 'register'].includes(tag.type)) {%>
+                    <div class="tag <%=tag.type%>"><%=tag.name%></div>
+                    <%}%>
+                    <%});%>
+                  </div>
+                  <%}%>
+                </div>
+
+                <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
+
+                <% if (valueGranularity == 'half') {%>
+                  <div class="col granular">
+                    <%let parts = [cell.binary.getBits(31,16), cell.binary.getBits(15,0)]
+                    for (let part of parts) {%>
+                      <div class="col value <%=valueFormat%>">
+                        <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                        <%=convert(valueFormat, part.binary, 16)%>
+                      </div>
+                    <%}%>
+                  </div>
+                <%} else if (valueGranularity == 'byte') {%>
+                  <div class="col granular">
+                    <%let parts = [cell.binary.getBits(31,24), cell.binary.getBits(23,16), cell.binary.getBits(15,8), cell.binary.getBits(7,0)]
+                    for (let part of parts) {%>
+                      <div class="col value <%=valueFormat%>">
+                        <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                        <%=convert(valueFormat, part.binary, 8)%>
+                      </div>
+                    <%}%>
+                  </div>
+                <%} else {%>
+                  <div class="col value <%=valueFormat%>">
+                    <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                    <%=convert(valueFormat, cell.binary.binary)%>
+                  </div>
+                <%}%>
+              </div>
+            <%}%>
+          <%});%>
+        </div>
+      </div>
+    <%});%>
+  </div>
 </div>
