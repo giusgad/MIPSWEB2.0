@@ -95,7 +95,7 @@ export function getMemoryIntervals() {
                 name: vm.cpu.registers.getRegisterFormat(
                   register.number,
                   getFromStorage("local", "settings").colsFormats[
-                  "registers-name-format"
+                    "registers-name-format"
                   ],
                   vm.cpu.registers,
                 ),
@@ -131,7 +131,6 @@ export function extendInterval(cells: any, index: number) {
       settings.colsFormats[`memory-address-format_${index}`];
   }
   if (settings.colsFormats[`memory-value-format_${index}`]) {
-    console.log("SET FORMAT");
     interval.formats.value =
       settings.colsFormats[`memory-value-format_${index}`];
   }
@@ -142,17 +141,21 @@ export function extendInterval(cells: any, index: number) {
   return interval;
 }
 
-(window as any).convert = function(format: string, value: number) {
+(window as any).convert = function (
+  format: string,
+  value: number,
+  bits: number = 32,
+) {
   const signed = value <= 0;
   switch (format) {
     case "decimal":
       return value;
     case "hexadecimal":
-      return new Binary(value, 32, signed).getHex();
+      return new Binary(value, bits, signed).getHex();
     case "binary":
-      return new Binary(value, 32, signed).getBinary();
+      return new Binary(value, bits, signed).getBinary();
     case "ascii":
-      return new Binary(value, 32, signed).getAscii();
+      return new Binary(value, bits, signed).getAscii();
     case "asm":
       const decodedInstruction = vm.cpu.decode(new Binary(value));
       if (decodedInstruction) {

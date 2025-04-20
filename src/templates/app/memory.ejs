@@ -34,9 +34,7 @@
                         <div class="col-format">
                             <select name="col-format" id="memory-value-granularity_<%=index%>" onchange="colFormatSelectOnChange(this)">
                                 <%
-                            console.log(interval.formats)
                                     let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
-                            console.log(valueGranularity)
                                 %>
                                 <option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option>
                                 <option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option>
@@ -70,11 +68,26 @@
 
                                 <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
                                 <% if (valueGranularity == 'half') {%>
-                                    <p>Half half</p>
+                                    <%let parts = [cell.binary.getBits(31,16), cell.binary.getBits(15,0)]
+                                    for (let part of parts) {%>
+                                        <div class="col value <%=valueFormat%>">
+                                            <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                                            <%=convert(valueFormat, part.binary, 16)%>
+                                        </div>
+                                    <%}%>
                                 <%} else if (valueGranularity == 'byte') {%>
-                                    <p>Byte Byte Byte Byte</p>
+                                    <%let parts = [cell.binary.getBits(31,24), cell.binary.getBits(23,16), cell.binary.getBits(15,8), cell.binary.getBits(7,0)]
+                                    for (let part of parts) {%>
+                                        <div class="col value <%=valueFormat%>">
+                                            <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                                            <%=convert(valueFormat, part.binary, 8)%>
+                                        </div>
+                                    <%}%>
                                 <%} else {%>
-                                    <div class="col value <%=valueFormat%>"><%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(valueFormat, cell.binary.getValue())%></div>
+                                    <div class="col value <%=valueFormat%>">
+                                        <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                                        <%=convert(valueFormat, cell.binary.binary)%>
+                                    </div>
                                 <%}%>
                             </div>
                         <%}%>

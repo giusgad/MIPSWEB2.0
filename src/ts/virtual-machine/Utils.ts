@@ -4,6 +4,7 @@ export class Utils {
     return hex;
   }
 
+  //TODO: adjust number of leading zeroes
   static toBinary(value: number, bits: number = 32): string {
     const binary = (value >>> 0).toString(2).padStart(bits, "0");
 
@@ -110,6 +111,9 @@ export class Binary {
     return Utils.asUnsignedValue(this.binary);
   }
 
+  /**@param from: number in [31-0]
+   * @param to: number in [31-0] and has to be less than from, range is inclusive
+   * @returns Binary representing bits from-to */
   getBits(from: number, to: number, signed: boolean = false): Binary {
     const bits = from - to + 1;
     const mask = ((1 << bits) - 1) << to;
