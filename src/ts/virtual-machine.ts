@@ -150,6 +150,10 @@ export function extendInterval(cells: any, index: number) {
     switch (format) {
         case "decimal":
             return bin.getValue();
+        case "uint":
+            return bin.getUnsignedValue();
+        case "int":
+            return bin.getSignedValue();
         case "hexadecimal":
             return bin.getHex();
         case "binary":

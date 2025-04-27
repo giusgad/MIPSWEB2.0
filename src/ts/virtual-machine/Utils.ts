@@ -104,6 +104,15 @@ export class Binary {
         }
     }
 
+    getUnsignedValue(): number {
+        return this.binary;
+    }
+
+    getSignedValue(): number {
+        const shift = 32 - this.length;
+        return (this.binary << shift) >> shift;
+    }
+
     /**@param from: number in [31-0]
      * @param to: number in [31-0] and has to be less than from, range is inclusive
      * @returns Binary representing bits from-to */

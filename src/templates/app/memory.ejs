@@ -25,6 +25,8 @@
                   let valueFormat = (interval.formats && interval.formats.value) || "decimal";
                 %>
                 <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
+                <option value="int" <%= valueFormat === "int" ? "selected" : "" %>>Signed integer</option>
+                <option value="uint" <%= valueFormat === "uint" ? "selected" : "" %>>Unsigned integer</option>
                 <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
                 <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
                 <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
