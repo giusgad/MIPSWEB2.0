@@ -30,8 +30,6 @@
                 <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
                 <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>MIPS Instruction</option>
               </select>
-            </div>
-            <div class="col-format">
               <select name="col-format" id="memory-value-granularity_<%=index%>" onchange="colFormatSelectOnChange(this)">
                 <%
                   let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";

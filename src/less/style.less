@@ -123,19 +123,20 @@ body {
 
     .col {
       display: flex;
+      flex-direction: column;
       justify-content: flex-start;
-      align-items: center;
 
       .col-name {
         display: flex;
-        padding: 4px;
+        padding: 2px;
         transition: all 0.5s;
         overflow: scroll;
       }
 
       .col-format {
         display: flex;
-        padding: 6px;
+        gap: 4px;
+        margin-bottom: 6px;
       }
     }
   }
@@ -284,7 +285,6 @@ body {
         .rows {
           .row {
             &.selected-instruction {
-
               //background-color: var(--rgb-gray-9) !important;
               .col {
                 &.address {
@@ -302,7 +302,6 @@ body {
               min-height: 28px;
 
               &.tags {
-
                 //border-left: none;
                 //border-top: none;
                 //: none;
@@ -342,7 +341,8 @@ body {
                     border: 1px solid var(--rgb-blue);
                   }
 
-                  &.label {}
+                  &.label {
+                  }
 
                   &.section {
                     font-weight: bold;
