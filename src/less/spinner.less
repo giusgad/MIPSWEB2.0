@@ -1,16 +1,16 @@
 @import "variables.less";
 
 .spinner-bg {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  opacity:0;
-  transition:0.5s opacity;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: 0.5s opacity;
   background-color: var(--rgb-gray-11);
-  pointer-events:none;
+  pointer-events: none;
   z-index: 3000;
   .spinner {
-    border:2px solid var(--rgb-app-color);
+    border: 2px solid var(--rgb-app-color);
     border-top-color: var(--rgb-gray-8);
     width: 40px;
     height: 40px;
@@ -22,7 +22,7 @@
   .spinner-bg {
     opacity: 1;
     background-color: var(--rgb-gray-11);
-    pointer-events:all;
+    pointer-events: all;
   }
 }
 @keyframes rotating {

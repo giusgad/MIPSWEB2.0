@@ -1,31 +1,34 @@
-import {renderApp} from "../app.js";
+import { renderApp } from "../app.js";
 
-type ConsoleLine = { text: string, type: "success" | "error", waitingInput?: boolean };
+type ConsoleLine = {
+    text: string;
+    type: "success" | "error";
+    waitingInput?: boolean;
+};
 
 export class Console {
-
     lines: ConsoleLine[] = [];
-    state: 'ready' | 'waitingInput' = 'ready';
-    input: string = '';
+    state: "ready" | "waitingInput" = "ready";
+    input: string = "";
 
     addLine(text: string, type: "success" | "error") {
-        this.lines.push({ text: text + '\n', type, waitingInput: false });
+        this.lines.push({ text: text + "\n", type, waitingInput: false });
     }
 
     async clear() {
-        this.state = 'ready';
-        await new Promise(resolve => setTimeout(resolve, 200));
+        this.state = "ready";
+        await new Promise((resolve) => setTimeout(resolve, 200));
         this.lines = [];
-        this.input = '';
+        this.input = "";
     }
 
     async getInput(): Promise<string> {
         this.lines[this.lines.length - 1].waitingInput = true;
-        this.state = 'waitingInput';
+        this.state = "waitingInput";
         await renderApp();
         return new Promise((resolve) => {
             const interval = setInterval(() => {
-                if (this.state === 'ready') {
+                if (this.state === "ready") {
                     clearInterval(interval);
                     resolve(this.input);
                 }
@@ -36,15 +39,14 @@ export class Console {
     async setInput(input: string) {
         this.input = input;
         this.lines[this.lines.length - 1].waitingInput = false;
-        this.addLine(input, 'success');
-        this.state = 'ready';
+        this.addLine(input, "success");
+        this.state = "ready";
         await renderApp();
     }
 
     reset() {
         this.lines = [];
-        this.state = 'ready';
-        this.input = '';
+        this.state = "ready";
+        this.input = "";
     }
-
 }

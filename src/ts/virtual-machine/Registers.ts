@@ -1,13 +1,12 @@
-import {Binary} from "./Utils.js";
+import { Binary } from "./Utils.js";
 
 export type register = {
-    name: string,
-    number?: number,
-    binary: Binary
-}
+    name: string;
+    number?: number;
+    binary: Binary;
+};
 
 export class Registers {
-
     registers: register[] = [];
 
     constructor(names: string[]) {
@@ -16,7 +15,7 @@ export class Registers {
             this.registers.push({
                 name: registerName,
                 number: i,
-                binary: new Binary(0, 32, true)
+                binary: new Binary(0, 32, true),
             });
         }
     }
@@ -27,7 +26,7 @@ export class Registers {
             registers.registers.push({
                 name: register.name,
                 number: register.number,
-                binary: register.binary.copy()
+                binary: register.binary.copy(),
             });
         }
         return registers;
@@ -38,15 +37,17 @@ export class Registers {
             return undefined;
         }
 
-        let register = this.registers.find(reg => reg.name === name);
+        let register = this.registers.find((reg) => reg.name === name);
 
         if (!register) {
-            const dollarIndex = name.indexOf('$');
+            const dollarIndex = name.indexOf("$");
             if (dollarIndex !== -1) {
                 const numberStr = name.substring(dollarIndex + 1);
                 const number = parseInt(numberStr, 10);
                 if (!isNaN(number)) {
-                    register = this.registers.find(reg => reg.number === number);
+                    register = this.registers.find(
+                        (reg) => reg.number === number,
+                    );
                 }
             }
         }
@@ -61,11 +62,10 @@ export class Registers {
     }
 
     getRegisterFormat(number: number, format: string, registers: Registers) {
-        if (format === 'number') {
-            return '$' + number;
+        if (format === "number") {
+            return "$" + number;
         } else {
             return registers.registers[number].name;
         }
     }
-
 }

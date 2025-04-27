@@ -1,12 +1,12 @@
-import {addLoader, removeLoader} from "./loaders.js";
-import {Icons} from "./lib/Icons.js";
-import {Colors} from "./lib/Colors.js";
-import {getFiles, getOpenedFiles, getSelectedFile} from "./files.js";
-import {sidebar} from "./sidebar.js";
-import {editorState, interfaceState} from "./app.js";
-import {getMemoryIntervals, vm} from "./virtual-machine.js";
-import {getFromStorage} from "./utils.js";
-import {getSelectedInstructionAddresses} from "./editors.js";
+import { addLoader, removeLoader } from "./loaders.js";
+import { Icons } from "./lib/Icons.js";
+import { Colors } from "./lib/Colors.js";
+import { getFiles, getOpenedFiles, getSelectedFile } from "./files.js";
+import { sidebar } from "./sidebar.js";
+import { editorState, interfaceState } from "./app.js";
+import { getMemoryIntervals, vm } from "./virtual-machine.js";
+import { getFromStorage } from "./utils.js";
+import { getSelectedInstructionAddresses } from "./editors.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -22,11 +22,15 @@ export function getContext() {
         settings: getFromStorage("local", "settings"),
         memoryIntervals: getMemoryIntervals(),
         selectedInstructionAddresses: getSelectedInstructionAddresses(),
-        vm: vm
+        vm: vm,
     };
 }
 
-export async function render(id: string, templatePath: string, ctx: any = undefined) {
+export async function render(
+    id: string,
+    templatePath: string,
+    ctx: any = undefined,
+) {
     addLoader(`render: ${id}`);
     if (!ctx) ctx = getContext();
     const element = document.getElementById(id);
@@ -39,12 +43,16 @@ export async function render(id: string, templatePath: string, ctx: any = undefi
 async function renderTemplate(templatePath: string, ctx: any = undefined) {
     addLoader(`renderTemplate: ${templatePath}`);
     if (!ctx) ctx = getContext();
-    const template = await fetch(`src/templates/${templatePath}`).then(res => {
-        if (!res.ok) {
-            throw new Error(`No template found: "src/templates/${templatePath}"`);
-        }
-        return res.text();
-    });
+    const template = await fetch(`src/templates/${templatePath}`).then(
+        (res) => {
+            if (!res.ok) {
+                throw new Error(
+                    `No template found: "src/templates/${templatePath}"`,
+                );
+            }
+            return res.text();
+        },
+    );
     const data = { ctx, Icons, Colors };
     const result = ejs.render(template, data, { async: true });
     removeLoader(`renderTemplate: ${templatePath}`);

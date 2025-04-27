@@ -1,4 +1,4 @@
-import {renderApp} from "./app.js";
+import { renderApp } from "./app.js";
 
 export let sidebar: string | undefined = undefined;
 

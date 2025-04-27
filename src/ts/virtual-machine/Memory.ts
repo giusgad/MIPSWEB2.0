@@ -1,7 +1,6 @@
-import {Binary} from "./Utils.js";
+import { Binary } from "./Utils.js";
 
 export class Memory {
-
     private memory: Map<number, Binary> = new Map<number, Binary>();
 
     storeWord(wordAddress: Binary, value: Binary) {
@@ -30,7 +29,6 @@ export class Memory {
         word.setBits(value, bitPosition + 7, bitPosition);
 
         this.storeWord(new Binary(alignedAddress), word);
-
     }
 
     loadByte(wordAddress: Binary): Binary {
@@ -61,7 +59,7 @@ export class Memory {
     }
 
     getString(address: Binary) {
-        let string = '';
+        let string = "";
         let byte = this.loadByte(address);
         while (byte.getValue() !== 0) {
             string += String.fromCharCode(byte.getValue());

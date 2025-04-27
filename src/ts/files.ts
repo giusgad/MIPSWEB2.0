@@ -1,8 +1,7 @@
-import {addEditor, editors, removeEditor, showEditor} from "./editors.js";
-import {renderApp} from "./app.js";
-import {setSidebar, sidebar} from "./sidebar.js";
-import {getFromStorage, scrollToEnd, setIntoStorage} from "./utils.js";
-
+import { addEditor, editors, removeEditor, showEditor } from "./editors.js";
+import { renderApp } from "./app.js";
+import { setSidebar, sidebar } from "./sidebar.js";
+import { getFromStorage, scrollToEnd, setIntoStorage } from "./utils.js";
 
 export type file = {
     id: number;
@@ -19,26 +18,26 @@ export async function changeFile(fileId: number) {
 }
 
 export async function closeAllFiles() {
-    localStorage.removeItem('openedFiles');
-    localStorage.removeItem('selectedFileId');
+    localStorage.removeItem("openedFiles");
+    localStorage.removeItem("selectedFileId");
     const files = getFiles();
-    files.forEach(file => {
+    files.forEach((file) => {
         file.opened = false;
     });
     setFiles(files);
-    editors.forEach(editor => {
+    editors.forEach((editor) => {
         removeEditor(editor.fileId);
     });
     if (!sidebar) {
-        setSidebar('all-files');
+        setSidebar("all-files");
     }
-    await renderApp('edit', 'edit');
+    await renderApp("edit", "edit");
 }
 
 export async function deleteFile(fileId: number) {
     await closeFile(fileId);
     const files = getFiles();
-    const index = files.findIndex(file => file.id === fileId);
+    const index = files.findIndex((file) => file.id === fileId);
     if (index !== -1) {
         files.splice(index, 1);
         setFiles(files);
@@ -48,7 +47,7 @@ export async function deleteFile(fileId: number) {
 
 export async function renameFile(fileId: number, newName: string) {
     const files = getFiles();
-    const file = files.find(file => file.id === fileId);
+    const file = files.find((file) => file.id === fileId);
     if (file) {
         file.name = generateUniqueName(newName);
         setFiles(files);
@@ -66,11 +65,10 @@ export async function closeFile(fileId: number) {
             await changeFile(openedFiles[openedFiles.length - 1].id);
         }
     } else {
-        localStorage.removeItem('selectedFileId');
+        localStorage.removeItem("selectedFileId");
     }
-    await renderApp('edit', 'edit');
+    await renderApp("edit", "edit");
 }
-
 
 export async function openFile(fileId: number) {
     if (getOpenedFilesIds().includes(fileId)) {
@@ -84,7 +82,7 @@ export async function openFile(fileId: number) {
         addEditor(file);
         showEditor(file.id);
     }
-    await renderApp('edit', 'edit');
+    await renderApp("edit", "edit");
 }
 
 export function getSelectedFileId(): number | null {
@@ -94,7 +92,7 @@ export function getSelectedFileId(): number | null {
 
 export function getSelectedFile() {
     const fileId = getSelectedFileId();
-    if (!(fileId == null) && !(!getOpenedFilesIds().includes(fileId!))) {
+    if (!(fileId == null) && !!getOpenedFilesIds().includes(fileId!)) {
         return getFile(fileId!);
     }
     if (getOpenedFiles().length > 0) {
@@ -114,7 +112,7 @@ export function setSelectedFileId(fileId: number) {
 
 export function updateFile(fileId: number, content: string) {
     const files = getFiles();
-    const file = files.find(file => file.id === fileId);
+    const file = files.find((file) => file.id === fileId);
     if (file) {
         file.content = content;
         setFiles(files);
@@ -152,7 +150,7 @@ function addFile(file: file) {
 
 export function pushOpenedFileId(fileId: number) {
     const files = getFiles();
-    const file = files.find(file => file.id === fileId);
+    const file = files.find((file) => file.id === fileId);
     if (file) {
         file.opened = true;
         setFiles(files);
@@ -166,7 +164,7 @@ export function pushOpenedFileId(fileId: number) {
 
 export function removeOpenedFileId(fileId: number) {
     const files = getFiles();
-    const file = files.find(file => file.id === fileId);
+    const file = files.find((file) => file.id === fileId);
     if (file) {
         file.opened = false;
         setFiles(files);
@@ -191,7 +189,7 @@ export function getOpenedFiles(): file[] {
     const files = getFiles();
     const openedFiles = [];
     for (const fileId of openedFilesIds) {
-        const file = files.find(file => file.id === fileId);
+        const file = files.find((file) => file.id === fileId);
         if (file) openedFiles.push(file);
     }
     return openedFiles;
@@ -207,9 +205,9 @@ export function getFiles(): file[] {
 }
 
 export function importFiles() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.asm';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".asm";
     input.multiple = true;
     input.onchange = async () => {
         if (input.files && input.files.length > 0) {
@@ -234,14 +232,14 @@ export function importFile(file: File) {
         try {
             const fileId = generateUniqueFileId();
             const fileName = generateUniqueName(file.name.split(".")[0]);
-            const fileContent = event.target?.result as string || '';
+            const fileContent = (event.target?.result as string) || "";
 
             const fileToAdd: file = {
                 id: fileId,
                 name: fileName,
-                type: 'asm',
+                type: "asm",
                 content: fileContent,
-                opened: false
+                opened: false,
             };
 
             addFile(fileToAdd);
@@ -255,8 +253,13 @@ export function importFile(file: File) {
     try {
         reader.readAsText(file);
     } catch (error) {
-        console.error(`Unexpected error while reading the file: ${file.name}`, error);
-        alert(`Unexpected error while reading the file: ${file.name}. Please check the file and try again.`);
+        console.error(
+            `Unexpected error while reading the file: ${file.name}`,
+            error,
+        );
+        alert(
+            `Unexpected error while reading the file: ${file.name}. Please check the file and try again.`,
+        );
     }
 }
 
@@ -281,7 +284,6 @@ export async function exportFile(fileId: number) {
         const writableStream = await handle.createWritable();
         await writableStream.write(file.content);
         await writableStream.close();
-
     } catch (error: any) {
         console.error(`Error exporting the file with ID: ${fileId}`, error);
 
@@ -301,7 +303,7 @@ export async function newFile() {
         name: fileName,
         type: "asm",
         content: "",
-        opened: false
+        opened: false,
     };
     addFile(fileToAdd);
     await openFile(fileId);
@@ -309,14 +311,14 @@ export async function newFile() {
 
 function generateUniqueFileId() {
     const files = getFiles();
-    return files.length > 0 ? Math.max(...files.map(file => file.id)) + 1 : 0;
+    return files.length > 0 ? Math.max(...files.map((file) => file.id)) + 1 : 0;
 }
 
 function generateUniqueName(name: string): string {
     const files = getFiles();
     let newName = name;
     let i = 1;
-    while (files.find(file => file.name === newName)) {
+    while (files.find((file) => file.name === newName)) {
         newName = `${name}_${i}`;
         i++;
     }
