@@ -64,7 +64,10 @@
                   <%}%>
                 </div>
 
-                <div class="col address <%=addressFormat%>"><%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%><%=convert(addressFormat, cell.address)%></div>
+                <div class="col address <%=addressFormat%>">
+                  <%if (addressFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
+                  <%=convert(addressFormat, cell.address)%>
+                </div>
 
                 <% if (valueGranularity == 'half') {%>
                   <div class="col granular">
@@ -72,7 +75,7 @@
                     for (let part of parts) {%>
                       <div class="col value <%=valueFormat%>">
                         <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
-                        <%=convert(valueFormat, part.binary, 16)%>
+                        <%=convert(valueFormat, part)%>
                       </div>
                     <%}%>
                   </div>
@@ -82,14 +85,14 @@
                     for (let part of parts) {%>
                       <div class="col value <%=valueFormat%>">
                         <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
-                        <%=convert(valueFormat, part.binary, 8)%>
+                        <%=convert(valueFormat, part)%>
                       </div>
                     <%}%>
                   </div>
                 <%} else {%>
                   <div class="col value <%=valueFormat%>">
                     <%if (valueFormat === 'hexadecimal'){%><div style="opacity: 0.5; font-size: 10px">0x</div><%}%>
-                    <%=convert(valueFormat, cell.binary.binary)%>
+                    <%=convert(valueFormat, cell.binary)%>
                   </div>
                 <%}%>
               </div>

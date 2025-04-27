@@ -3,6 +3,7 @@
     <div class="table">
         <div class="cols-names">
             <div class="col name">
+                <div class="col-name">Register</div>
                 <div class="col-format">
                     <select name="col-format" id="registers-name-format" onchange="colFormatSelectOnChange(this)">
                         <%
@@ -40,7 +41,7 @@
                         <%if (valueFormat === 'hexadecimal'){%>
                             <div style="opacity: 0.5; font-size: 10px">0x</div>
                         <%}%>
-                        <%=convert(valueFormat, register.value)%>
+                        <%=convert(valueFormat, register.binary)%>
                     </div>
                 </div>
             <%});%>

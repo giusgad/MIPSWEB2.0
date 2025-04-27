@@ -98,17 +98,10 @@ export class VirtualMachine {
     }
 
     getRegisters() {
-        const registers = [];
-        for (const register of this.cpu.getRegisters()) {
-            registers.push({
-                name: register.name,
-                number: register.number,
-                value: register.binary.getValue(),
-            });
-        }
-        registers.push({ name: "pc", value: this.cpu.pc.getValue() });
-        registers.push({ name: "hi", value: this.cpu.hi.getValue() });
-        registers.push({ name: "lo", value: this.cpu.lo.getValue() });
+        const registers = [...this.cpu.getRegisters()];
+        registers.push({ name: "pc", binary: this.cpu.pc });
+        registers.push({ name: "hi", binary: this.cpu.hi });
+        registers.push({ name: "lo", binary: this.cpu.lo });
         return registers;
     }
 

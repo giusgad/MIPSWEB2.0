@@ -83,7 +83,7 @@ export function getMemoryIntervals() {
                 }
             });
             for (const register of vm.getRegisters()) {
-                const addressValue = register.value;
+                const addressValue = register.binary.getValue();
                 if (
                     cell.address === addressValue ||
                     (addressValue > cell.address &&
@@ -142,23 +142,25 @@ export function extendInterval(cells: any, index: number) {
     return interval;
 }
 
-(window as any).convert = function (
-    format: string,
-    value: number,
-    bits: number = 32,
-) {
-    const signed = value <= 0;
+(window as any).convert = function (format: string, bin: Binary | number) {
+    if (typeof bin === "number") {
+        // cell addresses are passed as a number
+        bin = new Binary(bin);
+    }
     switch (format) {
         case "decimal":
-            return value;
+            return bin.getValue();
         case "hexadecimal":
-            return new Binary(value, bits, signed).getHex();
+            return bin.getHex();
         case "binary":
-            return new Binary(value, bits, signed).getBinary();
+            console.log(bin);
+            return bin.getBinary();
         case "ascii":
-            return new Binary(value, bits, signed).getAscii();
+            return bin.getAscii();
         case "asm":
-            const decodedInstruction = vm.cpu.decode(new Binary(value));
+            const decodedInstruction = vm.cpu.decode(
+                new Binary(bin.getValue()),
+            );
             if (decodedInstruction) {
                 return decodedInstruction.basic;
             }

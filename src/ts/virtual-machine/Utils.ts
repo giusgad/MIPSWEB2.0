@@ -74,10 +74,6 @@ export class Utils {
 
         return value;
     }
-
-    static asUnsignedValue(value: number): number {
-        return value;
-    }
 }
 
 export class Binary {
@@ -106,10 +102,6 @@ export class Binary {
         } else {
             return this.binary;
         }
-    }
-
-    getUnsignedValue(): number {
-        return Utils.asUnsignedValue(this.binary);
     }
 
     /**@param from: number in [31-0]
