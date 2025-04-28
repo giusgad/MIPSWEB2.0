@@ -162,9 +162,7 @@ export function extendInterval(cells: any, index: number) {
         case "ascii":
             return bin.getAscii();
         case "asm":
-            const decodedInstruction = vm.cpu.decode(
-                new Binary(bin.getValue()),
-            );
+            const decodedInstruction = vm.cpu.decode(bin);
             if (decodedInstruction) {
                 return decodedInstruction.basic;
             }

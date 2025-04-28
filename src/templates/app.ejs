@@ -22,7 +22,8 @@
     <div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% } else if (ctx.sidebar) { %>sidebar-open<% } %>"><%- await renderTemplate('/app/opened-files.ejs', ctx) %></div>
     <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
     <% if (ctx.interfaceState === 'execute') { %>
-    <div id="memory"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
+    <div id="memory" <%if(ctx.memoryMapActive){%>class="map-active"<%}%>><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
+    <div id="memorymap" <%if(ctx.memoryMapActive){%>class="map-active"<%}%>><%-await renderTemplate('/app/memorymap.ejs', ctx)%></div>
     <div id="console"><%-await renderTemplate('/app/console.ejs', ctx)%></div>
     <% } %>
 <%}%>

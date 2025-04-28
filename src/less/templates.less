@@ -64,6 +64,21 @@
   left: 60%;
   width: 40%;
   bottom: 0;
+  &.map-active {
+    width: 30%;
+  }
+}
+
+#memorymap {
+  position: absolute;
+  top: calc(@toolbar-h * 2);
+  left: 90%;
+  width: 10%;
+  bottom: 0;
+  display: none;
+  &.map-active {
+    display: block;
+  }
 }
 
 #console {

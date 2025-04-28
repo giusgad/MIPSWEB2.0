@@ -1,5 +1,9 @@
 <div class="component">
   <div class="title">Memory</div>
+  <div class="button default" onclick="toggleMemoryMapOnClick();">
+      <div class="icon gray-4"><%-Icons.render('step')%></div>
+      <div class="label">Show Minimap</div>
+  </div>
   <div class="tables">
     <%ctx.memoryIntervals.forEach((interval, index) => {%>
       <div class="table">

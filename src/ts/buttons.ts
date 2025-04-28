@@ -16,6 +16,7 @@ import {
 import { hideFilePopover, showFilePopover } from "./popovers.js";
 import { assemble, stop, step, run } from "./virtual-machine.js";
 import { colFormatSelect } from "./settings.js";
+import { toggleMemoryMap } from "./memorymap.js";
 
 (window as any).colFormatSelectOnChange = async function (
     element: HTMLSelectElement,
@@ -60,6 +61,10 @@ import { colFormatSelect } from "./settings.js";
 
 (window as any).toggleSidebarOnClick = async function (sidebarButton: string) {
     await toggleSidebar(sidebarButton);
+};
+
+(window as any).toggleMemoryMapOnClick = async function () {
+    await toggleMemoryMap();
 };
 
 (window as any).newFileOnClick = async function () {

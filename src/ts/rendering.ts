@@ -7,6 +7,7 @@ import { editorState, interfaceState } from "./app.js";
 import { getMemoryIntervals, vm } from "./virtual-machine.js";
 import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
+import { memoryMapActive } from "./memorymap.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -21,6 +22,7 @@ export function getContext() {
         editorState: editorState,
         settings: getFromStorage("local", "settings"),
         memoryIntervals: getMemoryIntervals(),
+        memoryMapActive: memoryMapActive,
         selectedInstructionAddresses: getSelectedInstructionAddresses(),
         vm: vm,
     };

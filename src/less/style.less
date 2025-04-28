@@ -264,6 +264,12 @@ body {
       border-bottom: 1px solid var(--rgb-gray-10);
     }
 
+    .button {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
     .tables {
       position: absolute;
       top: @toolbar-h;
@@ -302,9 +308,6 @@ body {
               min-height: 28px;
 
               &.tags {
-                //border-left: none;
-                //border-top: none;
-                //: none;
                 .static-tags {
                   width: 50%;
                   display: flex;
@@ -383,6 +386,17 @@ body {
           }
         }
       }
+    }
+  }
+}
+
+#memorymap {
+  .component {
+    background-color: var(--rgb-gray-11);
+    border-left: 1px solid var(--rgb-gray-10);
+
+    .title {
+      border-bottom: 1px solid var(--rgb-gray-10);
     }
   }
 }
