@@ -28,20 +28,12 @@ body {
 
 .header {
   background-color: var(--rgb-gray-10);
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   height: @toolbar-h;
   border-bottom: solid 1px var(--rgb-gray-11);
 }
 
 .toolbar {
   background-color: var(--rgb-gray-10);
-  position: absolute;
-  top: @toolbar-h;
-  left: 0;
-  right: 0;
   height: @toolbar-h;
   border-bottom: solid 1px var(--rgb-gray-11);
 }
@@ -160,17 +152,10 @@ body {
         &.binary {
           font-size: @font-size-small - 2;
 
-          //background-color: var(--rgb-yellow);
           .bytes {
-            //background-color: var(--rgb-green);
             display: inline-block;
             transform: scale(0.8, 1);
             transform-origin: top left;
-
-            //color: blue;
-            .byte {
-              //margin: 0 1.5px;
-            }
           }
         }
       }
@@ -179,22 +164,12 @@ body {
 }
 
 .component {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
   .title {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
     height: @toolbar-h;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    margin: 0 12px;
+    padding: 0.3em 1em;
     border-bottom: 1px solid var(--rgb-gray-11);
   }
 }
@@ -220,11 +195,6 @@ body {
     }
 
     .table {
-      position: absolute;
-      top: @toolbar-h;
-      bottom: 0;
-      right: 0;
-      left: 0;
       padding: 0 12px;
       padding-bottom: 12px;
 
@@ -282,11 +252,6 @@ body {
     }
 
     .tables {
-      position: absolute;
-      top: @toolbar-h;
-      bottom: 0;
-      right: 0;
-      left: 0;
       overflow-y: scroll;
 
       .table {
@@ -355,9 +320,6 @@ body {
                     font-weight: bold;
                     color: var(--rgb-blue);
                     border: 1px solid var(--rgb-blue);
-                  }
-
-                  &.label {
                   }
 
                   &.section {
@@ -506,10 +468,6 @@ body {
   border-right: 1px solid var(--rgb-gray-11);
 
   .title {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
     height: @toolbar-h;
     display: flex;
     justify-content: flex-start;
