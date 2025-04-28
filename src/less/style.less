@@ -5,6 +5,9 @@
 @import "ace-editor.less";
 @import "buttons.less";
 
+@border-gray-10: solid 1px var(--rgb-gray-10);
+@border-gray-11: solid 1px var(--rgb-gray-11);
+
 body {
   color: var(--rgb-gray-1);
   background-color: var(--rgb-gray-11);
@@ -96,7 +99,7 @@ body {
   width: 100%;
   height: 100%;
   background-color: var(--rgb-gray-10);
-  border-right: 1px solid var(--rgb-gray-11);
+  border-right: @border-gray-11;
 }
 
 .opened-files {
@@ -164,20 +167,29 @@ body {
 }
 
 .component {
+  height: 100%;
+  overflow-y: scroll;
+  padding-top: calc(@toolbar-h + 0.5em);
   .title {
+    z-index: 1; // without this semitransparent elements show through (like 0x before hex)
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
     height: @toolbar-h;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding: 0.3em 1em;
-    border-bottom: 1px solid var(--rgb-gray-11);
+    background-color: var(--rgb-gray-11);
+    border-bottom: @border-gray-11;
   }
 }
 
 #console {
   .component {
     background-color: var(--rgb-gray-10);
-    border-top: 1px solid var(--rgb-gray-11);
+    border-top: @border-gray-11;
 
     .title {
       border-bottom: 1px solid transparent;
@@ -188,10 +200,10 @@ body {
 #registers {
   .component {
     background-color: var(--rgb-gray-11);
-    border-left: 1px solid var(--rgb-gray-10);
+    border-left: @border-gray-10;
 
     .title {
-      border-bottom: 1px solid var(--rgb-gray-10);
+      border-bottom: @border-gray-10;
     }
 
     .table {
@@ -230,10 +242,11 @@ body {
 #memory {
   .component {
     background-color: var(--rgb-gray-11);
-    border-left: 1px solid var(--rgb-gray-10);
+    border-left: @border-gray-10;
 
     .title {
-      border-bottom: 1px solid var(--rgb-gray-10);
+      border-bottom: @border-gray-10;
+      border-left: @border-gray-10;
     }
 
     // toggle memory-map button
@@ -335,7 +348,7 @@ body {
         .col {
           &.tags {
             width: calc(100% / 100 * 25);
-            border-bottom: 1px solid var(--rgb-gray-10);
+            border-bottom: @border-gray-10;
           }
 
           &.address {
@@ -368,10 +381,10 @@ body {
 #memorymap {
   .component {
     background-color: var(--rgb-gray-11);
-    border-left: 1px solid var(--rgb-gray-10);
+    border-left: @border-gray-10;
 
     .title {
-      border-bottom: 1px solid var(--rgb-gray-10);
+      border-bottom: @border-gray-10;
     }
   }
 }
@@ -413,7 +426,7 @@ body {
   }
 
   &.waiting-input {
-    //border: 1px solid var(--rgb-gray-9);
+    //border: 1px solid var(--rib-gray-9);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   }
 }
@@ -465,7 +478,7 @@ body {
   width: 100%;
   height: 100%;
   background-color: var(--rgb-gray-10);
-  border-right: 1px solid var(--rgb-gray-11);
+  border-right: @border-gray-11;
 
   .title {
     height: @toolbar-h;
