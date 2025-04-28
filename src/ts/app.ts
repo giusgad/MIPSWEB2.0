@@ -63,10 +63,11 @@ window.addEventListener("resize", () => {
     hideFilePopover();
 });
 
-window.addEventListener("focus", async () => {
+/* window.addEventListener("focus", async () => {
     initEditors();
     await renderApp();
-});
+}); */
+// TODO: removed only while developing
 
 async function renderErrorPage(errorMessage: string) {
     document.getElementById("editors")!.style.display = "none";

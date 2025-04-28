@@ -128,6 +128,7 @@ body {
 
       .col-name {
         display: flex;
+        flex-wrap: wrap;
         padding: 2px;
         transition: all 0.5s;
         overflow: scroll;
@@ -135,6 +136,7 @@ body {
 
       .col-format {
         display: flex;
+        flex-wrap: wrap;
         gap: 4px;
         margin-bottom: 6px;
       }
@@ -264,10 +266,19 @@ body {
       border-bottom: 1px solid var(--rgb-gray-10);
     }
 
+    // toggle memory-map button
     .button {
+      z-index: 2;
+      @w: 9em;
+      @h: 2em;
       position: absolute;
-      top: 0;
-      right: 0;
+      margin: 0 !important;
+      width: @w;
+      height: @h;
+      margin-top: -@h;
+      top: calc(@w / 2 - @h / 2 + 1em);
+      right: calc(@h / 2 - @w / 2);
+      transform: rotate(-90deg);
     }
 
     .tables {
@@ -308,8 +319,10 @@ body {
               min-height: 28px;
 
               &.tags {
+                display: flex;
+                flex-wrap: wrap;
                 .static-tags {
-                  width: 50%;
+                  flex: 1;
                   display: flex;
                   justify-content: flex-start;
                   align-items: center;
@@ -317,7 +330,7 @@ body {
                 }
 
                 .dynamic-tags {
-                  width: 50%;
+                  flex: 1;
                   display: flex;
                   justify-content: flex-end;
                   align-items: center;
