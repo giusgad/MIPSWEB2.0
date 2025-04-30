@@ -1,6 +1,34 @@
 <div class="component">
   <div class="title">Memory Minimap</div>
-  <div>
-    Content
+  <div class="memorymap">
+    <%
+    // how many bytes are drawn before and after a defined address
+    const memoryPadding = 32;
+    function calculateStart(interval, lastDrawn) {
+      let firstAddr = interval.cells[0].address - memoryPadding;
+      if (firstAddr < lastDrawn) firstAddr = lastDrawn+4;
+      return firstAddr;
+    }
+    const startAddress=4194304;
+    const dataStartAddress=268500992;
+    let lastDrawn=startAddress-4;
+    for (let [index, interval] of ctx.memoryIntervals.entries()) {
+      let intervalStart = interval.cells[0].address;
+      let intervalEnd = interval.cells[interval.cells.length - 1].address;
+      let firstAddr = calculateStart(interval, lastDrawn);
+      let lastAddr = intervalEnd+memoryPadding;
+      // whether there is empty memory between intervals, in which case show an expandable cell
+      let jump = firstAddr > lastDrawn;
+      for (let addr = firstAddr; addr <= lastAddr; addr += 4) {
+      %>
+        <div class="cell <%=(addr >= intervalStart && addr <= intervalEnd) ? "active" : ""%>" title="<%=addr%>"></div>
+      <%}
+      lastDrawn = lastAddr;
+      if (jump) {
+        let nextInterval=ctx.memoryIntervals[index+1];
+        let nextStart = nextInterval ? calculateStart(nextInterval, lastDrawn) : 4294967295;
+      %>
+      <div class="" title="<%=`${lastDrawn+4}..${nextStart}`%>">+</div>
+    <%}}%>
   </div>
 </div>

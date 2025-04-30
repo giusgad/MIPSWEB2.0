@@ -26,6 +26,7 @@
     "@types/sortablejs": "^1.15.8",
     "concurrently": "^8.2.2",
     "ejs": "^3.1.10",
+    "ejs-lint": "^2.0.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "less": "^4.2.0",
