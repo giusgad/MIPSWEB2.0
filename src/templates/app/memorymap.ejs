@@ -19,16 +19,21 @@
       let lastAddr = intervalEnd+memoryPadding;
       // whether there is empty memory between intervals, in which case show an expandable cell
       let jump = firstAddr > lastDrawn;
-      for (let addr = firstAddr; addr <= lastAddr; addr += 4) {
-      %>
+      for (let addr = firstAddr; addr <= lastAddr; addr += 4) {%>
+        <%if (addr === intervalStart) {%><div class="interval"><%}%>
         <div class="cell <%=(addr >= intervalStart && addr <= intervalEnd) ? "active" : ""%>" title="<%=addr%>"></div>
+        <%if (addr === intervalEnd) {%></div><%}%>
       <%}
       lastDrawn = lastAddr;
       if (jump) {
         let nextInterval=ctx.memoryIntervals[index+1];
         let nextStart = nextInterval ? calculateStart(nextInterval, lastDrawn) : 4294967295;
       %>
-      <div class="" title="<%=`${lastDrawn+4}..${nextStart}`%>">+</div>
+      <div class="fading <%=(nextInterval != null) ? "mid" : ""%>" title="<%=`${lastDrawn+4}..${nextStart}`%>">
+        <%for (let i = 0; i <= memoryPadding; i+=4) {%>
+          <div class="cell"></div>
+        <%}%>
+      </div>
     <%}}%>
   </div>
 </div>
