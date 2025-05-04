@@ -47,7 +47,7 @@
             </div>
           </div>
         </div>
-        <div class="rows">
+        <div class="rows" data-intervalindex="<%=index%>" name="memoryIntervalTable">
           <%interval.cells.forEach((cell) => {%>
             <%if (cell) {%>
               <div class="row <%if (ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')){%> selected-instruction <%}%>">

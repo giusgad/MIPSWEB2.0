@@ -20,7 +20,7 @@
       // whether there is empty memory between intervals, in which case show an expandable cell
       let jump = firstAddr > lastDrawn;
       for (let addr = firstAddr; addr <= lastAddr; addr += 4) {%>
-        <%if (addr === intervalStart) {%><div class="interval"><%}%>
+      <%if (addr === intervalStart) {%><div class="interval" data-intervalindex="<%=index%>"><%}%>
         <div class="cell <%=(addr >= intervalStart && addr <= intervalEnd) ? "active" : ""%>" title="<%=addr%>"></div>
         <%if (addr === intervalEnd) {%></div><%}%>
       <%}

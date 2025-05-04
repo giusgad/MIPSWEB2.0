@@ -8,6 +8,7 @@ import { hideFilePopover } from "./popovers.js";
 import "./buttons.js";
 import "./drag.js";
 import "./settings.js";
+import "./memorymap.js";
 import {
     getFromStorage,
     scrollSelectedIntoView,

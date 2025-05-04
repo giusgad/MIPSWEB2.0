@@ -7,6 +7,17 @@
 
 @border-gray-10: solid 1px var(--rgb-gray-10);
 @border-gray-11: solid 1px var(--rgb-gray-11);
+.after-whiteout() {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: opacity 0.1s linear;
+}
 
 body {
   color: var(--rgb-gray-1);
@@ -278,6 +289,14 @@ body {
         }
 
         .rows {
+          position: relative;
+          &::after {
+            .after-whiteout();
+            transition: opacity 0.2s ease-out;
+          }
+          &.highlighted::after {
+            opacity: 1;
+          }
           .row {
             &.selected-instruction {
               //background-color: var(--rgb-gray-9) !important;
@@ -392,15 +411,7 @@ body {
         cursor: pointer;
         position: relative;
         &::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          opacity: 0;
-          background-color: rgba(255, 255, 255, 0.2);
-          transition: opacity 0.1s linear;
+          .after-whiteout();
         }
         &:hover {
           &::after {
@@ -411,7 +422,7 @@ body {
       .cell {
         width: 100%;
         height: 6px;
-        border-bottom: @border-gray-10;
+        border: @border-gray-10;
         background-color: var(--rgb-gray-11);
         &.active {
           background-color: var(--rgb-gray-8);
