@@ -62,53 +62,55 @@ export function getMemoryIntervals() {
     }
     intervals.push(extendInterval(currentInterval, intervals.length));
 
-    for (const interval of intervals) {
-        for (const cell of interval.cells) {
-            if (cell.address === vm.assembler.textSegmentStart.getValue()) {
-                cell.tags.push({ name: ".text", type: "section" });
-            }
-            if (cell.address === vm.assembler.dataSegmentStart.getValue()) {
-                cell.tags.push({ name: ".data", type: "section" });
-            }
-            vm.assembler.allLabels.forEach((address, label) => {
-                if (address) {
-                    const addressValue = address.getValue();
-                    if (
-                        cell.address === addressValue ||
-                        (addressValue > cell.address &&
-                            addressValue < cell.address + 4)
-                    ) {
-                        cell.tags.push({ name: label + ":", type: "label" });
-                    }
-                }
-            });
-            for (const register of vm.getRegisters()) {
-                const addressValue = register.binary.getValue();
+    intervals.forEach((interval) => addCellTags(interval));
+    return intervals;
+}
+
+function addCellTags(interval: { cells: any[] }) {
+    for (const cell of interval.cells) {
+        if (cell.address === vm.assembler.textSegmentStart.getValue()) {
+            cell.tags.push({ name: ".text", type: "section" });
+        }
+        if (cell.address === vm.assembler.dataSegmentStart.getValue()) {
+            cell.tags.push({ name: ".data", type: "section" });
+        }
+        vm.assembler.allLabels.forEach((address, label) => {
+            if (address) {
+                const addressValue = address.getValue();
                 if (
                     cell.address === addressValue ||
                     (addressValue > cell.address &&
                         addressValue < cell.address + 4)
                 ) {
-                    if (register.name === "pc") {
-                        cell.tags.push({ name: register.name, type: "pc" });
-                    } else {
-                        if (register.number) {
-                            cell.tags.push({
-                                name: vm.cpu.registers.getRegisterFormat(
-                                    register.number,
-                                    getFromStorage("local", "settings")
-                                        .colsFormats["registers-name-format"],
-                                    vm.cpu.registers,
-                                ),
-                                type: "register",
-                            });
-                        }
+                    cell.tags.push({ name: label + ":", type: "label" });
+                }
+            }
+        });
+        for (const register of vm.getRegisters()) {
+            const addressValue = register.binary.getValue();
+            if (
+                cell.address === addressValue ||
+                (addressValue > cell.address && addressValue < cell.address + 4)
+            ) {
+                if (register.name === "pc") {
+                    cell.tags.push({ name: register.name, type: "pc" });
+                } else {
+                    if (register.number) {
+                        cell.tags.push({
+                            name: vm.cpu.registers.getRegisterFormat(
+                                register.number,
+                                getFromStorage("local", "settings").colsFormats[
+                                    "registers-name-format"
+                                ],
+                                vm.cpu.registers,
+                            ),
+                            type: "register",
+                        });
                     }
                 }
             }
         }
     }
-    return intervals;
 }
 
 export function extendInterval(cells: any, index: number) {
