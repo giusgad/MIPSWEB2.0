@@ -39,6 +39,14 @@ export class Icons {
                 path: "M256 96l0-32 64 0 0 32 0 320 0 32-64 0 0-32 0-160L0 448 0 64 256 256l0-160z",
                 viewBox: "0 0 320 512",
             },
+            angleDown: {
+                path: "M 192 256 L 384 0 L 0 0 z",
+                viewBox: "0 0 384 256",
+            },
+            angleUp: {
+                path: "M 192 0 L 384 256 L 0 256 z",
+                viewBox: "0 0 384 256",
+            },
             run: {
                 path: "M384 256L0 32V480L384 256z",
                 viewBox: "0 0 384 512",

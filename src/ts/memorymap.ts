@@ -7,8 +7,9 @@ export async function toggleMemoryMap() {
     await renderApp();
 }
 
-(window as any).intervalOnClick = function intervalOnClick(ev: MouseEvent) {
-    const target = ev.currentTarget as HTMLDivElement;
+(window as any).intervalOnClick = function intervalOnClick(
+    target: HTMLDivElement,
+) {
     const intervalIndex = target.dataset["intervalindex"] ?? "";
     highlighInterval(intervalIndex);
 };
