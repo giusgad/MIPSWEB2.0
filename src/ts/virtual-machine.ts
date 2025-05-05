@@ -123,7 +123,7 @@ export function extendInterval(cells: any, index: number) {
     };
     if (
         interval.cells[0].address >= 4194304 &&
-        interval.cells[interval.cells.length - 1].address <= 268500992
+        interval.cells[interval.cells.length - 1].address < 268500992
     ) {
         interval.formats.value = "asm";
     }
@@ -155,9 +155,9 @@ export function extendInterval(cells: any, index: number) {
         case "int":
             return bin.getSignedValue();
         case "hexadecimal":
+        case "hex":
             return bin.getHex();
         case "binary":
-            console.log(bin);
             return bin.getBinary();
         case "ascii":
             return bin.getAscii();

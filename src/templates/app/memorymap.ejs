@@ -3,37 +3,47 @@
   <div class="memorymap">
     <%
     // how many bytes are drawn before and after a defined address
-    const memoryPadding = 32;
-    function calculateStart(interval, lastDrawn) {
-      let firstAddr = interval.cells[0].address - memoryPadding;
-      if (firstAddr < lastDrawn) firstAddr = lastDrawn+4;
-      return firstAddr;
-    }
+    const memoryPadding = 24;
+
     const startAddress=4194304;
     const dataStartAddress=268500992;
+    const maxAddress = 4294967295;
+    function calculateStart(interval, lastDrawn) {
+      let intervalStart = interval.cells[0].address;
+      let firstAddr =  intervalStart - memoryPadding; 
+      if (firstAddr <= lastDrawn) firstAddr = Math.min(lastDrawn+4, intervalStart);
+      return firstAddr;
+    }
+    function calculateEnd(intervalEnd, nextInterval) {
+      let nextIntervalStart = nextInterval ? nextInterval.cells[0].address : maxAddress;
+      return Math.min(intervalEnd+memoryPadding, nextIntervalStart-4);
+    }
     let lastDrawn=startAddress-4;
     for (let [index, interval] of ctx.memoryIntervals.entries()) {
+      let nextInterval = ctx.memoryIntervals[index+1];
       let intervalStart = interval.cells[0].address;
       let intervalEnd = interval.cells[interval.cells.length - 1].address;
       let firstAddr = calculateStart(interval, lastDrawn);
-      let lastAddr = intervalEnd+memoryPadding;
-      // whether there is empty memory between intervals, in which case show an expandable cell
-      let jump = firstAddr > lastDrawn;
-      for (let addr = firstAddr; addr <= lastAddr; addr += 4) {%>
-      <%if (addr === intervalStart) {%><div class="interval" data-intervalindex="<%=index%>"><%}%>
-        <div class="cell <%=(addr >= intervalStart && addr <= intervalEnd) ? "active" : ""%>" title="<%=addr%>"></div>
-        <%if (addr === intervalEnd) {%></div><%}%>
-      <%}
+      let lastAddr = calculateEnd(intervalEnd, nextInterval);
+
+      for (let addr = firstAddr; addr <= lastAddr; addr += 4) {
+        if (addr === intervalStart) {%><div class="interval" data-intervalindex="<%=index%>" onclick="intervalOnClick(event);"><%}%>
+        <div class="cell <%=(addr >= intervalStart && addr <= intervalEnd) ? "active" : ""%>"
+             title="<%=`0x${convert("hex", addr)}`%>"></div>
+        <%if (addr === intervalEnd) {%></div><%}
+      }
       lastDrawn = lastAddr;
-      if (jump) {
-        let nextInterval=ctx.memoryIntervals[index+1];
-        let nextStart = nextInterval ? calculateStart(nextInterval, lastDrawn) : 4294967295;
-      %>
-      <div class="fading <%=(nextInterval != null) ? "mid" : ""%>" title="<%=`${lastDrawn+4}..${nextStart}`%>">
-        <%for (let i = 0; i <= memoryPadding; i+=4) {%>
-          <div class="cell"></div>
-        <%}%>
-      </div>
-    <%}}%>
+      let nextStart = nextInterval ? calculateStart(nextInterval, lastDrawn) : maxAddress;
+      let jumpSize = nextStart - lastDrawn;
+      if (jumpSize > memoryPadding) {%>
+        <div class="fading <%=(nextInterval != null) ? "mid" : ""%>"
+             title="<%=`0x${convert("hex", lastDrawn+4)}..0x${convert("hex", nextStart)}`%>">
+          <%for (let i = 0; i <= memoryPadding; i+=4) {%>
+            <div class="cell"></div>
+          <%}%>
+        </div>
+      <%lastDrawn += memoryPadding;
+      }
+    }%>
   </div>
 </div>
