@@ -6,6 +6,7 @@ interface cell {
     address: number;
     binary: Binary;
     tags: { name: string; type: string }[];
+    userDefined?: boolean;
 }
 
 interface interval {
@@ -41,7 +42,7 @@ export function getMemoryIntervals() {
             currentInterval = [currentCell];
         }
     }
-    intervals.push(extendInterval(currentInterval, intervals.length));
+    intervals.push(extendInterval(currentInterval));
     mergeIntervals(intervals, getUserIntervals());
 
     intervals.forEach((interval) => addCellTags(interval));
@@ -93,6 +94,7 @@ function mergeIntervals(
                         address: addr,
                         binary: memory.loadWord(new Binary(addr)),
                         tags: [],
+                        userDefined: true,
                     });
                 }
                 for (
@@ -104,6 +106,7 @@ function mergeIntervals(
                         address: addr,
                         binary: memory.loadWord(new Binary(addr)),
                         tags: [],
+                        userDefined: true,
                     });
                 }
             } else {
@@ -117,14 +120,10 @@ function mergeIntervals(
                         address: addr,
                         binary: memory.loadWord(new Binary(addr)),
                         tags: [],
+                        userDefined: true,
                     });
                 }
-                newIntervals.push(
-                    extendInterval(
-                        cells,
-                        intervals.length + newIntervals.length,
-                    ),
-                );
+                newIntervals.push(extendInterval(cells));
             }
         }
     }
@@ -178,7 +177,9 @@ function addCellTags(interval: interval) {
     }
 }
 
-function extendInterval(cells: cell[]) {
+/** Adds the column format options to the provided cells.
+ * If there are saved options applies them, otherwise uses defaults*/
+function extendInterval(cells: cell[]): interval {
     const settings = getFromStorage("local", "settings");
     const id = cells.length > 0 ? cells[0].address : 0;
     const interval = {

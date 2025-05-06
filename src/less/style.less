@@ -295,14 +295,24 @@ body {
           }
           .row {
             &.selected-instruction {
-              //background-color: var(--rgb-gray-9) !important;
               .col {
-                &.address {
-                  background-color: var(--rgb-gray-9) !important;
-                }
-
+                &.address,
                 &.value {
                   background-color: var(--rgb-gray-9) !important;
+                }
+              }
+            }
+
+            &.userDefined {
+              .col {
+                &.address,
+                &.value {
+                  position: relative;
+                  &::after {
+                    .after-whiteout();
+                    background-color: var(--rgb-gray-12);
+                    opacity: 0.2;
+                  }
                 }
               }
             }
@@ -421,8 +431,10 @@ body {
         border: @border-gray-10;
         background-color: var(--rgb-gray-11);
         &.active {
+          background-color: var(--rgb-gray-7);
+        }
+        &.userDefined {
           background-color: var(--rgb-gray-8);
-          // border-bottom: none;
         }
       }
       .fading {

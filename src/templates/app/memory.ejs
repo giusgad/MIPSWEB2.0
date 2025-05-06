@@ -50,7 +50,10 @@
         <div class="rows" data-intervalid="<%=interval.id%>" name="memoryIntervalTable">
           <%interval.cells.forEach((cell) => {%>
             <%if (cell) {%>
-              <div class="row <%if (ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')){%> selected-instruction <%}%>">
+              <div class="row
+              <%=ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')
+                  ? "selected-instruction" : "" %>
+                <%=cell.userDefined ? "userDefined" : ""%>">
                 <div class="col tags">
                   <%if (cell.tags.length > 0) {%>
                   <div class="static-tags">
