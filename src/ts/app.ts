@@ -9,6 +9,7 @@ import "./buttons.js";
 import "./drag.js";
 import "./settings.js";
 import "./memorymap.js";
+import "./intervals.js";
 import {
     getFromStorage,
     scrollSelectedIntoView,

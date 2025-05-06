@@ -54,7 +54,7 @@ import { highlighInterval, toggleMemoryMap } from "./memorymap.js";
     form: string,
     dataString: string,
 ) {
-    await showForm(form, JSON.parse(dataString));
+    await showForm(form, dataString ? JSON.parse(dataString) : undefined);
 };
 
 (window as any).hideFormOnClick = async function () {

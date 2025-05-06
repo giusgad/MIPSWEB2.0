@@ -1,4 +1,6 @@
-import { getFromStorage } from "./utils.js";
+import { renderApp } from "./app.js";
+import { hideForm } from "./forms.js";
+import { getFromStorage, setIntoStorage } from "./utils.js";
 import { vm } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
@@ -50,22 +52,7 @@ export function getMemoryIntervals() {
 }
 
 function getUserIntervals(): userInterval[] {
-    return (
-        getFromStorage("local", "user Intervals") ?? [
-            {
-                start: 4194324,
-                end: 4194348,
-            },
-            {
-                start: 268500984,
-                end: 268500996,
-            },
-            {
-                start: 268460984,
-                end: 268460992,
-            },
-        ]
-    );
+    return getFromStorage("local", "userIntervals") ?? [];
 }
 
 function mergeIntervals(
@@ -209,3 +196,44 @@ function extendInterval(cells: cell[]): interval {
     }
     return interval;
 }
+
+function isIntervalValid(
+    start: number,
+    end: number,
+): { valid: boolean; msg: string } {
+    const hex = (n: number) => new Binary(n).getHex();
+    const minAddress = 4194304;
+    const maxAddress = 4294967295;
+    if (start < minAddress || end < minAddress) {
+        return { valid: false, msg: `Minimum address is 0x${hex(minAddress)}` };
+    } else if (start > maxAddress || end > maxAddress) {
+        return { valid: false, msg: `Maximum address is 0x${hex(maxAddress)}` };
+    } else if (end < start) {
+        return { valid: false, msg: "Start must be less than end" };
+    } else if (start % 4 != 0 || end % 4 != 0) {
+        return { valid: false, msg: "Both addresses must be divisible by 4" };
+    } else if (end - start >= 160) {
+        return {
+            valid: false,
+            msg: "You may not set address intervals bigger than 160 bytes.",
+        };
+    }
+    return { valid: true, msg: "" };
+}
+
+(window as any).createMemoryInterval = async function (event: SubmitEvent) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const start = new Number("0x" + formData.get("interval-start")).valueOf();
+    const end = new Number("0x" + formData.get("interval-end")).valueOf();
+    const { valid, msg } = isIntervalValid(start, end);
+    if (!valid) {
+        window.alert(msg);
+        return;
+    }
+    let intervals = getFromStorage("local", "userIntervals") ?? [];
+    intervals.push({ start: start, end: end });
+    setIntoStorage("local", "userIntervals", intervals);
+    await hideForm();
+    await renderApp();
+};
