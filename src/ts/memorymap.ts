@@ -10,14 +10,14 @@ export async function toggleMemoryMap() {
 (window as any).intervalOnClick = function intervalOnClick(
     target: HTMLDivElement,
 ) {
-    const intervalIndex = target.dataset["intervalindex"] ?? "";
-    highlighInterval(intervalIndex);
+    const intervalId = target.dataset["intervalid"] ?? "";
+    highlighInterval(intervalId);
 };
 
-function highlighInterval(index: string) {
+function highlighInterval(id: string) {
     const elem = Array.from(
         document.getElementsByName("memoryIntervalTable"),
-    ).find((e) => e.dataset["intervalindex"] === index);
+    ).find((e) => e.dataset["intervalid"] === id);
     elem?.parentElement?.scrollIntoView({
         behavior: "smooth",
         block: "center",

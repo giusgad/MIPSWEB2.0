@@ -9,6 +9,7 @@ interface cell {
 }
 
 interface interval {
+    id: number;
     cells: cell[];
     formats: {
         address: string;
@@ -36,7 +37,7 @@ export function getMemoryIntervals() {
         if (currentCell.address - previousCell.address <= 4) {
             currentInterval.push(currentCell);
         } else {
-            intervals.push(extendInterval(currentInterval, intervals.length));
+            intervals.push(extendInterval(currentInterval));
             currentInterval = [currentCell];
         }
     }
@@ -177,9 +178,11 @@ function addCellTags(interval: interval) {
     }
 }
 
-function extendInterval(cells: any, index: number) {
+function extendInterval(cells: cell[]) {
     const settings = getFromStorage("local", "settings");
+    const id = cells.length > 0 ? cells[0].address : 0;
     const interval = {
+        id: id,
         cells: cells,
         formats: {
             address: settings.colsFormats["memory-address-format"],
@@ -193,17 +196,17 @@ function extendInterval(cells: any, index: number) {
     ) {
         interval.formats.value = "asm";
     }
-    if (settings.colsFormats[`memory-address-format_${index}`]) {
+    if (settings.colsFormats[`memory-address-format_${id}`]) {
         interval.formats.address =
-            settings.colsFormats[`memory-address-format_${index}`];
+            settings.colsFormats[`memory-address-format_${id}`];
     }
-    if (settings.colsFormats[`memory-value-format_${index}`]) {
+    if (settings.colsFormats[`memory-value-format_${id}`]) {
         interval.formats.value =
-            settings.colsFormats[`memory-value-format_${index}`];
+            settings.colsFormats[`memory-value-format_${id}`];
     }
-    if (settings.colsFormats[`memory-value-granularity_${index}`]) {
+    if (settings.colsFormats[`memory-value-granularity_${id}`]) {
         interval.formats.valueGranularity =
-            settings.colsFormats[`memory-value-granularity_${index}`];
+            settings.colsFormats[`memory-value-granularity_${id}`];
     }
     return interval;
 }

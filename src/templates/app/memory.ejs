@@ -5,14 +5,14 @@
       <div class="label">Show Minimap</div>
   </div>
   <div class="tables">
-    <%ctx.memoryIntervals.forEach((interval, index) => {%>
+    <%ctx.memoryIntervals.forEach((interval) => {%>
       <div class="table">
         <div class="cols-names">
           <div class="col tags"><div class="col-name"></div></div>
           <div class="col address">
             <div class="col-name">Address</div>
             <div class="col-format">
-              <select name="col-format" id="memory-address-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
+              <select name="col-format" id="memory-address-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)">
                 <%
                   let addressFormat = (interval.formats && interval.formats.address) || "decimal";
                 %>
@@ -24,7 +24,7 @@
           <div class="col value">
             <div class="col-name">Value</div>
             <div class="col-format">
-              <select name="col-format" id="memory-value-format_<%=index%>" onchange="colFormatSelectOnChange(this)">
+              <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)">
                 <%
                   let valueFormat = (interval.formats && interval.formats.value) || "decimal";
                 %>
@@ -36,7 +36,7 @@
                 <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
                 <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>Instruction</option>
               </select>
-              <select name="col-format" id="memory-value-granularity_<%=index%>" onchange="colFormatSelectOnChange(this)">
+              <select name="col-format" id="memory-value-granularity_<%=interval.id%>" onchange="colFormatSelectOnChange(this)">
                 <%
                   let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
                 %>
@@ -47,7 +47,7 @@
             </div>
           </div>
         </div>
-        <div class="rows" data-intervalindex="<%=index%>" name="memoryIntervalTable">
+        <div class="rows" data-intervalid="<%=interval.id%>" name="memoryIntervalTable">
           <%interval.cells.forEach((cell) => {%>
             <%if (cell) {%>
               <div class="row <%if (ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')){%> selected-instruction <%}%>">

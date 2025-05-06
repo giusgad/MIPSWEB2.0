@@ -27,7 +27,7 @@
       let lastAddr = calculateEnd(intervalEnd, nextInterval);
 
       for (let addr = firstAddr; addr <= lastAddr; addr += 4) {
-        if (addr === intervalStart) {%><div class="interval" data-intervalindex="<%=index%>" onclick="intervalOnClick(this);"><%}%>
+        if (addr === intervalStart) {%><div class="interval" data-intervalid="<%=interval.id%>" onclick="intervalOnClick(this);"><%}%>
         <div class="cell <%=(addr >= intervalStart && addr <= intervalEnd) ? "active" : ""%>"
              title="<%=`0x${convert("hex", addr)}`%>"></div>
         <%if (addr === intervalEnd) {%></div><%}
