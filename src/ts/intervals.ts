@@ -29,7 +29,7 @@ export function getMemoryIntervals() {
     if (memory.length === 0) {
         return [];
     }
-    const intervals = [];
+    let intervals = [];
     let currentInterval = [memory[0]];
     for (let i = 1; i < memory.length; i++) {
         const currentCell = memory[i];
@@ -43,7 +43,7 @@ export function getMemoryIntervals() {
         }
     }
     intervals.push(extendInterval(currentInterval));
-    mergeIntervals(intervals, getUserIntervals());
+    intervals = mergeIntervals(intervals, getUserIntervals());
 
     intervals.forEach((interval) => addCellTags(interval));
     return intervals;
@@ -72,10 +72,19 @@ function mergeIntervals(
     intervals: interval[],
     userIntervals: userInterval[],
 ): interval[] {
-    let newIntervals: interval[] = [];
     const memory = vm.cpu.memory;
-    userIntervals.sort((a, b) => a.start - b.start);
+    const userCell = function (addr: number): cell {
+        return {
+            address: addr,
+            binary: memory.loadWord(new Binary(addr)),
+            tags: [],
+            userDefined: true,
+        };
+    };
+
+    let newIntervals: interval[] = [];
     for (const userInterval of userIntervals) {
+        let extended = false;
         for (let interval of intervals) {
             const intervalStart = interval.cells[0].address;
             const intervalEnd =
@@ -85,49 +94,38 @@ function mergeIntervals(
                 intervalStart <= userInterval.end &&
                 userInterval.start <= intervalEnd
             ) {
+                extended = true;
                 for (
                     let addr = intervalStart - 4;
                     addr >= userInterval.start;
                     addr -= 4
                 ) {
-                    interval.cells.unshift({
-                        address: addr,
-                        binary: memory.loadWord(new Binary(addr)),
-                        tags: [],
-                        userDefined: true,
-                    });
+                    interval.cells.unshift(userCell(addr));
                 }
                 for (
                     let addr = intervalEnd + 4;
                     addr <= userInterval.end;
                     addr += 4
                 ) {
-                    interval.cells.push({
-                        address: addr,
-                        binary: memory.loadWord(new Binary(addr)),
-                        tags: [],
-                        userDefined: true,
-                    });
+                    interval.cells.push(userCell(addr));
                 }
-            } else {
-                const cells = [];
-                for (
-                    let addr = userInterval.start;
-                    addr <= userInterval.end;
-                    addr += 4
-                ) {
-                    cells.push({
-                        address: addr,
-                        binary: memory.loadWord(new Binary(addr)),
-                        tags: [],
-                        userDefined: true,
-                    });
-                }
-                newIntervals.push(extendInterval(cells));
             }
         }
+        if (!extended) {
+            const cells = [];
+            for (
+                let addr = userInterval.start;
+                addr <= userInterval.end;
+                addr += 4
+            ) {
+                cells.push(userCell(addr));
+            }
+            newIntervals.push(extendInterval(cells));
+        }
     }
-    return [...intervals, ...newIntervals];
+    let res = [...intervals, ...newIntervals];
+    res.sort((a, b) => a.id - b.id);
+    return res;
 }
 
 function addCellTags(interval: interval) {
