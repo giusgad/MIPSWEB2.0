@@ -16,12 +16,14 @@ import {
 import { hideFilePopover, showFilePopover } from "./popovers.js";
 import { assemble, stop, step, run } from "./virtual-machine.js";
 import { colFormatSelect } from "./settings.js";
-import { toggleMemoryMap } from "./memorymap.js";
+import { highlighInterval, toggleMemoryMap } from "./memorymap.js";
 
 (window as any).colFormatSelectOnChange = async function (
     element: HTMLSelectElement,
 ) {
     await colFormatSelect(element);
+    const id = element.id.split("_")[1];
+    highlighInterval(id, { behavior: "instant", block: "center" });
 };
 
 (window as any).stepOnClick = async function () {

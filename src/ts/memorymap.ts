@@ -14,14 +14,17 @@ export async function toggleMemoryMap() {
     highlighInterval(intervalId);
 };
 
-function highlighInterval(id: string) {
+export function highlighInterval(
+    id: string,
+    opts: ScrollIntoViewOptions = {
+        behavior: "smooth",
+        block: "center",
+    },
+) {
     const elem = Array.from(
         document.getElementsByName("memoryIntervalTable"),
     ).find((e) => e.dataset["intervalid"] === id);
-    elem?.parentElement?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-    });
+    elem?.parentElement?.scrollIntoView(opts);
     elem?.classList.add("highlighted");
     setTimeout(() => elem?.classList.remove("highlighted"), 1500);
 }
