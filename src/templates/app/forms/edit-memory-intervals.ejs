@@ -1,18 +1,43 @@
-<form class="form" onsubmit="return createMemoryInterval(event)">
-  <div class="text">Create a custom memory interval</div>
-  <div class="input">
-    <label for="interval-start">From:</label>
-    <div class="flex justify-start align-end">
-      <div style="opacity: 0.5">0x</div>
-      <input type="string" id="interval-start" name="interval-start" required/>
+<form class="form" onsubmit="setUserIntervals(intervals)" id="edit-user-intervals">
+  <div class="text">Edit your watched memory intervals</div>
+  <div class="flex flex-column" style="gap: 1em">
+  <% //TODO: deletion
+  let intervals = getUserIntervals()
+  const minAddress = 4194304;
+  const maxAddress = 4294967295;
+  window.updateValue=(amount, index, which) => {
+    const input = document.getElementById(`interval${which}${index}`);
+    let newValue = hexStringToInt(input.value);
+    if (isNaN(newValue)) {
+      window.alert(`'${input.value}' is not a valid hex string`);
+      return;
+    }
+    newValue += amount;
+    if (newValue < minAddress || newValue > maxAddress) return;
+    if (which === 'start' && newValue > intervals[index]['end']) return;
+    if (which === 'end' && newValue < intervals[index]['start']) return;
+    input.value = numToHex(newValue);
+    intervals[index][which] = newValue;
+  }
+  intervals.forEach((interval, index) => {%>
+    <div class="interval">
+      <div class="input">
+        <button type="button" onclick="updateValue(-4, <%=index%>, 'start');">-</button>
+        <div class="hex">0x</div>
+        <input type="string" id="intervalstart<%=index%>" value="<%=numToHex(interval.start)%>">
+        <button type="button" onclick="updateValue(4, <%=index%>, 'start');">+</button>
+      </div>
+      <div class="input">
+        <button type="button" onclick="updateValue(-4, <%=index%>, 'end');">-</button>
+        <div class="hex">0x</div>
+        <input type="string" id="intervalend<%=index%>" value="<%=numToHex(interval.end)%>">
+        <button type="button" onclick="updateValue(4, <%=index%>, 'end');">+</button>
+      </div>
+      <button class="button default delete" type="button">
+        <div class="icon gray-4"><%-Icons.render('bin')%></div>
+      </button>
     </div>
-  </div>
-  <div class="input">
-    <label for="interval-end">To:</label>
-    <div class="flex justify-start align-end">
-      <div style="opacity: 0.5">0x</div>
-      <input type="string" id="interval-end" name="interval-end" required/>
-    </div>
+  <%})%>
   </div>
   <div class="buttons">
     <button class="button default" onclick="hideFormOnClick();">
@@ -21,7 +46,7 @@
     </button>
     <button class="button default" type="submit">
       <div class="icon gray-4"><%-Icons.render('edit')%></div>
-      <div class="label">Create</div>
+      <div class="label">Confirm changes</div>
     </button>
   </div>
 </form>

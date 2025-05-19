@@ -471,7 +471,7 @@ body {
             to bottom,
             rgba(255, 255, 255, 0) 0%,
             var(--rgb-gray-11) 50%,
-            rgba(255, 255, 255, 0) 100%
+            roba(255, 255, 255, 0) 100%
           );
         }
       }
@@ -493,6 +493,62 @@ body {
       }
       .icon > svg {
         height: 85%;
+      }
+    }
+  }
+}
+
+#edit-user-intervals {
+  @brdr: 0.5em;
+  .interval {
+    border: 1px solid var(--rgb-gray-8);
+    border-radius: @brdr;
+    display: flex;
+    gap: 1em;
+    padding: 0.5em;
+    .input {
+      padding: 0;
+      border: 1px solid var(--rgb-gray-8);
+      border-radius: @brdr;
+      display: flex;
+      flex-direction: row;
+      justify-content: start;
+      align-items: end;
+      background-color: var(--rgb-gray-9);
+      button {
+        width: 10%;
+        height: 100%;
+        margin: 0;
+        background-color: var(--rgb-gray-7);
+        color: var(--rgb-gray-4);
+        &:hover {
+          background-color: var(--rgb-gray-6);
+        }
+        &:active {
+          background-color: var(--rgb-gray-5);
+        }
+        &:first-of-type {
+          border-radius: @brdr 0 0 @brdr;
+        }
+        &:last-of-type {
+          border-radius: 0 @brdr @brdr 0;
+        }
+      }
+      .hex {
+        opacity: 0.5;
+        padding: 0.1em;
+      }
+      input {
+        height: 100%;
+        width: 75%;
+        border-radius: 0;
+      }
+    }
+    .button.delete {
+      border-color: var(--rgb-red);
+      svg {
+        fill: var(--rgb-red);
+        fill-opacity: 0.8;
       }
     }
   }

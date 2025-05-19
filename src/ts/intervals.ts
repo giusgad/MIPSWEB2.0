@@ -107,6 +107,12 @@ function mergeIntervals(
             ) {
                 cells.push(userCell(addr));
             }
+            if (cells.length === 0) {
+                console.warn(
+                    `Found user interval with end < start, ignoring: ${userInterval.start}..${userInterval.end}`,
+                );
+                continue;
+            }
             newIntervals.push(extendInterval(cells));
         }
     }
@@ -197,6 +203,14 @@ function extendInterval(cells: cell[]): interval {
     return interval;
 }
 
+function hexStringToInt(str: string): number {
+    if (str.startsWith("0x")) str = str.substring(2);
+    if (/^[a|b|c|d|e|f|\d]+$/.test(str)) {
+        return parseInt(str, 16);
+    }
+    return NaN;
+}
+
 function isIntervalValid(
     start: number,
     end: number,
@@ -204,7 +218,12 @@ function isIntervalValid(
     const hex = (n: number) => new Binary(n).getHex();
     const minAddress = 4194304;
     const maxAddress = 4294967295;
-    if (start < minAddress || end < minAddress) {
+    if (isNaN(start) || isNaN(end)) {
+        return {
+            valid: false,
+            msg: `${isNaN(start) ? "starting address" : "ending address"} is not a valid hex string`,
+        };
+    } else if (start < minAddress || end < minAddress) {
         return { valid: false, msg: `Minimum address is 0x${hex(minAddress)}` };
     } else if (start > maxAddress || end > maxAddress) {
         return { valid: false, msg: `Maximum address is 0x${hex(maxAddress)}` };
@@ -224,8 +243,8 @@ function isIntervalValid(
 (window as any).createMemoryInterval = async function (event: SubmitEvent) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const start = new Number("0x" + formData.get("interval-start")).valueOf();
-    const end = new Number("0x" + formData.get("interval-end")).valueOf();
+    const start = hexStringToInt(formData.get("start")?.toString() ?? "");
+    const end = hexStringToInt(formData.get("end")?.toString() ?? "");
     const { valid, msg } = isIntervalValid(start, end);
     if (!valid) {
         window.alert(msg);
@@ -237,3 +256,10 @@ function isIntervalValid(
     await hideForm();
     await renderApp();
 };
+(window as any).getUserIntervals = getUserIntervals;
+(window as any).setUserIntervals = (intervals: userInterval[]) =>
+    setIntoStorage("local", "userIntervals", intervals);
+(window as any).numToHex = (x: number) => {
+    return new Binary(x).getHex();
+};
+(window as any).hexStringToInt = hexStringToInt;
