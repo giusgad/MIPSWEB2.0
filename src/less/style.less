@@ -422,15 +422,13 @@ body {
         &::after {
           .after-whiteout();
         }
-        &:hover {
-          &::after {
-            opacity: 1;
-          }
+        &:hover::after {
+          opacity: 1;
         }
       }
       .cell {
         width: 100%;
-        height: 6px;
+        height: 7px;
         border-bottom: @border-gray-10;
         border-top: @border-gray-10;
         background-color: var(--rgb-gray-11);
@@ -440,9 +438,20 @@ body {
         &.userDefined {
           background-color: var(--rgb-gray-8);
         }
+        position: relative;
+        &::after {
+          .after-whiteout();
+          transition: opacity 0s;
+        }
+        &:hover::after {
+          opacity: 1;
+        }
       }
       .fading {
         position: relative;
+        .cell:hover::after {
+          opacity: 0;
+        }
         &::after {
           content: "";
           position: absolute;
@@ -481,6 +490,9 @@ body {
       .button {
         width: 100%;
         margin: 0;
+      }
+      .icon > svg {
+        height: 85%;
       }
     }
   }
