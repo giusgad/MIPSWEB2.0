@@ -263,3 +263,13 @@ function isIntervalValid(
     return new Binary(x).getHex();
 };
 (window as any).hexStringToInt = hexStringToInt;
+(window as any).backupUserIntervals = () => {
+    setIntoStorage("local", "userIntervalsBak", getUserIntervals());
+};
+(window as any).restoreUserIntervals = () => {
+    setIntoStorage(
+        "local",
+        "userIntervals",
+        getFromStorage("local", "userIntervalsBak"),
+    );
+};
