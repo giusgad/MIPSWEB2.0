@@ -1,16 +1,16 @@
 <div class="buttons">
     <div class="button default" onclick="newFileOnClick()">
         <div class="icon gray-4"><%-Icons.render('newFile')%></div>
-        <div class="label">New file</div>
+        <div class="label">New source</div>
     </div>
     <div class="button default" onclick="importFilesOnClick()">
         <div class="icon gray-4"><%-Icons.render('importFiles')%></div>
-        <div class="label">Import files</div>
+        <div class="label">Import sources</div>
     </div>
     <% if (ctx.openedFiles.length > 0) { %>
     <div class="button default"  onclick="closeAllFilesOnClick()">
         <div class="icon gray-4"><%-Icons.render('closeAll')%></div>
-        <div class="label">Close all files</div>
+        <div class="label">Close all sources</div>
     </div>
     <%}%>
 </div>

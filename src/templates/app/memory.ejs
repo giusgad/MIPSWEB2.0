@@ -23,26 +23,26 @@
           </div>
           <div class="col value">
             <div class="col-name">Value</div>
+            <%
+              let valueFormat = (interval.formats && interval.formats.value) || "decimal";
+              let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
+            %>
             <div class="col-format">
-              <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)">
-                <%
-                  let valueFormat = (interval.formats && interval.formats.value) || "decimal";
-                %>
+              <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">
                 <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
                 <option value="int" <%= valueFormat === "int" ? "selected" : "" %>>Signed int</option>
                 <option value="uint" <%= valueFormat === "uint" ? "selected" : "" %>>Unsigned int</option>
                 <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
                 <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
+                <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
                 <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>Instruction</option>
               </select>
-              <select name="col-format" id="memory-value-granularity_<%=interval.id%>" onchange="colFormatSelectOnChange(this)">
-                <%
-                  let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
-                %>
-                <option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option>
-                <option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option>
-                <option value="byte" <%= valueGranularity === "byte" ? "selected" : "" %>>Byte</option>
+              <select name="col-format" id="memory-value-granularity_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">
+                <% if (valueFormat !== "ascii") { %><option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option><%}%>
+                <% if (valueFormat != "binary" && valueFormat != "asm") { %>
+                  <% if (valueFormat !== "ascii") {%><option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option><%}%>
+                  <option value="byte" <%= valueGranularity === "byte" ? "selected" : "" %>>Byte</option>
+                <%}%>
               </select>
             </div>
           </div>
