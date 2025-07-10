@@ -48,7 +48,6 @@ export async function colFormatSelect(element: HTMLSelectElement) {
     // memory and asm can only be visualized with word granularity, ascii can only be visualized by bytes
     if (element.id.startsWith("memory-value-format")) {
         const granularity_id = `memory-value-granularity_${element.dataset["id"]}`;
-        console.log(element.dataset);
         if (element.value === "ascii") {
             settings.colsFormats[granularity_id] = "byte";
         } else if (element.value === "asm" || element.value === "binary") {

@@ -37,34 +37,45 @@ export class R_Format implements Format {
         let rd: register | undefined = cpu.registers.get("$zero");
         let shamt: Binary = new Binary(0, 5);
 
-        if (instruction.params === "rd, rt, sa") {
-            rd = cpu.registers.get(tokens[1]);
-            rt = cpu.registers.get(tokens[2]);
-            shamt.set(Number(tokens[3]));
-        } else if (instruction.params === "rd, rt, rs") {
-            rd = cpu.registers.get(tokens[1]);
-            rt = cpu.registers.get(tokens[2]);
-            rs = cpu.registers.get(tokens[3]);
-        } else if (instruction.params === "rs") {
-            rs = cpu.registers.get(tokens[1]);
-        } else if (instruction.params === "rd, rs") {
-            rd = cpu.registers.get(tokens[1]);
-            rs = cpu.registers.get(tokens[2]);
-        } else if (instruction.params === "SYSCALL") {
-        } else if (instruction.params === "BREAK") {
-        } else if (instruction.params === "rd") {
-            rd = cpu.registers.get(tokens[1]);
-        } else if (instruction.params === "rs, rt") {
-            rs = cpu.registers.get(tokens[1]);
-            rt = cpu.registers.get(tokens[2]);
-        } else if (instruction.params === "rd, rs, rt") {
-            rd = cpu.registers.get(tokens[1]);
-            rs = cpu.registers.get(tokens[2]);
-            rt = cpu.registers.get(tokens[3]);
-        } else {
-            console.error(
-                `Unhandled R-format instruction: ${instruction.symbol} ${instruction.params}`,
+        let possible_params = instruction.getPossibleParams(tokens.length - 1);
+        if (possible_params.length === 0) {
+            throw new Error(
+                `Invalid params for instruction ${tokens.join(" ")}`,
             );
+        }
+        for (const param of possible_params) {
+            if (param === "rd, rt, sa") {
+                rd = cpu.registers.get(tokens[1]);
+                rt = cpu.registers.get(tokens[2]);
+                shamt.set(Number(tokens[3]));
+            } else if (param === "rd, rt, rs") {
+                rd = cpu.registers.get(tokens[1]);
+                rt = cpu.registers.get(tokens[2]);
+                rs = cpu.registers.get(tokens[3]);
+            } else if (param === "rs") {
+                rs = cpu.registers.get(tokens[1]);
+                if (instruction.symbol === "JALR") {
+                    rd = cpu.registers.get("$ra");
+                }
+            } else if (param === "rd, rs") {
+                rd = cpu.registers.get(tokens[1]);
+                rs = cpu.registers.get(tokens[2]);
+            } else if (param === "SYSCALL") {
+            } else if (param === "BREAK") {
+            } else if (param === "rd") {
+                rd = cpu.registers.get(tokens[1]);
+            } else if (param === "rs, rt") {
+                rs = cpu.registers.get(tokens[1]);
+                rt = cpu.registers.get(tokens[2]);
+            } else if (param === "rd, rs, rt") {
+                rd = cpu.registers.get(tokens[1]);
+                rs = cpu.registers.get(tokens[2]);
+                rt = cpu.registers.get(tokens[3]);
+            } else {
+                console.error(
+                    `Unhandled R-format instruction: ${instruction.symbol} ${instruction.params}`,
+                );
+            }
         }
 
         if (!rs || !rt || !rd) {
@@ -112,62 +123,77 @@ export class I_Format implements Format {
         let rt = cpu.registers.get("$zero");
         let immediate = new Binary(0, 16, true);
 
-        if (instruction.params === "rs, rt, offset") {
-            rs = cpu.registers.get(tokens[1]);
-            rt = cpu.registers.get(tokens[2]);
-            const offset = assembler.resolveLabel(
-                tokens[3],
-                globals,
-                labels,
-                address,
-            );
-            immediate.set(offset);
-        } else if (instruction.params === "rs, offset") {
-            rs = cpu.registers.get(tokens[1]);
-            const offset = assembler.resolveLabel(
-                tokens[2],
-                globals,
-                labels,
-                address,
-            );
-            immediate.set(offset);
-        } else if (instruction.params === "rt, rs, immediate") {
-            rt = cpu.registers.get(tokens[1]);
-            rs = cpu.registers.get(tokens[2]);
-            if (
-                ["ADDI", "ADDIU", "DADDI", "DADDIU", "SLTI", "SLTIU"].includes(
-                    instruction.symbol,
-                )
-            ) {
-                // immediate signed
-                immediate.set(Number(tokens[3]));
-            } else if (["ANDI", "ORI", "XORI"].includes(instruction.symbol)) {
-                // immediate unsigned
-                immediate.set(Number(tokens[3]), false);
-            } else
-                console.error(
-                    `Unhandled I-format instruction: ${instruction.symbol} ${instruction.params}`,
-                );
-        } else if (instruction.params === "rt, immediate") {
-            rt = cpu.registers.get(tokens[1]);
-            immediate.set(Number(tokens[2]));
-        } else if (instruction.params === "cop_fun") {
+        let possible_params = instruction.getPossibleParams(tokens.length - 1);
+        if (possible_params.length === 0) {
             throw new Error(
-                `TO-DO: Assemble I ${instruction.symbol} ${instruction.params}`,
+                `Invalid params for instruction ${tokens.join(" ")}`,
             );
-        } else if (instruction.params === "rt, offset(base)") {
-            rt = cpu.registers.get(tokens[1]);
-            const offsetBaseMatch = tokens[2].match(/(-?\d+)\((\$\w+)\)/);
-            if (offsetBaseMatch) {
-                const offset = Number(offsetBaseMatch[1]);
+        }
+        for (const param of possible_params) {
+            if (param === "rs, rt, offset") {
+                rs = cpu.registers.get(tokens[1]);
+                rt = cpu.registers.get(tokens[2]);
+                const offset = assembler.resolveLabel(
+                    tokens[3],
+                    globals,
+                    labels,
+                    address,
+                );
                 immediate.set(offset);
-                const base = cpu.registers.get(offsetBaseMatch[2]);
-                rs = base;
+            } else if (param === "rs, offset") {
+                rs = cpu.registers.get(tokens[1]);
+                const offset = assembler.resolveLabel(
+                    tokens[2],
+                    globals,
+                    labels,
+                    address,
+                );
+                immediate.set(offset);
+            } else if (param === "rt, rs, immediate") {
+                rt = cpu.registers.get(tokens[1]);
+                rs = cpu.registers.get(tokens[2]);
+                if (
+                    [
+                        "ADDI",
+                        "ADDIU",
+                        "DADDI",
+                        "DADDIU",
+                        "SLTI",
+                        "SLTIU",
+                    ].includes(instruction.symbol)
+                ) {
+                    // immediate signed
+                    immediate.set(Number(tokens[3]));
+                } else if (
+                    ["ANDI", "ORI", "XORI"].includes(instruction.symbol)
+                ) {
+                    // immediate unsigned
+                    immediate.set(Number(tokens[3]), false);
+                } else
+                    console.error(
+                        `Unhandled I-format instruction: ${instruction.symbol} ${param}`,
+                    );
+            } else if (param === "rt, immediate") {
+                rt = cpu.registers.get(tokens[1]);
+                immediate.set(Number(tokens[2]));
+            } else if (param === "cop_fun") {
+                throw new Error(
+                    `TO-DO: Assemble I ${instruction.symbol} ${param}`,
+                );
+            } else if (param === "rt, offset(base)") {
+                rt = cpu.registers.get(tokens[1]);
+                const offsetBaseMatch = tokens[2].match(/(-?\d+)\((\$\w+)\)/);
+                if (offsetBaseMatch) {
+                    const offset = Number(offsetBaseMatch[1]);
+                    immediate.set(offset);
+                    const base = cpu.registers.get(offsetBaseMatch[2]);
+                    rs = base;
+                }
+            } else {
+                console.error(
+                    `Unhandled I-format instruction: ${instruction.symbol} ${param}`,
+                );
             }
-        } else {
-            console.error(
-                `Unhandled I-format instruction: ${instruction.symbol} ${instruction.params}`,
-            );
         }
 
         if (!rs || !rt) {
@@ -217,19 +243,27 @@ export class J_Format implements Format {
         const opcode: Binary = instruction.opcode!;
         const target = new Binary(0, 26);
 
-        if (instruction.params === "target") {
-            const targetAddress = assembler.resolveLabel(
-                tokens[1],
-                globals,
-                labels,
-                address,
-                true,
+        let possible_params = instruction.getPossibleParams(tokens.length - 1);
+        if (possible_params.length === 0) {
+            throw new Error(
+                `Invalid params for instruction ${tokens.join(" ")}`,
             );
-            target.set(targetAddress);
-        } else {
-            console.error(
-                `Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`,
-            );
+        }
+        for (const param of possible_params) {
+            if (param === "target") {
+                const targetAddress = assembler.resolveLabel(
+                    tokens[1],
+                    globals,
+                    labels,
+                    address,
+                    true,
+                );
+                target.set(targetAddress);
+            } else {
+                console.error(
+                    `Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`,
+                );
+            }
         }
 
         let code = new Binary();

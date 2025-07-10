@@ -5,16 +5,36 @@ import { VirtualMachine } from "./VirtualMachine.js";
 import { getFromStorage } from "../utils.js";
 import { Registers } from "./Registers.js";
 
+type ParamsFormat =
+    | "rt, rs, immediate"
+    | "rd, rt, sa"
+    | "rd, rt, rs"
+    | "rs"
+    | "rd, rs"
+    | "rd"
+    | "rs, rt"
+    | "rd, rs, rt"
+    | "target"
+    | "rs, rt, offset"
+    | "rs, offset"
+    | "rt, immediate"
+    | "cop_fun"
+    | "rt, offset(base)"
+    | "SYSCALL"
+    | "BREAK";
+
 export abstract class Instruction {
     symbol: string;
-    params: string;
+    /**How the params can be passed to an instruction. It's an array
+     * since some instructions can accept parameters in different ways*/
+    params: ParamsFormat[];
     format: string;
     opcode: Binary;
     funct: Binary | undefined;
 
     constructor(
         symbol: string,
-        params: string,
+        params: ParamsFormat[],
         format: string,
         opcode: Binary,
         funct: Binary | undefined,
@@ -32,12 +52,17 @@ export abstract class Instruction {
         vm: VirtualMachine | undefined,
     ): void;
 
+    /** returns the possible params acceptable for the instruction given the number of params found*/
+    getPossibleParams( n_found_params: number): ParamsFormat[] {
+      return this.params.filter(p => p.split(",").length===n_found_params)
+    }
+
     basic(params: { [key: string]: Binary }, registers: Registers): string {
         const registersFormat = getFromStorage("local", "settings").colsFormats[
             "registers-name-format"
         ];
 
-        const paramsNames = this.params.split(",").map((p) => p.trim());
+        const paramsNames = this.params[0].split(",").map((p) => p.trim());
         const paramValues: string[] = [];
 
         for (const name of paramsNames) {
@@ -147,7 +172,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SLL",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b000000, 6),
@@ -174,7 +199,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SRL",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b000010, 6),
@@ -194,7 +219,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SRA",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b000011, 6),
@@ -214,7 +239,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SLLV",
-                        "rd, rt, rs",
+                        ["rd, rt, rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b000100, 6),
@@ -234,7 +259,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SRLV",
-                        "rd, rt, rs",
+                        ["rd, rt, rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b000110, 6),
@@ -254,7 +279,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SRAV",
-                        "rd, rt, rs",
+                        ["rd, rt, rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b000111, 6),
@@ -274,7 +299,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "JR",
-                        "rs",
+                        ["rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001000, 6),
@@ -298,7 +323,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "JALR",
-                        "rd, rs",
+                        ["rd, rs", "rs"], // if not specified rd is implied to 31
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001001, 6),
@@ -309,7 +334,13 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const target = params.rd.getValue();
+                    const rd = registers[params.rd!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+
+                    rd.set(cpu.pc.getValue() + 4);
+                    cpu.pc.set(rs.getValue());
                 }
             })(),
         );
@@ -318,7 +349,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SYSCALL",
-                        "SYSCALL",
+                        ["SYSCALL"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001100, 6),
@@ -346,7 +377,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BREAK",
-                        "BREAK",
+                        ["BREAK"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001101, 6),
@@ -366,7 +397,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "MFHI",
-                        "rd",
+                        ["rd"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b010000, 6),
@@ -386,7 +417,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "MTHI",
-                        "rs",
+                        ["rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b010001, 6),
@@ -406,7 +437,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "MFLO",
-                        "rd",
+                        ["rd"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b010010, 6),
@@ -431,7 +462,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "MTLO",
-                        "rs",
+                        ["rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b010011, 6),
@@ -451,7 +482,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSLLV",
-                        "rd, rt, rs",
+                        ["rd, rt, rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b010100, 6),
@@ -471,7 +502,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSRAV",
-                        "rd, rt, rs",
+                        ["rd, rt, rs"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b010111, 6),
@@ -491,7 +522,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "MULT",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011000, 6),
@@ -524,7 +555,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "MULTU",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011001, 6),
@@ -544,7 +575,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DIV",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011010, 6),
@@ -584,7 +615,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DIVU",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011011, 6),
@@ -604,7 +635,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DMULT",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011100, 6),
@@ -624,7 +655,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DMULTU",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011101, 6),
@@ -644,7 +675,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DDIV",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011110, 6),
@@ -664,7 +695,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DDIVU",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b011111, 6),
@@ -684,7 +715,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "ADD",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100000, 6),
@@ -723,7 +754,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "ADDU",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100001, 6),
@@ -750,7 +781,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SUB",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100010, 6),
@@ -789,7 +820,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SUBU",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100011, 6),
@@ -809,7 +840,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "AND",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100100, 6),
@@ -829,7 +860,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "OR",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100101, 6),
@@ -849,7 +880,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "XOR",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100110, 6),
@@ -869,7 +900,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "NOR",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b100111, 6),
@@ -889,7 +920,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SLT",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b101010, 6),
@@ -909,7 +940,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SLTU",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b101011, 6),
@@ -929,7 +960,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DADD",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b101100, 6),
@@ -949,7 +980,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DADDU",
-                        "rd, rs, rt",
+                        ["rd, rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b101101, 6),
@@ -969,7 +1000,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "TGE",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b110000, 6),
@@ -989,7 +1020,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "TGEU",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b110001, 6),
@@ -1009,7 +1040,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "TLT",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b110010, 6),
@@ -1029,7 +1060,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "TLTU",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b110011, 6),
@@ -1049,7 +1080,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "TEQ",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b110100, 6),
@@ -1069,7 +1100,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "TNE",
-                        "rs, rt",
+                        ["rs, rt"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b110110, 6),
@@ -1089,7 +1120,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSLL",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b111000, 6),
@@ -1109,7 +1140,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSRL",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b111010, 6),
@@ -1129,7 +1160,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSRA",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b111011, 6),
@@ -1149,7 +1180,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSLL32",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b111100, 6),
@@ -1169,7 +1200,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSRL32",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b111110, 6),
@@ -1189,7 +1220,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DSRA32",
-                        "rd, rt, sa",
+                        ["rd, rt, sa"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b111111, 6),
@@ -1209,7 +1240,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "J",
-                        "target",
+                        ["target"],
                         "J",
                         new Binary(0b000010, 6),
                         undefined,
@@ -1229,7 +1260,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "JAL",
-                        "target",
+                        ["target"],
                         "J",
                         new Binary(0b000011, 6),
                         undefined,
@@ -1256,7 +1287,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BEQ",
-                        "rs, rt, offset",
+                        ["rs, rt, offset"],
                         "I",
                         new Binary(0b000100, 6),
                         undefined,
@@ -1276,7 +1307,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BNE",
-                        "rs, rt, offset",
+                        ["rs, rt, offset"],
                         "I",
                         new Binary(0b000101, 6),
                         undefined,
@@ -1308,7 +1339,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BLEZ",
-                        "rs, offset",
+                        ["rs, offset"],
                         "I",
                         new Binary(0b000110, 6),
                         undefined,
@@ -1328,7 +1359,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BGTZ",
-                        "rs, offset",
+                        ["rs, offset"],
                         "I",
                         new Binary(0b000111, 6),
                         undefined,
@@ -1357,7 +1388,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "ADDI",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001000, 6),
                         undefined,
@@ -1396,7 +1427,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "ADDIU",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001001, 6),
                         undefined,
@@ -1423,7 +1454,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SLTI",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001010, 6),
                         undefined,
@@ -1443,7 +1474,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SLTIU",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001011, 6),
                         undefined,
@@ -1463,7 +1494,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "ANDI",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001100, 6),
                         undefined,
@@ -1483,7 +1514,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "ORI",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001101, 6),
                         undefined,
@@ -1510,7 +1541,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "XORI",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b001110, 6),
                         undefined,
@@ -1530,7 +1561,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LUI",
-                        "rt, immediate",
+                        ["rt, immediate"],
                         "I",
                         new Binary(0b001111, 6),
                         undefined,
@@ -1556,7 +1587,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "COP0",
-                        "cop_fun",
+                        ["cop_fun"],
                         "I",
                         new Binary(0b010000, 6),
                         undefined,
@@ -1576,7 +1607,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "COP1",
-                        "cop_fun",
+                        ["cop_fun"],
                         "I",
                         new Binary(0b010001, 6),
                         undefined,
@@ -1596,7 +1627,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "COP2",
-                        "cop_fun",
+                        ["cop_fun"],
                         "I",
                         new Binary(0b010010, 6),
                         undefined,
@@ -1616,7 +1647,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "COP3",
-                        "cop_fun",
+                        ["cop_fun"],
                         "I",
                         new Binary(0b010011, 6),
                         undefined,
@@ -1636,7 +1667,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BEQL",
-                        "rs, rt, offset",
+                        ["rs, rt, offset"],
                         "I",
                         new Binary(0b010100, 6),
                         undefined,
@@ -1656,7 +1687,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BNEL",
-                        "rs, rt, offset",
+                        ["rs, rt, offset"],
                         "I",
                         new Binary(0b010101, 6),
                         undefined,
@@ -1676,7 +1707,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BLEZL",
-                        "rs, offset",
+                        ["rs, offset"],
                         "I",
                         new Binary(0b010110, 6),
                         undefined,
@@ -1696,7 +1727,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BGTZL",
-                        "rs, offset",
+                        ["rs, offset"],
                         "I",
                         new Binary(0b010111, 6),
                         undefined,
@@ -1716,7 +1747,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DADDI",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b011000, 6),
                         undefined,
@@ -1736,7 +1767,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "DADDIU",
-                        "rt, rs, immediate",
+                        ["rt, rs, immediate"],
                         "I",
                         new Binary(0b011001, 6),
                         undefined,
@@ -1756,7 +1787,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LB",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100000, 6),
                         undefined,
@@ -1776,7 +1807,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LH",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100001, 6),
                         undefined,
@@ -1796,7 +1827,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LWL",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100010, 6),
                         undefined,
@@ -1816,7 +1847,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LW",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100011, 6),
                         undefined,
@@ -1848,7 +1879,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LBU",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100100, 6),
                         undefined,
@@ -1868,7 +1899,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LHU",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100101, 6),
                         undefined,
@@ -1888,7 +1919,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LWR",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b100110, 6),
                         undefined,
@@ -1908,7 +1939,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SB",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b101000, 6),
                         undefined,
@@ -1928,7 +1959,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SH",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b101001, 6),
                         undefined,
@@ -1948,7 +1979,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SWL",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b101010, 6),
                         undefined,
@@ -1968,7 +1999,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SW",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b101011, 6),
                         undefined,
@@ -1996,7 +2027,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SWR",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b101110, 6),
                         undefined,
@@ -2016,7 +2047,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LWC1",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b110001, 6),
                         undefined,
@@ -2036,7 +2067,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LWC2",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b110010, 6),
                         undefined,
@@ -2056,7 +2087,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LWC3",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b110011, 6),
                         undefined,
@@ -2076,7 +2107,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LDC1",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b110101, 6),
                         undefined,
@@ -2096,7 +2127,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "LDC2",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b110110, 6),
                         undefined,
@@ -2116,7 +2147,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SC",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b111000, 6),
                         undefined,
@@ -2136,7 +2167,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SWC1",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b111001, 6),
                         undefined,
@@ -2156,7 +2187,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SWC2",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b111010, 6),
                         undefined,
@@ -2176,7 +2207,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SWC3",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b111011, 6),
                         undefined,
@@ -2196,7 +2227,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SDC1",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b111101, 6),
                         undefined,
@@ -2216,7 +2247,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "SDC2",
-                        "rt, offset(base)",
+                        ["rt, offset(base)"],
                         "I",
                         new Binary(0b111110, 6),
                         undefined,
