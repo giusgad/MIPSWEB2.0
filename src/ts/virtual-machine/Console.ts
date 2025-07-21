@@ -1,8 +1,9 @@
 import { renderApp } from "../app.js";
 
+type LineSeverity = "success" | "error" | "warn";
 type ConsoleLine = {
     text: string;
-    type: "success" | "error";
+    type: LineSeverity;
     waitingInput?: boolean;
 };
 
@@ -11,7 +12,7 @@ export class Console {
     state: "ready" | "waitingInput" = "ready";
     input: string = "";
 
-    addLine(text: string, type: "success" | "error") {
+    addLine(text: string, type: LineSeverity) {
         this.lines.push({ text: text + "\n", type, waitingInput: false });
     }
 

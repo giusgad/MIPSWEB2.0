@@ -36,14 +36,15 @@ export class R_Format implements Format {
         let rt: register | undefined = cpu.registers.get("$zero");
         let rd: register | undefined = cpu.registers.get("$zero");
         let shamt: Binary = new Binary(0, 5);
-
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
-        if (possible_params.length === 0) {
-            throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}`,
-            );
-        }
         for (const param of possible_params) {
+            if (param !== "SYSCALL" && param !== "BREAK") {
+                if (possible_params.length === 0) {
+                    throw new Error(
+                        `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
+                    );
+                }
+            }
             if (param === "rd, rt, sa") {
                 rd = cpu.registers.get(tokens[1]);
                 rt = cpu.registers.get(tokens[2]);
@@ -60,8 +61,6 @@ export class R_Format implements Format {
             } else if (param === "rd, rs") {
                 rd = cpu.registers.get(tokens[1]);
                 rs = cpu.registers.get(tokens[2]);
-            } else if (param === "SYSCALL") {
-            } else if (param === "BREAK") {
             } else if (param === "rd") {
                 rd = cpu.registers.get(tokens[1]);
             } else if (param === "rs, rt") {
@@ -80,7 +79,7 @@ export class R_Format implements Format {
 
         if (!rs || !rt || !rd) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}`,
+                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
 
@@ -126,7 +125,7 @@ export class I_Format implements Format {
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
         if (possible_params.length === 0) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}`,
+                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
         for (const param of possible_params) {
@@ -176,6 +175,9 @@ export class I_Format implements Format {
             } else if (param === "rt, immediate") {
                 rt = cpu.registers.get(tokens[1]);
                 immediate.set(Number(tokens[2]));
+            } else if (param === "rs, immediate") {
+                rs = cpu.registers.get(tokens[1]);
+                immediate.set(Number(tokens[2]));
             } else if (param === "cop_fun") {
                 throw new Error(
                     `TO-DO: Assemble I ${instruction.symbol} ${param}`,
@@ -183,11 +185,15 @@ export class I_Format implements Format {
             } else if (param === "rt, offset(base)") {
                 rt = cpu.registers.get(tokens[1]);
                 const offsetBaseMatch = tokens[2].match(/(-?\d+)\((\$\w+)\)/);
-                if (offsetBaseMatch) {
+                if (offsetBaseMatch != null) {
                     const offset = Number(offsetBaseMatch[1]);
                     immediate.set(offset);
                     const base = cpu.registers.get(offsetBaseMatch[2]);
                     rs = base;
+                } else {
+                    throw new Error(
+                        `Incorrect format for offset(base) address in ${instruction.symbol} instruction: ${tokens[2]}`,
+                    );
                 }
             } else {
                 console.error(
@@ -198,7 +204,7 @@ export class I_Format implements Format {
 
         if (!rs || !rt) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}`,
+                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
 
@@ -246,7 +252,7 @@ export class J_Format implements Format {
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
         if (possible_params.length === 0) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}`,
+                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
         for (const param of possible_params) {

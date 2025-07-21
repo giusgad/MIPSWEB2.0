@@ -74,11 +74,9 @@ export class CPU {
                         foundInstruction = instruction;
                         break;
                     }
-                } else {
-                    if (!instruction.funct) {
-                        foundInstruction = instruction;
-                        break;
-                    }
+                } else if (!instruction.funct) {
+                    foundInstruction = instruction;
+                    break;
                 }
             }
         }

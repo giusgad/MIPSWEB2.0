@@ -2,7 +2,7 @@
     <div class="title">Console</div>
     <div class="console <% if (ctx.vm.console.state === "waitingInput") {%> waiting-input <% } %>">
         <%ctx.vm.console.lines.forEach((line) => {%>
-        <div class="line <%if (line.type === "error") {%>error<%}%>">
+        <div class="line <%=line.type%>">
             <%=line.text%>
             <% if (line.waitingInput) {%>
                 <% if (line.waitingInput) {%>

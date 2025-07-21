@@ -6,12 +6,16 @@ export class Utils {
         return hex;
     }
 
-    static toBinary(value: number, bits: number = 32): string {
+    static toBinary(
+        value: number,
+        bits: number = 32,
+        split: number = 8,
+    ): string {
         const binary = (value >>> 0).toString(2).padStart(bits, "0");
 
         const parts: string[] = [];
-        for (let i = 0; i < bits; i += 8) {
-            parts.push(binary.substring(i, i + 8));
+        for (let i = 0; i < bits; i += split) {
+            parts.push(binary.substring(i, i + split));
         }
 
         return parts.join(" ");
@@ -113,21 +117,21 @@ export class Binary {
         return (this.binary << shift) >> shift;
     }
 
-    /**@param from: number in [31-0]
-     * @param to: number in [31-0] and has to be less than from, range is inclusive
+    /**@param from: number in [this.length-0]
+     * @param to: number in [this.length-0] and has to be less than from, range is inclusive
      * @returns Binary representing bits from-to */
     getBits(from: number, to: number, signed: boolean = false): Binary {
         const bits = from - to + 1;
-        const mask = ((1 << bits) - 1) << to;
-        const extractedBits = (this.binary & mask) >>> to;
+        const mask = ((BigInt(1) << BigInt(bits)) - BigInt(1)) << BigInt(to);
+        const extractedBits = (BigInt(this.binary) & mask) >> BigInt(to);
         if (signed) {
             return new Binary(
-                Utils.fromSigned(extractedBits, bits),
+                Utils.fromSigned(Number(extractedBits), bits),
                 bits,
                 true,
             );
         } else {
-            return new Binary(extractedBits, bits);
+            return new Binary(Number(extractedBits), bits);
         }
     }
 
@@ -141,8 +145,8 @@ export class Binary {
         return Utils.toHex(this.binary, this.length);
     }
 
-    getBinary(): string {
-        return Utils.toBinary(this.binary, this.length);
+    getBinary(split: number = 8): string {
+        return Utils.toBinary(this.binary, this.length, split);
     }
 
     getAscii(): string {
@@ -158,5 +162,19 @@ export class Binary {
         if (this.length !== binary.length) return false;
         if (this.signed !== binary.signed) return false;
         return this.binary === binary.binary;
+    }
+
+    /**Returns a new 32 bit `Binary` by extending the sign of `this`.
+     * Throws an error if `this` is of length >= 32.*/
+    signExtendTo32(): Binary {
+        if (this.length >= 32) {
+            throw new Error(
+                "Trying to extend sign on a word with 32 or more bits",
+            );
+        }
+        const shift = 32 - this.length;
+        // works with javascript's signed shift operator
+        const extended = (this.getUnsignedValue() << shift) >> shift;
+        return new Binary(extended, 32, true);
     }
 }

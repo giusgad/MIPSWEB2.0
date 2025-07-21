@@ -245,7 +245,17 @@ export class Assembler {
 
     tokenize(line: string): string[] {
         line = line.split("#")[0].trim();
-        return line.match(/"([^"]*)"|'([^']*)'|\S+/g) || [];
+        const tokens = line.split(/\s*,\s*|\s+/);
+        for (let i = 0; i < tokens.length; i++) {
+            const tok = tokens[i];
+            const matched = tok.match(/"([^"]*)"|'([^']*)'|\S+/g);
+            if (matched?.length != 1) {
+                throw new Error(`Unexpected token: ${tok}`);
+            } else {
+                tokens[i] = matched[0];
+            }
+        }
+        return tokens;
     }
 
     reset() {

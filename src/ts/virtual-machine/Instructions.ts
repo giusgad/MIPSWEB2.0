@@ -1,4 +1,5 @@
 import { Binary, Utils } from "./Utils.js";
+
 import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { VirtualMachine } from "./VirtualMachine.js";
@@ -18,6 +19,7 @@ type ParamsFormat =
     | "rs, rt, offset"
     | "rs, offset"
     | "rt, immediate"
+    | "rs, immediate"
     | "cop_fun"
     | "rt, offset(base)"
     | "SYSCALL"
@@ -31,6 +33,7 @@ export abstract class Instruction {
     format: string;
     opcode: Binary;
     funct: Binary | undefined;
+    //TODO: add a fixed registers part (example: TGEI/TGEIU have a fixed rt, that needs to be used in decoding to determine which)
 
     constructor(
         symbol: string,
@@ -53,8 +56,10 @@ export abstract class Instruction {
     ): void;
 
     /** returns the possible params acceptable for the instruction given the number of params found*/
-    getPossibleParams( n_found_params: number): ParamsFormat[] {
-      return this.params.filter(p => p.split(",").length===n_found_params)
+    getPossibleParams(n_found_params: number): ParamsFormat[] {
+        return this.params.filter(
+            (p) => p.split(",").length === n_found_params,
+        );
     }
 
     basic(params: { [key: string]: Binary }, registers: Registers): string {
@@ -70,12 +75,20 @@ export abstract class Instruction {
                 const offsetValue = params["immediate"]?.getValue() || 0;
                 const rsValue = params["rs"]?.getValue();
                 paramValues.push(
-                    `${offsetValue}(${registers.getRegisterFormat(rsValue, registersFormat, registers)})`,
+                    `${offsetValue}(${registers.getRegisterFormat(
+                        rsValue,
+                        registersFormat,
+                        registers,
+                    )})`,
                 );
             } else if (["rs", "rt", "rd"].includes(name)) {
                 const regValue = params[name]?.getValue();
                 paramValues.push(
-                    `${registers.getRegisterFormat(regValue, registersFormat, registers)}`,
+                    `${registers.getRegisterFormat(
+                        regValue,
+                        registersFormat,
+                        registers,
+                    )}`,
                 );
             } else if (name === "immediate" || name === "offset") {
                 const immediateValue = params["immediate"]?.getValue();
@@ -210,7 +223,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const sa = params.shamt!.getValue();
+
+                    rd.set(rt.getValue() >> sa);
+                    rd.setBits(new Binary(0), 31, 31 - sa + 1);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -230,7 +251,14 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const sa = params.shamt!.getValue();
+
+                    rd.set(rt.getValue() >> sa);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -250,7 +278,14 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const sa = rs.getBits(4, 0).getValue();
+                    rd.set(rt.getValue() << sa);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -270,7 +305,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const sa = rs.getBits(4, 0).getValue();
+                    rd.set(rt.getValue() >> sa);
+                    rd.setBits(new Binary(0), 31, 31 - sa + 1);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -290,7 +333,14 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const sa = rs.getBits(4, 0).getValue();
+                    rd.set(rt.getValue() >> sa);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -323,7 +373,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "JALR",
-                        ["rd, rs", "rs"], // if not specified rd is implied to 31
+                        ["rd, rs", "rs"], // if not specified rd is implied to 31 ($ra)
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001001, 6),
@@ -335,7 +385,6 @@ export class Instructions {
                     vm: VirtualMachine,
                 ): Promise<void> {
                     const registers = cpu.getRegisters();
-                    const target = params.rd.getValue();
                     const rd = registers[params.rd!.getValue()].binary;
                     const rs = registers[params.rs!.getValue()].binary;
 
@@ -388,7 +437,20 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = params.rs!;
+                    const rt = params.rt!;
+                    const rd = params.rd!;
+                    const shamt = params.shamt!;
+                    // the code is made of the 20 bits between opcode and funct
+                    let code = new Binary(0, 20, false);
+                    code.setBits(rs, 25, 21);
+                    code.setBits(rt, 20, 16);
+                    code.setBits(rd, 15, 11);
+                    code.setBits(shamt, 10, 6);
+                    vm.console.addLine(`BREAK: ${code.getBinary(5)}`, "warn");
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -408,7 +470,10 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const rd = cpu.getRegisters()[params.rd!.getValue()].binary;
+                    rd.set(cpu.hi.getUnsignedValue(), false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -428,7 +493,10 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const rs = cpu.getRegisters()[params.rs!.getValue()].binary;
+                    cpu.hi.set(rs.getValue());
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -451,7 +519,7 @@ export class Instructions {
                     const registers = cpu.getRegisters();
                     const rd = registers[params.rd!.getValue()].binary;
 
-                    rd.set(cpu.lo.getValue());
+                    rd.set(cpu.lo.getUnsignedValue(), false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -473,7 +541,10 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const rs = cpu.getRegisters()[params.rs!.getValue()].binary;
+                    cpu.lo.set(rs.getValue());
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -481,6 +552,7 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
+                        // TODO: this is only for mips64
                         "DSLLV",
                         ["rd, rt, rs"],
                         "R",
@@ -566,7 +638,24 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    const rsValue = BigInt(rs.getUnsignedValue());
+                    const rtValue = BigInt(rt.getUnsignedValue());
+
+                    const val = rsValue * rtValue;
+
+                    const loValue = Number(val & BigInt(0xffffffff));
+                    const hiValue = Number(
+                        (val >> BigInt(32)) & BigInt(0xffffffff),
+                    );
+
+                    cpu.lo.set(loValue, false);
+                    cpu.hi.set(hiValue, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -626,7 +715,27 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    const rsValue = rs.getUnsignedValue();
+                    const rtValue = rt.getUnsignedValue();
+
+                    if (rtValue === 0) {
+                        console.warn(
+                            "DIVU instruction: Division by zero. Result undefined.",
+                        );
+                        return;
+                    }
+
+                    const quotient = Math.floor(rsValue / rtValue);
+                    const remainder = rsValue % rtValue;
+
+                    cpu.lo.set(quotient, false);
+                    cpu.hi.set(remainder, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -831,7 +940,22 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rsValue =
+                        registers[
+                            params.rs.getValue()
+                        ].binary.getUnsignedValue();
+                    const rtValue =
+                        registers[
+                            params.rt.getValue()
+                        ].binary.getUnsignedValue();
+                    const rd = registers[params.rd.getValue()].binary;
+
+                    const result = (rsValue - rtValue) >>> 0;
+
+                    rd.set(result, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -851,7 +975,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    const value =
+                        (rs.getUnsignedValue() & rt.getUnsignedValue()) >>> 0;
+                    rd.set(value, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -871,7 +1004,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    const value =
+                        (rs.getUnsignedValue() | rt.getUnsignedValue()) >>> 0;
+                    rd.set(value, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -891,7 +1033,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    const value =
+                        (rs.getUnsignedValue() ^ rt.getUnsignedValue()) >>> 0;
+                    rd.set(value, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -911,7 +1062,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    const value =
+                        ~(rs.getUnsignedValue() | rt.getUnsignedValue()) >>> 0;
+                    rd.set(value, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -931,7 +1091,18 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getValue() < rt.getValue()) {
+                        rd.set(1);
+                    } else {
+                        rd.set(0);
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -951,7 +1122,18 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rd = registers[params.rd.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getUnsignedValue() < rt.getUnsignedValue()) {
+                        rd.set(1);
+                    } else {
+                        rd.set(0);
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1011,7 +1193,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getValue() >= rt.getValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1031,7 +1221,71 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getUnsignedValue() >= rt.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "TGEI",
+                        ["rs, immediate"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getValue() >= imm.getValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "TGEIU",
+                        ["rs, immediate"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getUnsignedValue() >= imm.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1051,7 +1305,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getValue() < rt.getValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1071,7 +1333,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getUnsignedValue() < rt.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1091,7 +1361,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getUnsignedValue() === rt.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1111,7 +1389,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const rt = registers[params.rt.getValue()].binary;
+
+                    if (rs.getUnsignedValue() !== rt.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1251,7 +1537,12 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const target = params.target.getValue();
+
+                    const newPC =
+                        (cpu.pc.getValue() & 0xf0000000) | (target << 2);
+                    cpu.pc.set(newPC);
                 }
             })(),
         );
@@ -1298,7 +1589,17 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    if (rs.getUnsignedValue() === rt.getUnsignedValue()) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
                 }
             })(),
         );
@@ -1319,14 +1620,12 @@ export class Instructions {
                     vm: VirtualMachine,
                 ): Promise<void> {
                     const registers = cpu.getRegisters();
-                    const rs =
-                        registers[params.rs!.getValue()].binary.getValue();
-                    const rt =
-                        registers[params.rt!.getValue()].binary.getValue();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const rt = registers[params.rt!.getValue()].binary;
                     const offset =
                         Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
 
-                    if (rs !== rt) {
+                    if (rs.getUnsignedValue() !== rt.getUnsignedValue()) {
                         cpu.pc.set(cpu.pc.getValue() + 4 + offset);
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
@@ -1350,7 +1649,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    if (rs.getValue() <= 0) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
                 }
             })(),
         );
@@ -1373,7 +1681,7 @@ export class Instructions {
                     const registers = cpu.getRegisters();
                     const rs = registers[params.rs!.getValue()].binary;
                     const offset =
-                        Utils.fromSigned(params.immediate!.getValue(), 18) << 2;
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
 
@@ -1465,7 +1773,18 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getValue() < imm.getValue()) {
+                        rt.set(1);
+                    } else {
+                        rt.set(0);
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1485,7 +1804,18 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getUnsignedValue() < imm.getUnsignedValue()) {
+                        rt.set(1);
+                    } else {
+                        rt.set(0);
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1505,7 +1835,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    const value =
+                        (rs.getUnsignedValue() & imm.getUnsignedValue()) >>> 0;
+                    rt.set(value, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1526,11 +1865,13 @@ export class Instructions {
                     vm: VirtualMachine,
                 ): Promise<void> {
                     const registers = cpu.getRegisters();
-                    const rt = registers[params.rt!.getValue()].binary;
-                    const rs = registers[params.rs!.getValue()].binary;
-                    const immediate = params.immediate!.getValue();
+                    const rt = registers[params.rt.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
 
-                    rt.set(rs.getValue() | immediate);
+                    const value =
+                        (rs.getUnsignedValue() | imm.getUnsignedValue()) >>> 0;
+                    rt.set(value, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -1552,7 +1893,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt.getValue()].binary;
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    const value =
+                        (rs.getUnsignedValue() ^ imm.getUnsignedValue()) >>> 0;
+                    rt.set(value, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1798,7 +2148,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const value = cpu.memory.loadByte(new Binary(address));
+                    rt.setBits(value.signExtendTo32(), 31, 0);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1818,7 +2177,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const value = cpu.memory.loadHalf(new Binary(address));
+                    rt.setBits(value.signExtendTo32(), 31, 0);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1838,7 +2206,18 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const first = cpu.memory.loadByte(new Binary(address));
+                    const second = cpu.memory.loadByte(new Binary(address + 1));
+                    rt.setBits(first, 31, 24);
+                    rt.setBits(second, 23, 16);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1890,7 +2269,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const value = cpu.memory.loadByte(new Binary(address));
+                    rt.set(value.getUnsignedValue(), false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1910,7 +2298,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const value = cpu.memory.loadHalf(new Binary(address));
+                    rt.set(value.getUnsignedValue(), false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1930,7 +2327,18 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const first = cpu.memory.loadByte(new Binary(address));
+                    const second = cpu.memory.loadByte(new Binary(address + 1));
+                    rt.setBits(first, 15, 8);
+                    rt.setBits(second, 7, 0);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1950,7 +2358,16 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    const value = rt.getBits(7, 0);
+                    cpu.memory.storeByte(new Binary(address), value);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1970,7 +2387,15 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                     cpu.memory.storeHalf(new Binary(address), rt.getBits(15,0));
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -1990,7 +2415,22 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    cpu.memory.storeByte(
+                        new Binary(address),
+                        rt.getBits(31, 24),
+                    );
+                    cpu.memory.storeByte(
+                        new Binary(address + 1),
+                        rt.getBits(23, 16),
+                    );
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -2038,7 +2478,22 @@ export class Instructions {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
+                    const registers = cpu.getRegisters();
+                    const rt = registers[params.rt!.getValue()].binary;
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const immediate = params.immediate!.getValue();
+
+                    const address = rs.getValue() + immediate;
+                    cpu.memory.storeByte(
+                        new Binary(address),
+                        rt.getBits(15, 8),
+                    );
+                    cpu.memory.storeByte(
+                        new Binary(address + 1),
+                        rt.getBits(7, 0),
+                    );
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );

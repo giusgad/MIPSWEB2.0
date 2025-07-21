@@ -43,6 +43,44 @@ export class Memory {
         return word.getBits(bitPosition + 7, bitPosition, true);
     }
 
+    loadHalf(wordAddress: Binary): Binary {
+        const address = wordAddress.getValue();
+        const byteOffset = address % 4;
+        // unaligned address
+        if (byteOffset % 2 != 0) {
+            throw new Error(
+                `Trying to load unaligned half word at 0x${wordAddress.getHex()}`,
+            );
+        }
+        const alignedAddress = address - byteOffset;
+        const wordAlignedAddress = new Binary(alignedAddress);
+        let word: Binary = this.loadWord(wordAlignedAddress);
+
+        const bitPosition = byteOffset * 8; // 0 or 16
+
+        return word.getBits(bitPosition + 15, bitPosition, true);
+    }
+
+    storeHalf(wordAddress: Binary, value: Binary) {
+        const address = wordAddress.getValue();
+        const byteOffset = address % 4;
+        // unaligned address
+        if (byteOffset % 2 != 0) {
+            throw new Error(
+                `Trying to load unaligned half word at 0x${wordAddress.getHex()}`,
+            );
+        }
+        const alignedAddress = address - byteOffset;
+        const wordAlignedAddress = new Binary(alignedAddress);
+        let word: Binary = this.loadWord(wordAlignedAddress);
+
+        const bitPosition = byteOffset * 8; // 0 or 16
+
+        word.setBits(value, bitPosition + 15, bitPosition);
+
+        this.storeWord(new Binary(alignedAddress), word);
+    }
+
     get() {
         const sortedKeys = Array.from(this.memory.keys()).sort((a, b) => a - b);
         const sortedMemory = new Map<number, Binary>();
