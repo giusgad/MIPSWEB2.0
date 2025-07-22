@@ -34,6 +34,9 @@ export class VirtualMachine {
                 this.assembler.addressEditorsPositions.get(
                     this.cpu.pc.getValue(),
                 );
+            // the end of static data is the highest key in memory after assembling the program
+            const heap = Math.max(...this.cpu.memory.get().keys());
+            this.cpu.memory.initHeapPointer(heap);
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
@@ -72,8 +75,11 @@ export class VirtualMachine {
                 this.pause();
             }
         } catch (error) {
-            // @ts-ignore
-            this.console.addLine(`${error.message}`, "error");
+            this.console.addLine(
+                // @ts-ignore
+                `Runtime Error at 0x${this.cpu.pc.getHex()}: ${error.message}`,
+                "error",
+            );
             console.error(error);
             this.pause();
         }

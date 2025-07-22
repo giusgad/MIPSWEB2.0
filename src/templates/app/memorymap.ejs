@@ -5,9 +5,9 @@
     // how many bytes are drawn before and after a defined address
     const memoryPadding = 24;
 
-    const startAddress=4194304;
-    const dataStartAddress=268500992;
-    const maxAddress = 4294967295;
+    const startAddress=0x400000;
+    const dataStartAddress=0x10010000;
+    const maxAddress = 0xFFFFFFFF;
     function calculateStart(interval, lastDrawn) {
       let intervalStart = interval.cells[0].address;
       let firstAddr =  intervalStart - memoryPadding; 

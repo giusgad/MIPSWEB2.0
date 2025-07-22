@@ -189,7 +189,11 @@ export class Syscalls {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.name} not implemented yet`);
+                    const bytes = cpu.registers.get("$a0")!.binary.getValue();
+                    const allocatedAddr = cpu.memory.allocate(bytes);
+                    cpu.registers.get("$v0")!.binary.set(allocatedAddr, false);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );

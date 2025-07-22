@@ -1,15 +1,77 @@
 import { Binary } from "./Utils.js";
 
+enum Alignment {
+    Word,
+    Half,
+    None,
+}
+
+/**returns the address in the given binary as a number.
+ * throws an error if the required alignment check doesn't pass
+ * or if the address is out of bounds*/
+function getNumericAddress(
+    addr: Binary,
+    alignment: Alignment = Alignment.None,
+): number {
+    const minAddress = 0x400000;
+    const maxAddress = 0xffffffff;
+    const val = addr.getValue();
+    if (val < minAddress) {
+        throw new Error(
+            `Invalid address: 0x${addr.getHex()}. Minimum address is 0x${minAddress.toString(16).toUpperCase()}.`,
+        );
+    } else if (val > maxAddress) {
+        throw new Error(
+            `Invalid address: 0x${addr.getHex()}. Maximum address is 0x${maxAddress.toString(16).toUpperCase()}.`,
+        );
+    }
+    switch (alignment) {
+        case Alignment.Word:
+            if (val % 4 != 0) {
+                throw new Error(
+                    `Address: 0x${addr.getHex()} should be word-aligned.`,
+                );
+            }
+        case Alignment.Half:
+            if (val % 2 != 0) {
+                throw new Error(
+                    `Address: 0x${addr.getHex()} should be half-aligned.`,
+                );
+            }
+        case Alignment.None:
+            break;
+    }
+    return val;
+}
+
 export class Memory {
+    private heapPointer = 0x10040000;
     private memory: Map<number, Binary> = new Map<number, Binary>();
 
+    /**Inits the heap pointer to 0x10040000 or after the static data end if it exceeds 0x10040000*/
+    initHeapPointer(staticDataEnd: number) {
+        this.heapPointer = Math.max(staticDataEnd + 4, 0x10040000);
+    }
+
+    /**Returns the pointer to the available memory and increases the heap pointer*/
+    allocate(bytes: number) {
+        const pointer = this.heapPointer;
+        let nextHeap = pointer + bytes;
+        if (nextHeap % 4 !== 0) {
+            nextHeap = nextHeap + (4 - (nextHeap % 4));
+        }
+        this.heapPointer = nextHeap;
+        return pointer;
+    }
+
     storeWord(wordAddress: Binary, value: Binary) {
-        let address = wordAddress.getValue();
+        let address = getNumericAddress(wordAddress, Alignment.Word);
         this.memory.set(address, value);
     }
 
     loadWord(wordAddress: Binary, signed: boolean = false): Binary {
-        const value = this.memory.get(wordAddress.getValue());
+        const address = getNumericAddress(wordAddress, Alignment.Word);
+        const value = this.memory.get(address);
         if (value !== undefined) {
             return new Binary(value.getValue(), 32, signed);
         } else {
@@ -18,7 +80,7 @@ export class Memory {
     }
 
     storeByte(wordAddress: Binary, value: Binary) {
-        const address = wordAddress.getValue();
+        const address = getNumericAddress(wordAddress);
         const byteOffset = address % 4;
         const alignedAddress = address - byteOffset;
         const wordAlignedAddress = new Binary(alignedAddress);
@@ -32,7 +94,7 @@ export class Memory {
     }
 
     loadByte(wordAddress: Binary): Binary {
-        const address = wordAddress.getValue();
+        const address = getNumericAddress(wordAddress);
         const byteOffset = address % 4;
         const alignedAddress = address - byteOffset;
         const wordAlignedAddress = new Binary(alignedAddress);
@@ -44,14 +106,9 @@ export class Memory {
     }
 
     loadHalf(wordAddress: Binary): Binary {
-        const address = wordAddress.getValue();
+        const address = getNumericAddress(wordAddress, Alignment.Half);
         const byteOffset = address % 4;
-        // unaligned address
-        if (byteOffset % 2 != 0) {
-            throw new Error(
-                `Trying to load unaligned half word at 0x${wordAddress.getHex()}`,
-            );
-        }
+
         const alignedAddress = address - byteOffset;
         const wordAlignedAddress = new Binary(alignedAddress);
         let word: Binary = this.loadWord(wordAlignedAddress);
@@ -62,14 +119,8 @@ export class Memory {
     }
 
     storeHalf(wordAddress: Binary, value: Binary) {
-        const address = wordAddress.getValue();
+        const address = getNumericAddress(wordAddress, Alignment.Half);
         const byteOffset = address % 4;
-        // unaligned address
-        if (byteOffset % 2 != 0) {
-            throw new Error(
-                `Trying to load unaligned half word at 0x${wordAddress.getHex()}`,
-            );
-        }
         const alignedAddress = address - byteOffset;
         const wordAlignedAddress = new Binary(alignedAddress);
         let word: Binary = this.loadWord(wordAlignedAddress);
