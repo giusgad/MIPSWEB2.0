@@ -163,18 +163,4 @@ export class Binary {
         if (this.signed !== binary.signed) return false;
         return this.binary === binary.binary;
     }
-
-    /**Returns a new 32 bit `Binary` by extending the sign of `this`.
-     * Throws an error if `this` is of length >= 32.*/
-    signExtendTo32(): Binary {
-        if (this.length >= 32) {
-            throw new Error(
-                "Trying to extend sign on a word with 32 or more bits",
-            );
-        }
-        const shift = 32 - this.length;
-        // works with javascript's signed shift operator
-        const extended = (this.getUnsignedValue() << shift) >> shift;
-        return new Binary(extended, 32, true);
-    }
 }

@@ -2155,7 +2155,7 @@ export class Instructions {
 
                     const address = rs.getValue() + immediate;
                     const value = cpu.memory.loadByte(new Binary(address));
-                    rt.setBits(value.signExtendTo32(), 31, 0);
+                    rt.set(value.getValue(), true);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -2184,7 +2184,7 @@ export class Instructions {
 
                     const address = rs.getValue() + immediate;
                     const value = cpu.memory.loadHalf(new Binary(address));
-                    rt.setBits(value.signExtendTo32(), 31, 0);
+                    rt.set(value.getValue(), true);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -2212,10 +2212,14 @@ export class Instructions {
                     const immediate = params.immediate!.getValue();
 
                     const address = rs.getValue() + immediate;
-                    const first = cpu.memory.loadByte(new Binary(address));
-                    const second = cpu.memory.loadByte(new Binary(address + 1));
-                    rt.setBits(first, 31, 24);
-                    rt.setBits(second, 23, 16);
+                    const inWordOffset = address % 4;
+                    const alignedAddress = address - inWordOffset;
+                    const word = cpu.memory.loadWord(
+                        new Binary(alignedAddress),
+                    );
+                    const from = 8 * inWordOffset - 1;
+                    const to = 0;
+                    rt.setBits(word.getBits(from, to), from, to);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -2333,10 +2337,14 @@ export class Instructions {
                     const immediate = params.immediate!.getValue();
 
                     const address = rs.getValue() + immediate;
-                    const first = cpu.memory.loadByte(new Binary(address));
-                    const second = cpu.memory.loadByte(new Binary(address + 1));
-                    rt.setBits(first, 15, 8);
-                    rt.setBits(second, 7, 0);
+                    const inWordOffset = address % 4;
+                    const alignedAddress = address - inWordOffset;
+                    const word = cpu.memory.loadWord(
+                        new Binary(alignedAddress),
+                    );
+                    const from = 31;
+                    const to = 31 - 8 * inWordOffset;
+                    rt.setBits(word.getBits(from, to), from, to);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -2393,7 +2401,10 @@ export class Instructions {
                     const immediate = params.immediate!.getValue();
 
                     const address = rs.getValue() + immediate;
-                     cpu.memory.storeHalf(new Binary(address), rt.getBits(15,0));
+                    cpu.memory.storeHalf(
+                        new Binary(address),
+                        rt.getBits(15, 0),
+                    );
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -2456,7 +2467,7 @@ export class Instructions {
                     const immediate = params.immediate!.getValue();
 
                     const address = rs.getValue() + immediate;
-                    cpu.memory.storeWord(new Binary(address), rt);
+                    cpu.memory.storeWord(new Binary(address), rt.copy());
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }

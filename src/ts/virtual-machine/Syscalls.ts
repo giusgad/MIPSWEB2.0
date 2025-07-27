@@ -94,7 +94,7 @@ export class Syscalls {
                     const address = cpu.registers.get("$a0");
                     if (address) {
                         const string = vm.cpu.memory.getString(address.binary);
-                        vm.console.addLine(string, "success");
+                        vm.console.printString(string);
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
@@ -174,7 +174,40 @@ export class Syscalls {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.name} not implemented yet`);
+                    const currentAsyncToken = vm.getCurrentAsyncToken();
+
+                    vm.cpu.halt();
+                    const input: string = await vm.console.getInput();
+
+                    if (currentAsyncToken !== vm.getCurrentAsyncToken()) {
+                        return;
+                    }
+
+                    vm.cpu.resume();
+                    const buffer = cpu.registers.get("$a0")!.binary.getValue();
+                    const maxLength = cpu.registers
+                        .get("$a1")!
+                        .binary.getValue();
+                    const stringBytes = new TextEncoder().encode(input);
+                    const terminated = new Uint8Array(stringBytes.length + 1);
+                    terminated.set(stringBytes);
+                    terminated[terminated.length - 1] = 0; // null byte terminator
+
+                    for (let i = 0; i < terminated.length; i++) {
+                        if (i >= maxLength) {
+                            vm.console.addLine(
+                                `Input string too long, ignoring last ${terminated.length - maxLength} bytes`,
+                                "warn",
+                            );
+                            break;
+                        }
+                        cpu.memory.storeByte(
+                            new Binary(buffer + i),
+                            new Binary(terminated[i], 8, false),
+                        );
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );

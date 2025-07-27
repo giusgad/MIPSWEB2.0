@@ -2,6 +2,8 @@ import { CPU } from "./CPU.js";
 import { file } from "../files.js";
 import { Binary } from "./Utils.js";
 import {
+    alignDirective,
+    asciiDirective,
     asciizDirective,
     asmDirective,
     byteDirective,
@@ -15,9 +17,11 @@ export class Assembler {
     cpu: CPU;
     directives: Map<string, Directive> = new Map<string, Directive>([
         [".asm", new asmDirective()],
+        [".align", new alignDirective()],
         [".word", new wordDirective()],
         [".globl", new globlDirective()],
         [".asciiz", new asciizDirective()],
+        [".ascii", new asciiDirective()],
         [".byte", new byteDirective()],
         [".space", new spaceDirective()],
     ]);
@@ -160,7 +164,10 @@ export class Assembler {
                     );
                 }
             } else {
-                address.set(address.getValue() + directive.size(tokens));
+                address.set(
+                    address.getValue() +
+                        directive.size(tokens, address.getValue()),
+                );
             }
 
             if (section === ".data") {
@@ -245,17 +252,8 @@ export class Assembler {
 
     tokenize(line: string): string[] {
         line = line.split("#")[0].trim();
-        const tokens = line.split(/\s*,\s*|\s+/);
-        for (let i = 0; i < tokens.length; i++) {
-            const tok = tokens[i];
-            const matched = tok.match(/"([^"]*)"|'([^']*)'|\S+/g);
-            if (matched?.length != 1) {
-                throw new Error(`Unexpected token: ${tok}`);
-            } else {
-                tokens[i] = matched[0];
-            }
-        }
-        return tokens;
+
+        return line.match(/"[^"]*"|'[^']*'|[^,\s]+/g) || [];
     }
 
     reset() {

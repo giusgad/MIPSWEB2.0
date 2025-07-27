@@ -1,5 +1,6 @@
 import { Binary } from "./Utils.js";
 import { Assembler } from "./Assembler";
+import { assert } from "console";
 
 export abstract class Directive {
     abstract assemble(
@@ -10,7 +11,7 @@ export abstract class Directive {
         assembler: Assembler,
         editorPosition: { fileId: number; lineNumber: number },
     ): void;
-    abstract size(tokens: string[]): number;
+    abstract size(tokens: string[], address?: number): number;
     tokenize(tokens: string[]) {
         tokens = tokens.map((token) => token.replace(/,/g, ""));
         return tokens;
@@ -146,6 +147,30 @@ export class globlDirective extends Directive {
     }
 }
 
+export class asciiDirective extends Directive {
+    assemble(
+        tokens: string[],
+        globals: Map<string, Binary | undefined>,
+        labels: Map<string, Binary | undefined>,
+        address: Binary,
+        assembler: Assembler,
+        editorPosition: { fileId: number; lineNumber: number },
+    ) {
+        const string = tokens[0].slice(1, -1);
+        for (let i = 0; i < string.length; i++) {
+            let value: Binary = new Binary(string.charCodeAt(i), 8);
+            assembler.cpu.storeByte(address, value);
+            address.set(address.getValue() + 1);
+        }
+        address.set(address.getValue() + 1);
+    }
+
+    size(tokens: string[]): number {
+        const string = tokens[0].slice(1, -1);
+        return string.length + 1;
+    }
+}
+
 export class asciizDirective extends Directive {
     assemble(
         tokens: string[],
@@ -190,6 +215,32 @@ export class spaceDirective extends Directive {
     }
 }
 
+export class alignDirective extends Directive {
+    assemble(
+        tokens: string[],
+        globals: Map<string, Binary | undefined>,
+        labels: Map<string, Binary | undefined>,
+        address: Binary,
+        assembler: Assembler,
+        editorPosition: { fileId: number; lineNumber: number },
+    ) {
+        const currentAddr = address.getValue();
+        address.set(currentAddr + this.size(tokens, currentAddr));
+    }
+
+    size(tokens: string[], address: number): number {
+        const n = parseInt(tokens[0]);
+        const alignment = 2 ** n;
+        const filled = address % alignment;
+        // already aligned
+        if (filled === 0) {
+            return 0;
+        } else {
+            return alignment - filled;
+        }
+    }
+}
+
 export class byteDirective extends Directive {
     assemble(
         tokens: string[],
@@ -202,7 +253,8 @@ export class byteDirective extends Directive {
         tokens.forEach((token) => {
             let value: Binary = new Binary(0, 8);
             if (!isNaN(Number(token))) {
-                value.set(Number(token));
+                const num = Number(token);
+                value.set(num, num < 128);
             } else if (
                 (token.startsWith('"') && token.endsWith('"')) ||
                 (token.startsWith("'") && token.endsWith("'"))
@@ -233,7 +285,7 @@ export class byteDirective extends Directive {
                 newTokens.push(token);
             } else {
                 token = token.replace(",", "");
-                if (!isNaN(Number(token)) && token.length === 1) {
+                if (!isNaN(Number(token))) {
                     newTokens.push(token);
                 }
             }

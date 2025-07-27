@@ -5,9 +5,7 @@
         <div class="line <%=line.type%>">
             <%=line.text%>
             <% if (line.waitingInput) {%>
-                <% if (line.waitingInput) {%>
-                    <textarea id="console-input" name="input" autofocus autocomplete="off"></textarea>
-                <%}%>
+              <textarea id="console-input" name="input" autofocus autocomplete="off"></textarea>
             <%}%>
         </div>
         <%});%>
