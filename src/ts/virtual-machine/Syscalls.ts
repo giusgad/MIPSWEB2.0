@@ -43,7 +43,7 @@ export class Syscalls {
                     const address = cpu.registers.get("$a0");
                     if (address) {
                         const int = address.binary.getValue();
-                        vm.console.addLine(int.toString(), "success");
+                        vm.console.printString(int.toString());
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);

@@ -98,7 +98,7 @@ export class Memory {
         const byteOffset = address % 4;
         const alignedAddress = address - byteOffset;
         const wordAlignedAddress = new Binary(alignedAddress);
-        let word: Binary = this.loadWord(wordAlignedAddress);
+        let word: Binary = this.loadWord(wordAlignedAddress, false);
 
         const bitPosition = byteOffset * 8;
 
@@ -147,14 +147,18 @@ export class Memory {
         this.memory.clear();
     }
 
-    getString(address: Binary) {
-        let string = "";
+    getString(address: Binary): string {
+        const bytes: number[] = [];
+
         let byte = this.loadByte(address);
         while (byte.getValue() !== 0) {
-            string += String.fromCharCode(byte.getValue());
+            bytes.push(byte.getUnsignedValue());
             address.set(address.getValue() + 1);
             byte = this.loadByte(address);
         }
-        return string;
+
+        const decoder = new TextDecoder("latin1");
+        const str = decoder.decode(new Uint8Array(bytes));
+        return str;
     }
 }

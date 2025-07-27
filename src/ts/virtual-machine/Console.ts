@@ -29,7 +29,7 @@ export class Console {
         for (let i = 0; i < parts.length; i++) {
             let last = this.lines[this.lines.length - 1];
             // only at the first iteration we can append to the last string, otherwise it was a newline
-            if (last && last.isPrintString && i == 0) {
+            if (last != null && last.isPrintString && i == 0) {
                 last.text += parts[i];
             } else {
                 this.lines.push({

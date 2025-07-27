@@ -253,7 +253,8 @@ export class Assembler {
     tokenize(line: string): string[] {
         line = line.split("#")[0].trim();
 
-        return line.match(/"[^"]*"|'[^']*'|[^,\s]+/g) || [];
+        // quoted strings, labels (end with colon), space separated words
+        return line.match(/"[^"]*"|'[^']*'|[^,\s]+:|[^,\s]+/g) || [];
     }
 
     reset() {
