@@ -9,6 +9,7 @@ import {
     byteDirective,
     Directive,
     globlDirective,
+    halfDirective,
     spaceDirective,
     wordDirective,
 } from "./Directives.js";
@@ -18,11 +19,12 @@ export class Assembler {
     directives: Map<string, Directive> = new Map<string, Directive>([
         [".asm", new asmDirective()],
         [".align", new alignDirective()],
+        [".byte", new byteDirective()],
+        [".half", new halfDirective()],
         [".word", new wordDirective()],
         [".globl", new globlDirective()],
         [".asciiz", new asciizDirective()],
         [".ascii", new asciiDirective()],
-        [".byte", new byteDirective()],
         [".space", new spaceDirective()],
     ]);
 

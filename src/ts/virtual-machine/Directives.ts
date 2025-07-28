@@ -293,3 +293,59 @@ export class byteDirective extends Directive {
         return newTokens;
     }
 }
+
+export class halfDirective extends Directive {
+    assemble(
+        tokens: string[],
+        globals: Map<string, Binary | undefined>,
+        labels: Map<string, Binary | undefined>,
+        address: Binary,
+        assembler: Assembler,
+        editorPosition: { fileId: number; lineNumber: number },
+    ) {
+        tokens.forEach((token) => {
+            let value: Binary = new Binary(0, 16);
+            if (!isNaN(Number(token))) {
+                const num = Number(token);
+                value.set(num, num < 2 ** 16);
+            } else if (
+                (token.startsWith('"') && token.endsWith('"')) ||
+                (token.startsWith("'") && token.endsWith("'"))
+            ) {
+                const first = token.slice(1, -1).charCodeAt(0) || 0;
+                const second = token.slice(1, -1).charCodeAt(1) || 0;
+                value.setBits(new Binary(first, 8), 7, 0);
+                value.setBits(new Binary(second, 8), 15, 8);
+            } else {
+                console.error(
+                    `Token non valido nella direttiva .byte: ${token}`,
+                );
+            }
+            assembler.cpu.memory.storeHalf(address, value);
+            address.set(address.getValue() + 2);
+        });
+    }
+
+    size(tokens: string[]): number {
+        const numValues = tokens.length;
+        return numValues * 2;
+    }
+
+    tokenize(tokens: string[]) {
+        const newTokens: string[] = [];
+        tokens.forEach((token) => {
+            if (
+                (token.startsWith('"') && token.endsWith('"')) ||
+                (token.startsWith("'") && token.endsWith("'"))
+            ) {
+                newTokens.push(token);
+            } else {
+                token = token.replace(",", "");
+                if (!isNaN(Number(token))) {
+                    newTokens.push(token);
+                }
+            }
+        });
+        return newTokens;
+    }
+}

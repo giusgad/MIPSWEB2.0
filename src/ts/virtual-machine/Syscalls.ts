@@ -256,7 +256,15 @@ export class Syscalls {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.name} not implemented yet`);
+                    const character = cpu.registers.get("$a0")!.binary;
+
+                    const decoder = new TextDecoder("latin1");
+                    const char = decoder.decode(
+                        new Uint8Array([character.getUnsignedValue()]),
+                    );
+                    vm.console.printString(char);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -271,7 +279,21 @@ export class Syscalls {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
-                    throw new Error(`${this.name} not implemented yet`);
+                    const currentAsyncToken = vm.getCurrentAsyncToken();
+
+                    vm.cpu.halt();
+                    const input: string = await vm.console.getInput();
+
+                    if (currentAsyncToken !== vm.getCurrentAsyncToken()) {
+                        return;
+                    }
+
+                    vm.cpu.resume();
+                    const bytes = new TextEncoder().encode(input);
+                    const char = bytes[0] || 0;
+                    cpu.registers.get("$v0")!.binary.set(char);
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
