@@ -33,13 +33,14 @@ export async function render(
     id: string,
     templatePath: string,
     ctx: any = undefined,
+    showLoaders: boolean = true,
 ) {
-    addLoader(`render: ${id}`);
+    if (showLoaders) addLoader(`render: ${id}`);
     if (!ctx) ctx = getContext();
     const element = document.getElementById(id);
     if (!element) throw new Error(`No element found by Id: ${id}`);
     element.innerHTML = await renderTemplate(templatePath, ctx);
-    removeLoader(`render: ${id}`);
+    if (showLoaders) removeLoader(`render: ${id}`);
 }
 
 (window as any).renderTemplate = renderTemplate;

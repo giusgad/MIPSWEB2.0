@@ -10,6 +10,7 @@ import "./drag.js";
 import "./settings.js";
 import "./memorymap.js";
 import "./intervals.js";
+import "./execution-speed.js";
 import {
     getFromStorage,
     scrollSelectedIntoView,
@@ -82,12 +83,13 @@ async function renderErrorPage(errorMessage: string) {
 export async function renderApp(
     newInterfaceState: "edit" | "execute" = interfaceState,
     newEditorState: "edit" | "execute" = editorState,
+    showLoaders: boolean = true,
 ) {
-    addLoader("renderApp");
+    if (showLoaders) addLoader("renderApp");
     interfaceState = newInterfaceState;
     editorState = newEditorState;
     renderEditors();
-    await render("app", "app.ejs");
+    await render("app", "app.ejs", undefined, showLoaders);
     scrollConsoleToBottom();
     watchingConsole();
     initSortables();
@@ -95,5 +97,5 @@ export async function renderApp(
     scrollSelectedIntoView("files-tabs");
     scrollSelectedIntoView("all-files");
     endDrag();
-    removeLoader("renderApp");
+    if (showLoaders) removeLoader("renderApp");
 }

@@ -4,6 +4,8 @@ import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
 import { Binary } from "./Utils.js";
 import { renderApp } from "../app.js";
+import { getExecutionSpeedTimeOut } from "../execution-speed.js";
+import { step } from "../virtual-machine.js";
 
 export class VirtualMachine {
     cpu: CPU;
@@ -87,8 +89,15 @@ export class VirtualMachine {
 
     async run() {
         this.running = true;
+        const timeout = getExecutionSpeedTimeOut();
         while (this.running && !this.cpu.isHalted()) {
-            await this.step();
+            if (timeout > 0) {
+                // calls the outer step function since it also updates ui
+                step();
+                await new Promise((resolve) => setTimeout(resolve, timeout));
+            } else {
+                await this.step();
+            }
         }
     }
 

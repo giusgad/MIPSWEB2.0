@@ -7,7 +7,6 @@ import {
     selectNextInstruction,
 } from "./editors.js";
 import { Binary } from "./virtual-machine/Utils.js";
-import { getFromStorage } from "./utils.js";
 
 export const vm = new VirtualMachine(new CPU());
 
@@ -28,7 +27,7 @@ export async function stop() {
 
 export async function step() {
     await vm.step();
-    await renderApp();
+    await renderApp(undefined, undefined, false);
     if (vm.nextInstructionEditorPosition) {
         await changeFile(vm.nextInstructionEditorPosition.fileId);
         selectNextInstruction();

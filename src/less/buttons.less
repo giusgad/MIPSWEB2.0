@@ -1,5 +1,8 @@
 @import "variables.less";
 
+@btn-border: 1px solid var(--rgb-gray-9);
+@btn-b-radius: 4px;
+
 button {
   background: none;
   border: none;
@@ -34,8 +37,8 @@ button {
 
 .button {
   &.default {
-    border-radius: 4px;
-    border: 1px solid var(--rgb-gray-9);
+    border-radius: @btn-b-radius;
+    border: @btn-border;
     background-color: var(--rgb-gray-10);
     &:hover {
       background-color: var(--rgb-gray-9);
@@ -47,6 +50,23 @@ button {
     }
     .label {
       color: var(--rgb-gray-4);
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+  margin-right: 8px;
+  & > .button {
+    margin: 0;
+    border-radius: 0;
+    border-right: none;
+    &:first-child {
+      border-radius: @btn-b-radius 0 0 @btn-b-radius;
+    }
+    &:last-child {
+      border-right: @btn-border;
+      border-radius: 0 @btn-b-radius @btn-b-radius 0;
     }
   }
 }

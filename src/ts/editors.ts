@@ -205,7 +205,7 @@ export function addEditor(file: file) {
 
     aceEditor.getSession().selection.on("changeCursor", async () => {
         if (interfaceState === "execute") {
-            await renderApp();
+            await renderApp(undefined, undefined, false);
         }
     });
 

@@ -12,6 +12,7 @@ export type file = {
 };
 
 export async function changeFile(fileId: number) {
+    if (getSelectedFileId() === fileId) return;
     setSelectedFileId(fileId);
     await renderApp();
     showEditor(fileId);

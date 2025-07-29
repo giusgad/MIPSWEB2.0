@@ -1,0 +1,23 @@
+<form class="form">
+  <div class="text">Edit execution speed</div>
+  <%
+    window.updateLabel = (val) => {
+      const text = getExecSpeedLabel(val);
+      document.getElementById("exec-speed-label").innerText = text;
+    }
+    let execSpeed = getExecutionSpeed() || 5;
+  %>
+  <div class="input">
+    <label id="exec-speed-label" for="exec-speed" style="text-align:center; width:30ch">
+      <%=getExecSpeedLabel(execSpeed)%>
+    </label>
+    <input type="range" min="1" max="5" step="1" value="<%=execSpeed%>" id="exec-speed"
+    onchange="setExecutionSpeed(this.value);" oninput="updateLabel(this.value);">
+  </div>
+  <div class="buttons">
+    <button class="button default" onclick="hideFormOnClick();">
+      <div class="icon gray-4"><%-Icons.render('edit')%></div>
+      <div class="label">Confirm</div>
+    </button>
+  </div>
+</form>

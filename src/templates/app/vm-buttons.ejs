@@ -1,4 +1,3 @@
-
 <div class="buttons">
     <% if (ctx.interfaceState === "execute") { %>
         <%if ((ctx.vm.nextInstructionEditorPosition !== undefined) && (ctx.editorState === "execute") && (!ctx.vm.cpu.isHalted())) {%>
@@ -6,9 +5,14 @@
                 <div class="icon gray-4"><%-Icons.render('step')%></div>
                 <div class="label">Step</div>
             </div>
-            <div class="button default" onclick="runOnClick();">
-                <div class="icon gray-4"><%-Icons.render('run')%></div>
-                <div class="label">Run</div>
+            <div class="button-group">
+              <div class="button default" onclick="runOnClick();">
+                  <div class="icon gray-4"><%-Icons.render('run')%></div>
+                  <div class="label">Run</div>
+              </div>
+              <div class="button default" onclick="showFormOnClick('execution-speed')">
+                  <div class="icon gray-4"><%-Icons.render('dots')%></div>
+              </div>
             </div>
         <%}%>
         <div class="button default" onclick="stopOnClick();">
