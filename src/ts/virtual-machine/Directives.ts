@@ -98,9 +98,10 @@ export class wordDirective extends Directive {
         editorPosition: { fileId: number; lineNumber: number },
     ) {
         tokens.forEach((token) => {
-            let value: Binary = new Binary(0, 32, true);
+            let value: Binary = new Binary(0, 32);
             if (!isNaN(Number(token))) {
-                value.set(Number(token));
+                const num = Number(token);
+                value.set(num, num <= 2147483647);
             } else if (
                 (token.startsWith('"') && token.endsWith('"')) ||
                 (token.startsWith("'") && token.endsWith("'"))
@@ -307,7 +308,7 @@ export class halfDirective extends Directive {
             let value: Binary = new Binary(0, 16);
             if (!isNaN(Number(token))) {
                 const num = Number(token);
-                value.set(num, num < 2 ** 16);
+                value.set(num, num < 2 ** 15);
             } else if (
                 (token.startsWith('"') && token.endsWith('"')) ||
                 (token.startsWith("'") && token.endsWith("'"))
