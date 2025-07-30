@@ -14,9 +14,10 @@ import {
     renameFile,
 } from "./files.js";
 import { hideFilePopover, showFilePopover } from "./popovers.js";
-import { assemble, stop, step, run } from "./virtual-machine.js";
+import { assemble, stop, step, run, pause, vm } from "./virtual-machine.js";
 import { colFormatSelect } from "./settings.js";
 import { highlighInterval, toggleMemoryMap } from "./memorymap.js";
+import { render } from "./rendering.js";
 
 (window as any).colFormatSelectOnChange = async function (
     element: HTMLSelectElement,
@@ -31,7 +32,12 @@ import { highlighInterval, toggleMemoryMap } from "./memorymap.js";
 };
 
 (window as any).runOnClick = async function () {
-    await run();
+    if (vm.running) {
+        pause();
+    } else {
+        run();
+    }
+    await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);
 };
 
 (window as any).stopOnClick = async function () {

@@ -7,8 +7,8 @@
             </div>
             <div class="button-group">
               <div class="button default" onclick="runOnClick();">
-                  <div class="icon gray-4"><%-Icons.render('run')%></div>
-                  <div class="label">Run</div>
+                  <div class="icon gray-4"><%-ctx.vm.running ? Icons.render('pause') : Icons.render('run')%></div>
+                  <div class="label"><%=ctx.vm.running ? "Pause" : "Run" %></div>
               </div>
               <div class="button default" onclick="showFormOnClick('execution-speed')">
                   <div class="icon gray-4"><%-Icons.render('dots')%></div>

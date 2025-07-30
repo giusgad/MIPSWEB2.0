@@ -51,6 +51,10 @@ export class Icons {
                 path: "M384 256L0 32V480L384 256z",
                 viewBox: "0 0 384 512",
             },
+            pause: {
+                path: "M7 1H2V15H7V1Z M14 1H9V15H14V1Z",
+                viewBox: "0 0 16 16",
+            },
             stop: {
                 path: "M0 64H384V448H0V64z",
                 viewBox: "0 0 384 512",

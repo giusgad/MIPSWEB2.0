@@ -205,7 +205,18 @@ export function addEditor(file: file) {
 
     aceEditor.getSession().selection.on("changeCursor", async () => {
         if (interfaceState === "execute") {
-            await renderApp(undefined, undefined, false);
+            const session = getAceEditor()?.getSession();
+            if (session) {
+                const markers = session.getMarkers(false);
+                let first = true;
+                for (const i in markers) {
+                    if (first) {
+                        first = false;
+                        continue;
+                    }
+                    session.removeMarker(markers[i].id);
+                }
+            }
         }
     });
 

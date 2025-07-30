@@ -93,7 +93,7 @@ export class VirtualMachine {
         while (this.running && !this.cpu.isHalted()) {
             if (timeout > 0) {
                 // calls the outer step function since it also updates ui
-                step();
+                await step();
                 await new Promise((resolve) => setTimeout(resolve, timeout));
             } else {
                 await this.step();

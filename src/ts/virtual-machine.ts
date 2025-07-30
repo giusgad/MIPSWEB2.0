@@ -7,6 +7,7 @@ import {
     selectNextInstruction,
 } from "./editors.js";
 import { Binary } from "./virtual-machine/Utils.js";
+import { render } from "./rendering.js";
 
 export const vm = new VirtualMachine(new CPU());
 
@@ -27,18 +28,24 @@ export async function stop() {
 
 export async function step() {
     await vm.step();
-    await renderApp(undefined, undefined, false);
     if (vm.nextInstructionEditorPosition) {
         await changeFile(vm.nextInstructionEditorPosition.fileId);
         selectNextInstruction();
         moveCursorToNextInstruction();
     }
+    await render("memory", "/app/memory.ejs", undefined, false);
+    await render("registers", "/app/registers.ejs", undefined, false);
 }
 
 export async function run() {
     await vm.run();
     await renderApp();
     moveCursorToNextInstruction();
+}
+
+export async function pause() {
+    vm.pause();
+    await renderApp();
 }
 
 (window as any).convert = function (format: string, bin: Binary | number) {
