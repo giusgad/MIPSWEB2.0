@@ -99,6 +99,14 @@ export class VirtualMachine {
                 await this.step();
             }
         }
+        if (
+            this.cpu.pc.getValue() >= this.assembler.textSegmentEnd.getValue()
+        ) {
+            this.console.addLine(
+                "Program finished (dropped off bottom).",
+                "success",
+            );
+        }
     }
 
     pause() {

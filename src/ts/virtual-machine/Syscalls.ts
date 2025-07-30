@@ -241,6 +241,7 @@ export class Syscalls {
                     params: { [key: string]: Binary },
                     vm: VirtualMachine,
                 ): Promise<void> {
+                    vm.console.addLine("Program exited.", "success");
                     await vm.exit();
                 }
             })(),
