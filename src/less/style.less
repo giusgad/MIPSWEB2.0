@@ -53,6 +53,15 @@ body {
   border-bottom: solid 1px var(--rgb-gray-11);
 }
 
+.address.hexadecimal,
+.value.hexadecimal {
+  &::before {
+    content: "0𝗑";
+    user-select: none;
+    opacity: 0.3;
+  }
+}
+
 .icon {
   width: @icon-hw;
   height: @icon-hw;
