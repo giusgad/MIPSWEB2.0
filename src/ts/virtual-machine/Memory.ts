@@ -73,7 +73,11 @@ export class Memory {
         const address = getNumericAddress(wordAddress, Alignment.Word);
         const value = this.memory.get(address);
         if (value !== undefined) {
-            return new Binary(value.getValue(), 32, signed);
+            return new Binary(
+                signed ? value.getValue() : value.getUnsignedValue(),
+                32,
+                signed,
+            );
         } else {
             return new Binary(0, 32, true);
         }

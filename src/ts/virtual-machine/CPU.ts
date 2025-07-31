@@ -124,6 +124,10 @@ export class CPU {
                         }
                     }
                     vm.lastChangedRegister = changedRegister;
+                    vm.lastReadRegisters = instruction.getReadRegisters(
+                        decodedInstruction.params,
+                        this.getRegisters(),
+                    );
                 }
             }
         } else {

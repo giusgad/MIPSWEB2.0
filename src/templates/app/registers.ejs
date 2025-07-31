@@ -30,7 +30,10 @@
         </div>
         <div class="rows">
             <%ctx.vm.getRegisters().forEach((register) => {%>
-                <div class="row <% if ((ctx.vm.lastChangedRegister) && (ctx.vm.lastChangedRegister === register.name)) { %> last-changed <% } %>">
+                <div class="row 
+                <% if ((ctx.vm.lastChangedRegister) && (ctx.vm.lastChangedRegister === register.name)) { %> last-changed <% } %>
+                <% if ((ctx.vm.lastReadRegisters) && (ctx.vm.lastReadRegisters.includes(register.name))) { %> last-read <% } %>
+                ">
                     <div class="col name">
                         <% if ((nameFormat === 'number') && (!['pc', 'hi', 'lo'].includes(register.name))) { %>
                         $<%=register.number%>

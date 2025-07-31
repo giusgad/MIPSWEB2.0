@@ -233,10 +233,13 @@ body {
         background-color: var(--rgb-gray-10);
 
         &.last-changed {
-          .col {
-            &.value {
-              color: var(--rgb-ace-variable);
-            }
+          .col.value {
+            background-color: var(--rgba-blue-30);
+          }
+        }
+        &.last-read {
+          .col.value {
+            background-color: var(--rgba-green-30);
           }
         }
       }

@@ -17,6 +17,8 @@ export class VirtualMachine {
         | undefined;
 
     lastChangedRegister?: string;
+    /**List of register names that were read in the last */
+    lastReadRegisters?: string[];
 
     console: Console = new Console();
 
@@ -56,6 +58,7 @@ export class VirtualMachine {
         this.running = false;
         this.nextInstructionEditorPosition = undefined;
         this.lastChangedRegister = undefined;
+        this.lastReadRegisters = undefined;
         this.console.reset();
         this.asyncToken++;
     }

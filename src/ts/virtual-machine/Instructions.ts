@@ -4,7 +4,7 @@ import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { VirtualMachine } from "./VirtualMachine.js";
 import { getFromStorage } from "../utils.js";
-import { Registers } from "./Registers.js";
+import { register, Registers } from "./Registers.js";
 
 type ParamsFormat =
     | "rt, rs, immediate"
@@ -33,7 +33,6 @@ export abstract class Instruction {
     format: string;
     opcode: Binary;
     funct: Binary | undefined;
-    //TODO: add a fixed registers part (example: TGEI/TGEIU have a fixed rt, that needs to be used in decoding to determine which)
 
     constructor(
         symbol: string,
@@ -123,6 +122,51 @@ export abstract class Instruction {
         }
 
         return `${this.symbol.toLowerCase()} ${paramValues.join(", ")}`;
+    }
+
+    /**returns a list of the register names that were read*/
+    getReadRegisters(
+        params: { [key: string]: Binary },
+        registers: register[],
+    ): string[] {
+        let read: register[] = [];
+        const rs = params.rs ? registers[params.rs.getValue()] : null;
+        const rt = params.rt ? registers[params.rt.getValue()] : null;
+        switch (this.params[0]) {
+            case "rt, rs, immediate": // imm
+                read = [rs!];
+                break;
+            case "rd, rt, sa": // shift
+                read = [rt!];
+                break;
+            case "rd, rt, rs": // shift register
+            case "rs, rt": // mult / div
+            case "rs, rt, offset": // branches
+            case "rd, rs, rt": // R-format ops
+                read = [rt!, rs!];
+                break;
+            case "rs": // mtlo/mthi
+            case "rd, rs": // j
+            case "rs, offset": // some branches
+            case "rs, immediate": // tgei
+                read = [rs!];
+                break;
+            case "rt, offset(base)": // loads and stores
+                if (this.symbol.startsWith("S")) {
+                    // only the store read the register
+                    read = [rt!];
+                }
+                break;
+            case "SYSCALL":
+                read = [registers[2]]; // v0
+            case "rd": // mfhi/mflo
+            case "rt, immediate": // lui
+            case "BREAK":
+            case "cop_fun":
+            case "target":
+                break;
+        }
+        return read.map((r) => r.name);
     }
 }
 
@@ -552,7 +596,6 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
-                        // TODO: this is only for mips64
                         "DSLLV",
                         ["rd, rt, rs"],
                         "R",
@@ -2372,7 +2415,7 @@ export class Instructions {
                     const immediate = params.immediate!.getValue();
 
                     const address = rs.getValue() + immediate;
-                    const value = rt.getBits(7, 0);
+                    const value = rt.getBits(7, 0, false);
                     cpu.memory.storeByte(new Binary(address), value);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
@@ -2403,7 +2446,7 @@ export class Instructions {
                     const address = rs.getValue() + immediate;
                     cpu.memory.storeHalf(
                         new Binary(address),
-                        rt.getBits(15, 0),
+                        rt.getBits(15, 0, false),
                     );
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
