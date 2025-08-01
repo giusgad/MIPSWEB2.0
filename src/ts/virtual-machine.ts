@@ -28,6 +28,10 @@ export async function stop() {
 
 export async function step() {
     await vm.step();
+    if (vm.cpu.isHalted()) {
+        await renderApp();
+        return;
+    }
     if (vm.nextInstructionEditorPosition) {
         await changeFile(vm.nextInstructionEditorPosition.fileId);
         selectNextInstruction();

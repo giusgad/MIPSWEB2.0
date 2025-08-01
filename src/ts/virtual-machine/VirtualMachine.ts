@@ -88,6 +88,15 @@ export class VirtualMachine {
             console.error(error);
             this.pause();
         }
+        if (
+            this.cpu.pc.getValue() >= this.assembler.textSegmentEnd.getValue()
+        ) {
+            this.cpu.halt();
+            this.console.addLine(
+                "Program finished (dropped off bottom).",
+                "success",
+            );
+        }
     }
 
     async run() {
@@ -101,14 +110,6 @@ export class VirtualMachine {
             } else {
                 await this.step();
             }
-        }
-        if (
-            this.cpu.pc.getValue() >= this.assembler.textSegmentEnd.getValue()
-        ) {
-            this.console.addLine(
-                "Program finished (dropped off bottom).",
-                "success",
-            );
         }
     }
 
