@@ -168,6 +168,37 @@ export abstract class Instruction {
         }
         return read.map((r) => r.name);
     }
+
+    /**Returns the word-aligned address of memory read by this instruction (if any)*/
+    getReadMem(
+        params: { [key: string]: Binary },
+        registers: register[],
+    ): number | undefined {
+        if (
+            ["LW", "LWL", "LWR", "LH", "LHU", "LB", "LBU", "LL"].includes(
+                this.symbol,
+            )
+        ) {
+            const rs = registers[params.rs!.getValue()].binary;
+            const immediate = params.immediate!.getValue();
+            const address = rs.getValue() + immediate;
+            return address - (address % 4);
+        }
+        return undefined;
+    }
+    /**Returns the word-aligned address of memory written by this instruction (if any)*/
+    getWrittenMem(
+        params: { [key: string]: Binary },
+        registers: register[],
+    ): number | undefined {
+        if (["SW", "SWL", "SWR", "SH", "SB", "SC"].includes(this.symbol)) {
+            const rs = registers[params.rs!.getValue()].binary;
+            const immediate = params.immediate!.getValue();
+            const address = rs.getValue() + immediate;
+            return address - (address % 4);
+        }
+        return undefined;
+    }
 }
 
 export abstract class PseudoInstruction {

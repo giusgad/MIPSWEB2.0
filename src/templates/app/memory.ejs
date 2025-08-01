@@ -77,11 +77,18 @@
                   <%=convert(addressFormat, cell.address)%>
                 </div>
 
+                <%let highlightClass = "";
+                  if (ctx.vm.lastReadMem === cell.address) {
+                    highlightClass = "last-read";
+                  } else if (ctx.vm.lastWrittenMem === cell.address) {
+                    highlightClass = "last-changed";
+                  }
+                %>
                 <% if (valueGranularity == 'half') {%>
                   <div class="col granular">
                     <%let parts = [cell.binary.getBits(31,16), cell.binary.getBits(15,0)]
                     for (let part of parts) {%>
-                      <div class="col value <%=valueFormat%>">
+                      <div class="col value <%=valueFormat%> <%=highlightClass%>">
                         <%=convert(valueFormat, part)%>
                       </div>
                     <%}%>
@@ -90,13 +97,13 @@
                   <div class="col granular">
                     <%let parts = [cell.binary.getBits(31,24), cell.binary.getBits(23,16), cell.binary.getBits(15,8), cell.binary.getBits(7,0)]
                     for (let part of parts) {%>
-                      <div class="col value <%=valueFormat%>">
+                      <div class="col value <%=valueFormat%> <%=highlightClass%>">
                         <%=convert(valueFormat, part)%>
                       </div>
                     <%}%>
                   </div>
                 <%} else {%>
-                  <div class="col value <%=valueFormat%>">
+                  <div class="col value <%=valueFormat%> <%=highlightClass%>">
                     <%=convert(valueFormat, cell.binary)%>
                   </div>
                 <%}%>

@@ -32,7 +32,12 @@ export class Utils {
 
         for (let i = bits - 8; i >= 0; i -= 8) {
             const byte = (value >> i) & 0xff;
-            const char = String.fromCharCode(byte);
+            let char;
+            if (byte === 0) {
+                char = "\\0";
+            } else {
+                char = String.fromCharCode(byte);
+            }
             if (char) {
                 ascii.push(char);
             }

@@ -16,9 +16,14 @@ export class VirtualMachine {
         | { fileId: number; lineNumber: number }
         | undefined;
 
+    /**Register that was changed by the last instruction*/
     lastChangedRegister?: string;
     /**List of register names that were read in the last */
     lastReadRegisters?: string[];
+    /**word-aligned address of the memory read by the last instruction*/
+    lastReadMem?: number;
+    /**word-aligned address of the memory written by the last instruction*/
+    lastWrittenMem?: number;
 
     console: Console = new Console();
 
@@ -39,8 +44,8 @@ export class VirtualMachine {
                     this.cpu.pc.getValue(),
                 );
             // the end of static data is the highest key in memory after assembling the program
-            const heap = Math.max(...this.cpu.memory.get().keys());
-            this.cpu.memory.initHeapPointer(heap);
+            const staticDataEnd = Math.max(...this.cpu.memory.get().keys());
+            this.cpu.memory.initHeapPointer(staticDataEnd);
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
@@ -59,6 +64,8 @@ export class VirtualMachine {
         this.nextInstructionEditorPosition = undefined;
         this.lastChangedRegister = undefined;
         this.lastReadRegisters = undefined;
+        this.lastReadMem = undefined;
+        this.lastWrittenMem = undefined;
         this.console.reset();
         this.asyncToken++;
     }

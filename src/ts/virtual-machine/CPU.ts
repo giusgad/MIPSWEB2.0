@@ -112,6 +112,7 @@ export class CPU {
                         vm,
                     );
 
+                    // update vm's values for operation visualization (read/written registers and memory)
                     let changedRegister: string | undefined = undefined;
                     for (let i = 0; i < this.registers.registers.length; i++) {
                         if (
@@ -123,11 +124,21 @@ export class CPU {
                             break;
                         }
                     }
+                    const registers = this.getRegisters();
                     vm.lastChangedRegister = changedRegister;
                     vm.lastReadRegisters = instruction.getReadRegisters(
                         decodedInstruction.params,
-                        this.getRegisters(),
+                        registers,
                     );
+                    vm.lastReadMem = instruction.getReadMem(
+                        decodedInstruction.params,
+                        registers,
+                    );
+                    vm.lastWrittenMem = instruction.getWrittenMem(
+                        decodedInstruction.params,
+                        registers,
+                    );
+                    console.log(vm.lastReadMem, vm.lastWrittenMem);
                 }
             }
         } else {
