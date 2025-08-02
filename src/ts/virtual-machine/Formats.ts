@@ -38,7 +38,7 @@ export class R_Format implements Format {
         let shamt: Binary = new Binary(0, 5);
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
         for (const param of possible_params) {
-            if (param !== "SYSCALL" && param !== "BREAK") {
+            if (param !== "SYSCALL" && param !== "EMPTY") {
                 if (possible_params.length === 0) {
                     throw new Error(
                         `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,

@@ -23,7 +23,7 @@ type ParamsFormat =
     | "cop_fun"
     | "rt, offset(base)"
     | "SYSCALL"
-    | "BREAK";
+    | "EMPTY";
 
 export abstract class Instruction {
     symbol: string;
@@ -101,7 +101,7 @@ export abstract class Instruction {
                 paramValues.push(
                     targetValue !== undefined ? targetValue.toString() : "0",
                 );
-            } else if (name === "SYSCALL" || name === "BREAK") {
+            } else if (name === "SYSCALL" || name === "EMPTY") {
                 return this.symbol.toLowerCase();
             } else if (name === "sa") {
                 const shamtValue = params["shamt"]?.getValue();
@@ -161,7 +161,7 @@ export abstract class Instruction {
                 read = [registers[2]]; // v0
             case "rd": // mfhi/mflo
             case "rt, immediate": // lui
-            case "BREAK":
+            case "EMPTY":
             case "cop_fun":
             case "target":
                 break;
@@ -221,7 +221,7 @@ export abstract class PseudoInstruction {
     }
 
     abstract expand(
-        assebler: Assembler,
+        assembler: Assembler,
         tokens: string[],
         globals: Map<string, Binary | undefined>,
         labels: Map<string, Binary | undefined>,
@@ -501,7 +501,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BREAK",
-                        ["BREAK"],
+                        ["EMPTY"],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001101, 6),
@@ -2808,17 +2808,111 @@ export class Instructions {
         this.pseudoInstructions.push(
             new (class extends PseudoInstruction {
                 constructor() {
+                    super("NOP", "EMPTY");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    return [["sll", "$zero", "$zero", "$zero"]];
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
                     super("MOVE", "rd, rs");
                 }
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [["addu", params["rd"], "$zero", params["rs"]]];
+                    return [["addu", params["rd"], params["rs"], "$zero"]];
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("NOT", "rd, rs");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [["nor", params["rd"], params["rs"], "$zero"]];
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("NEG", "rd, rs");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [["sub", params["rd"], "$zero", params["rs"]]];
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("NEGU", "rd, rs");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [["subu", params["rd"], "$zero", params["rs"]]];
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("ABS", "rd, rs");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    let skipLabel = "L1";
+                    while (labels.has(skipLabel)) {
+                        let n = Math.floor(Math.random() * 10);
+                        skipLabel = `${skipLabel}${n}`;
+                    }
+                    labels.set(skipLabel, new Binary(address.getValue() + 12));
+                    return [
+                        ["addu", params["rd"], params["rs"], "$zero"],
+                        ["bgez", params["rs"], skipLabel],
+                        ["sub", params["rd"], "$zero", params["rs"]],
+                    ];
                 }
             })(),
         );
@@ -2828,7 +2922,7 @@ export class Instructions {
                     super("LI", "rd, immediate");
                 }
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
@@ -2867,7 +2961,7 @@ export class Instructions {
                     super("LA", "rd, label");
                 }
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
@@ -2899,14 +2993,17 @@ export class Instructions {
                     super("BLT", "rs, rt, label");
                 }
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [];
+                    return [
+                        ["slt", "$at", params["rs"], params["rt"]],
+                        ["bne", "$at", "$zero", params["label"]],
+                    ];
                 }
             })(),
         );
@@ -2917,14 +3014,17 @@ export class Instructions {
                 }
 
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [];
+                    return [
+                        ["slt", "$at", params["rt"], params["rs"]],
+                        ["beq", "$at", "$zero", params["label"]],
+                    ];
                 }
             })(),
         );
@@ -2935,14 +3035,17 @@ export class Instructions {
                 }
 
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [];
+                    return [
+                        ["slt", "$at", params["rt"], params["rs"]],
+                        ["bne", "$at", "$zero", params["label"]],
+                    ];
                 }
             })(),
         );
@@ -2953,14 +3056,17 @@ export class Instructions {
                 }
 
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [];
+                    return [
+                        ["slt", "$at", params["rs"], params["rt"]],
+                        ["beq", "$at", "$zero", params["label"]],
+                    ];
                 }
             })(),
         );
@@ -2971,7 +3077,7 @@ export class Instructions {
                 }
 
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
@@ -2993,7 +3099,7 @@ export class Instructions {
                 }
 
                 expand(
-                    assebler: Assembler,
+                    assembler: Assembler,
                     tokens: string[],
                     globals: Map<string, Binary | undefined>,
                     labels: Map<string, Binary | undefined>,
