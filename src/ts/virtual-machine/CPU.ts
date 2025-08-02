@@ -66,6 +66,7 @@ export class CPU {
             funct = new Binary(instructionCode.getBits(5, 0).getValue(), 6);
         }
         let foundInstruction: Instruction | undefined = undefined;
+        const rtField = instructionCode.getBits(20, 16).getValue();
 
         for (const instruction of this.instructionsSet.instructions) {
             if (instruction.opcode.getValue() === opcode.getValue()) {
@@ -75,6 +76,17 @@ export class CPU {
                         break;
                     }
                 } else if (!instruction.funct) {
+                    if (instruction.fixedRt) {
+                        if (instruction.fixedRt.getValue() === rtField) {
+                            // bal and bgezal have the same opcode and fixedRt, but need to be interpreted as bgezal
+                            // specifically, `bal target` is interpreted as `bgezal $zero target`
+                            if (instruction.symbol === "BAL") continue;
+                            foundInstruction = instruction;
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
                     foundInstruction = instruction;
                     break;
                 }
@@ -138,7 +150,6 @@ export class CPU {
                         decodedInstruction.params,
                         registers,
                     );
-                    console.log(vm.lastReadMem, vm.lastWrittenMem);
                 }
             }
         } else {

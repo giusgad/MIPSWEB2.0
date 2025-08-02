@@ -195,7 +195,6 @@ export class Assembler {
         address: Binary,
     ): Binary {
         const symbol = tokens[0];
-        if (symbol.toLowerCase() === "nop") return new Binary();
         const instruction = this.cpu.instructionsSet.getBySymbol(symbol);
         if (!instruction) {
             throw new Error(`Instruction ${tokens[0].toUpperCase()} not found`);

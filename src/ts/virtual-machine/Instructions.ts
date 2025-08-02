@@ -17,13 +17,14 @@ type ParamsFormat =
     | "rd, rs, rt"
     | "target"
     | "rs, rt, offset"
+    | "offset"
     | "rs, offset"
     | "rt, immediate"
     | "rs, immediate"
     | "cop_fun"
     | "rt, offset(base)"
     | "SYSCALL"
-    | "EMPTY";
+    | ""; // no params
 
 export abstract class Instruction {
     symbol: string;
@@ -33,6 +34,8 @@ export abstract class Instruction {
     format: string;
     opcode: Binary;
     funct: Binary | undefined;
+    /**Some I instructions are differentiated by a fixed rt field (not accessed by the user)*/
+    fixedRt: Binary | undefined;
 
     constructor(
         symbol: string,
@@ -101,7 +104,7 @@ export abstract class Instruction {
                 paramValues.push(
                     targetValue !== undefined ? targetValue.toString() : "0",
                 );
-            } else if (name === "SYSCALL" || name === "EMPTY") {
+            } else if (name === "SYSCALL" || name === "") {
                 return this.symbol.toLowerCase();
             } else if (name === "sa") {
                 const shamtValue = params["shamt"]?.getValue();
@@ -161,7 +164,7 @@ export abstract class Instruction {
                 read = [registers[2]]; // v0
             case "rd": // mfhi/mflo
             case "rt, immediate": // lui
-            case "EMPTY":
+            case "":
             case "cop_fun":
             case "target":
                 break;
@@ -501,7 +504,7 @@ export class Instructions {
                 constructor() {
                     super(
                         "BREAK",
-                        ["EMPTY"],
+                        [""],
                         "R",
                         new Binary(0b000000, 6),
                         new Binary(0b001101, 6),
@@ -1317,6 +1320,7 @@ export class Instructions {
                         new Binary(0b000001, 6),
                         undefined,
                     );
+                    this.fixedRt = new Binary(0b01000, 5);
                 }
                 async execute(
                     cpu: CPU,
@@ -1345,6 +1349,7 @@ export class Instructions {
                         new Binary(0b000001, 6),
                         undefined,
                     );
+                    this.fixedRt = new Binary(0b01001, 5);
                 }
                 async execute(
                     cpu: CPU,
@@ -1384,6 +1389,64 @@ export class Instructions {
                     const rt = registers[params.rt.getValue()].binary;
 
                     if (rs.getValue() < rt.getValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "TLTI",
+                        ["rs, immediate"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b01010, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getValue() < imm.getValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "TLTIU",
+                        ["rs, immediate"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b01011, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getUnsignedValue() < imm.getUnsignedValue()) {
                         vm.console.addLine(`Trap by ${this.symbol}`, "warn");
                     }
 
@@ -1451,6 +1514,35 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
+                        "TEQI",
+                        ["rs, immediate"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b01100, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getUnsignedValue() === imm.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
                         "TNE",
                         ["rs, rt"],
                         "R",
@@ -1468,6 +1560,35 @@ export class Instructions {
                     const rt = registers[params.rt.getValue()].binary;
 
                     if (rs.getUnsignedValue() !== rt.getUnsignedValue()) {
+                        vm.console.addLine(`Trap by ${this.symbol}`, "warn");
+                    }
+
+                    cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "TNEI",
+                        ["rs, immediate"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b01110, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs.getValue()].binary;
+                    const imm = params.immediate!;
+
+                    if (rs.getUnsignedValue() !== imm.getUnsignedValue()) {
                         vm.console.addLine(`Trap by ${this.symbol}`, "warn");
                     }
 
@@ -1651,6 +1772,55 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
+                        "B",
+                        ["offset"],
+                        "I",
+                        new Binary(0b000100, 6),
+                        undefined,
+                    );
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "BAL",
+                        ["offset"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b10001, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    registers[31].binary.set(cpu.pc.getValue() + 4);
+                    cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
                         "BEQ",
                         ["rs, rt, offset"],
                         "I",
@@ -1670,6 +1840,97 @@ export class Instructions {
                         Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
 
                     if (rs.getUnsignedValue() === rt.getUnsignedValue()) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "BGEZ",
+                        ["rs, offset"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b00001, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    if (rs.getSignedValue() >= 0) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "BGEZAL",
+                        ["rs, offset"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b10001, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+                    registers[31].binary.set(cpu.pc.getValue() + 4);
+
+                    if (rs.getSignedValue() >= 0) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "BGTZ",
+                        ["rs, offset"],
+                        "I",
+                        new Binary(0b000111, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b00000, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    if (rs.getSignedValue() > 0) {
                         cpu.pc.set(cpu.pc.getValue() + 4 + offset);
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
@@ -1740,12 +2001,13 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
-                        "BGTZ",
+                        "BLTZ",
                         ["rs, offset"],
                         "I",
-                        new Binary(0b000111, 6),
+                        new Binary(0b000001, 6),
                         undefined,
                     );
+                    this.fixedRt = new Binary(0, 5);
                 }
                 async execute(
                     cpu: CPU,
@@ -1757,10 +2019,41 @@ export class Instructions {
                     const offset =
                         Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
 
-                    cpu.pc.set(cpu.pc.getValue() + 4);
+                    if (rs.getValue() <= 0) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
+                    }
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "BLTZAL",
+                        ["rs, offset"],
+                        "I",
+                        new Binary(0b000001, 6),
+                        undefined,
+                    );
+                    this.fixedRt = new Binary(0b10000, 5);
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const registers = cpu.getRegisters();
+                    const rs = registers[params.rs!.getValue()].binary;
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+                    registers[31].binary.set(cpu.pc.getValue() + 4);
 
-                    if (rs.getValue() > 0) {
-                        cpu.pc.set(cpu.pc.getValue() + offset);
+                    if (rs.getValue() <= 0) {
+                        cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                    } else {
+                        cpu.pc.set(cpu.pc.getValue() + 4);
                     }
                 }
             })(),
@@ -2134,26 +2427,6 @@ export class Instructions {
                         ["rs, offset"],
                         "I",
                         new Binary(0b010110, 6),
-                        undefined,
-                    );
-                }
-                async execute(
-                    cpu: CPU,
-                    params: { [key: string]: Binary },
-                    vm: VirtualMachine,
-                ): Promise<void> {
-                    throw new Error(`${this.symbol} not implemented yet`);
-                }
-            })(),
-        );
-        this.instructions.push(
-            new (class extends Instruction {
-                constructor() {
-                    super(
-                        "BGTZL",
-                        ["rs, offset"],
-                        "I",
-                        new Binary(0b010111, 6),
                         undefined,
                     );
                 }
@@ -2808,7 +3081,7 @@ export class Instructions {
         this.pseudoInstructions.push(
             new (class extends PseudoInstruction {
                 constructor() {
-                    super("NOP", "EMPTY");
+                    super("NOP", "");
                 }
                 expand(
                     assembler: Assembler,

@@ -39,6 +39,7 @@ export async function step() {
     }
     await render("memory", "/app/memory.ejs", undefined, false);
     await render("registers", "/app/registers.ejs", undefined, false);
+    await render("console", "/app/console.ejs", undefined, false);
 }
 
 export async function run() {

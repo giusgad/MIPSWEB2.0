@@ -38,7 +38,7 @@ export class R_Format implements Format {
         let shamt: Binary = new Binary(0, 5);
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
         for (const param of possible_params) {
-            if (param !== "SYSCALL" && param !== "EMPTY") {
+            if (param !== "SYSCALL" && param !== "") {
                 if (possible_params.length === 0) {
                     throw new Error(
                         `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
@@ -119,7 +119,10 @@ export class I_Format implements Format {
     ): Binary {
         const opcode: Binary = instruction.opcode!;
         let rs = cpu.registers.get("$zero");
-        let rt = cpu.registers.get("$zero");
+        let rt =
+            instruction.fixedRt !== undefined
+                ? cpu.getRegisters()[instruction.fixedRt!.getValue()]
+                : cpu.registers.get("$zero");
         let immediate = new Binary(0, 16, true);
 
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
@@ -134,6 +137,14 @@ export class I_Format implements Format {
                 rt = cpu.registers.get(tokens[2]);
                 const offset = assembler.resolveLabel(
                     tokens[3],
+                    globals,
+                    labels,
+                    address,
+                );
+                immediate.set(offset);
+            } else if (param === "offset") {
+                const offset = assembler.resolveLabel(
+                    tokens[1],
                     globals,
                     labels,
                     address,
