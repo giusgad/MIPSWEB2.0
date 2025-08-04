@@ -24,6 +24,6 @@
     <% if (ctx.interfaceState === 'execute') { %>
     <div id="memory" <%if(ctx.memoryMapActive){%>class="map-active"<%}%>><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
     <div id="console"><%-await renderTemplate('/app/console.ejs', ctx)%></div>
-    <%if(ctx.memoryMapActive){%><div id="memorymap" class="map-active"><%-await renderTemplate('/app/memorymap.ejs', ctx)%></div><%}%>
+    <!--<%if(ctx.memoryMapActive){%><div id="memorymap" class="map-active"><%-await renderTemplate('/app/memorymap.ejs', ctx)%></div><%}%>-->
     <% } %>
 <%}%>
