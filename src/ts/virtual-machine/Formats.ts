@@ -195,7 +195,7 @@ export class I_Format implements Format {
                 );
             } else if (param === "rt, offset(base)") {
                 rt = cpu.registers.get(tokens[1]);
-                const offsetBaseMatch = tokens[2].match(/(-?\d+)\((\$\w+)\)/);
+                const offsetBaseMatch = tokens[2].match(/(-?\d*)\((\$\w+)\)/);
                 if (offsetBaseMatch != null) {
                     const offset = Number(offsetBaseMatch[1]);
                     immediate.set(offset);
