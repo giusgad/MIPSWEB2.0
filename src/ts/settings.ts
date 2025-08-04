@@ -37,20 +37,23 @@ export function clearMemorySelectedFormats() {
     }
 }
 
-export async function colFormatSelect(element: HTMLSelectElement) {
+export async function colFormatSelect(
+    element: HTMLButtonElement,
+    value: string,
+) {
     let settings = getFromStorage("local", "settings");
     if (!settings) {
         settings = default_settings;
     } else if (!settings.colsFormats) {
         settings.colsFormats = default_settings.colsFormats;
     }
-    settings.colsFormats[element.id] = element.value;
+    settings.colsFormats[element.id] = value;
     // memory and asm can only be visualized with word granularity, ascii can only be visualized by bytes
     if (element.id.startsWith("memory-value-format")) {
         const granularity_id = `memory-value-granularity_${element.dataset["id"]}`;
-        if (element.value === "ascii") {
+        if (value === "ascii") {
             settings.colsFormats[granularity_id] = "byte";
-        } else if (element.value === "asm" || element.value === "binary") {
+        } else if (value === "asm" || value === "binary") {
             settings.colsFormats[granularity_id] = "word";
         }
     }

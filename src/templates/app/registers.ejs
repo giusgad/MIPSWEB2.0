@@ -3,28 +3,38 @@
     <div class="table">
         <div class="cols-names">
             <div class="col name">
-                <div class="col-name">Register</div>
                 <div class="col-format">
-                    <select name="col-format" id="registers-name-format" onchange="colFormatSelectOnChange(this)">
-                        <%
-                        let nameFormat = (ctx.settings.colsFormats && ctx.settings.colsFormats['registers-name-format']) || "name";
-                        %>
-                        <option value="name" <%= nameFormat === "name" ? "selected" : "" %>>Name</option>
-                        <option value="number" <%= nameFormat === "number" ? "selected" : "" %>>Number</option>
-                    </select>
+                    <%
+                    const regNameValues = ["name", "number"]
+                    let nameFormat = (ctx.settings.colsFormats && ctx.settings.colsFormats['registers-name-format']) || "name";
+                    let currentName = regNameValues.indexOf(nameFormat) || 0;
+                    %>
+                    <button
+                      type="button"
+                      class="state-btn"
+                      id="registers-name-format"
+                      onclick="cycleStateBtn(this, colFormatSelectOnChange)"
+                      data-values="<%=regNameValues%>"
+                      data-current="<%=currentName%>"
+                    ><%=getStateBtnText(nameFormat)%></button>
                 </div>
             </div>
             <div class="col value">
                 <div class="col-name">Value</div>
                 <div class="col-format">
-                    <select name="col-format" id="registers-value-format" onchange="colFormatSelectOnChange(this)">
-                        <%
-                        let valueFormat = (ctx.settings.colsFormats && ctx.settings.colsFormats['registers-value-format']) || "decimal";
-                        %>
-                        <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
-                        <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                        <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
-                    </select>
+                    <%
+                    const regValOptions = ["decimal", "hexadecimal", "binary"]
+                    let valueFormat = (ctx.settings.colsFormats && ctx.settings.colsFormats['registers-value-format']) || "decimal";
+                    let currentVal = regValOptions.indexOf(valueFormat) || 0;
+                    %>
+                    <button
+                      type="button"
+                      class="state-btn"
+                      id="registers-value-format"
+                      onclick="cycleStateBtn(this, colFormatSelectOnChange)"
+                      data-values="<%=regValOptions%>"
+                      data-current="<%=currentVal%>"
+                    ><%=getStateBtnText(valueFormat)%></button>
                 </div>
             </div>
         </div>

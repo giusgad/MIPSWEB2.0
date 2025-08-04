@@ -16,15 +16,56 @@ import {
 import { hideFilePopover, showFilePopover } from "./popovers.js";
 import { assemble, stop, step, run, pause, vm } from "./virtual-machine.js";
 import { colFormatSelect } from "./settings.js";
-import { highlighInterval, toggleMemoryMap } from "./memorymap.js";
+import { highlightInterval, toggleMemoryMap } from "./memorymap.js";
 import { render } from "./rendering.js";
 
-(window as any).colFormatSelectOnChange = async function (
-    element: HTMLSelectElement,
+(window as any).cycleStateBtn = async function (
+    btn: HTMLButtonElement,
+    onchange: (btn: HTMLButtonElement, value: string) => Promise<void>,
 ) {
-    await colFormatSelect(element);
+    const values = btn.dataset["values"]?.split(",");
+    const curr = Number(btn.dataset["current"]);
+    if (isNaN(curr) || values == null) return;
+    const next = (curr + 1) % values.length;
+    btn.dataset["current"] = `${next}`;
+    const val = values[next];
+    btn.innerText = getStateBtnText(val);
+    await onchange(btn, val);
+};
+const getStateBtnText = function (val: string): string {
+    switch (val) {
+        case "decimal":
+            return "Dec";
+        case "uint":
+            return "Unsigned Int";
+        case "int":
+            return "Signed Int";
+        case "hexadecimal":
+        case "hex":
+            return "Hex";
+        case "binary":
+            return "Bin";
+        case "ascii":
+            return "ASCII";
+        case "asm":
+            return "Instruction";
+        case "name":
+            return "name";
+        case "number":
+            return "num";
+        default:
+            return val;
+    }
+};
+(window as any).getStateBtnText = getStateBtnText;
+
+(window as any).colFormatSelectOnChange = async function (
+    element: HTMLButtonElement,
+    value: string | undefined,
+) {
+    await colFormatSelect(element, value || element?.value);
     const id = element.id.split("_")[1];
-    highlighInterval(id, { behavior: "instant", block: "center" });
+    highlightInterval(id, { behavior: "instant", block: "center" });
 };
 
 (window as any).stepOnClick = async function () {

@@ -6,22 +6,27 @@
         <div class="cols-names">
           <div class="col tags"><div class="col-name"></div></div>
           <div class="col address">
-            <div class="col-name">Address</div>
+            <div class="col-name">Addr</div>
             <div class="col-format">
-              <select name="col-format" id="memory-address-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)">
                 <%
-                  let addressFormat = (interval.formats && interval.formats.address) || "decimal";
+                const addrValues = ["hexadecimal", "decimal"]
+                let addressFormat = (interval.formats && interval.formats.address) || "hexadecimal";
+                let currAddrValue = addrValues.indexOf(addressFormat) || 0;
                 %>
-                <option value="decimal" <%= addressFormat === "decimal" ? "selected" : "" %>>Decimal</option>
-                <option value="hexadecimal" <%= addressFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-              </select>
+                <button
+                  type="button"
+                  class="state-btn"
+                  id="memory-address-format_<%=interval.id%>" 
+                  onclick="cycleStateBtn(this, colFormatSelectOnChange)"
+                  data-values="<%=addrValues%>"
+                  data-current="<%=currAddrValue%>"
+                ><%=getStateBtnText(addressFormat)%></button>
             </div>
           </div>
           <div class="col value">
             <div class="col-name">Value</div>
             <%
               let valueFormat = (interval.formats && interval.formats.value) || "decimal";
-              let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";
             %>
             <div class="col-format">
               <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">
@@ -33,13 +38,25 @@
                 <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
                 <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>Instruction</option>
               </select>
-              <select name="col-format" id="memory-value-granularity_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">
-                <% if (valueFormat !== "ascii") { %><option value="word" <%= valueGranularity === "word" ? "selected" : "" %>>Word</option><%}%>
-                <% if (valueFormat != "binary" && valueFormat != "asm") { %>
-                  <% if (valueFormat !== "ascii") {%><option value="half" <%= valueGranularity === "half" ? "selected" : "" %>>Half</option><%}%>
-                  <option value="byte" <%= valueGranularity === "byte" ? "selected" : "" %>>Byte</option>
-                <%}%>
-              </select>
+              <%
+              let granularityValues = ["word", "half", "byte"];
+              if (valueFormat === "ascii") {
+                granularityValues = [ "byte" ];
+              } else if (["binary", "asm"].includes(valueFormat)) {
+                granularityValues = [ "word" ];
+              }
+              let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";;
+              let currentGranularity = granularityValues.indexOf(valueGranularity) || 0;
+              %>
+              <button
+                type="button"
+                class="state-btn"
+                id="memory-value-granularity_<%=interval.id%>" 
+                onclick="cycleStateBtn(this, colFormatSelectOnChange)"
+                data-values="<%=granularityValues%>"
+                data-current="<%=currentGranularity%>"
+                data-id="<%=interval.id%>"
+              ><%=getStateBtnText(valueGranularity)%></button>
             </div>
           </div>
         </div>
