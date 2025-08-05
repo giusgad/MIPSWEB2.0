@@ -26,17 +26,16 @@
           <div class="col value">
             <div class="col-name">Value</div>
             <%
+              const valueFormatOptions = ["int", "uint", "hexadecimal", "ascii", "binary", "asm"];
               let valueFormat = (interval.formats && interval.formats.value) || "decimal";
             %>
             <div class="col-format">
               <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">
-                <option value="decimal" <%= valueFormat === "decimal" ? "selected" : "" %>>Decimal</option>
-                <option value="int" <%= valueFormat === "int" ? "selected" : "" %>>Signed int</option>
-                <option value="uint" <%= valueFormat === "uint" ? "selected" : "" %>>Unsigned int</option>
-                <option value="hexadecimal" <%= valueFormat === "hexadecimal" ? "selected" : "" %>>Hexadecimal</option>
-                <option value="ascii" <%= valueFormat === "ascii" ? "selected" : "" %>>ASCII</option>
-                <option value="binary" <%= valueFormat === "binary" ? "selected" : "" %>>Binary</option>
-                <option value="asm" <%= valueFormat === "asm" ? "selected" : "" %>>Instruction</option>
+                <%valueFormatOptions.forEach(val => {%>
+                <option value="<%=val%>" <%=valueFormat === val ? "selected" : ""%>>
+                  <%=getStateBtnText(val, true)%>
+                </option>
+                <%})%>
               </select>
               <%
               let granularityValues = ["word", "half", "byte"];

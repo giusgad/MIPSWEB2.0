@@ -14,9 +14,9 @@ export const default_settings = {
     theme: "auto",
     colsFormats: {
         "registers-name-format": "name",
-        "registers-value-format": "decimal",
+        "registers-value-format": "int",
         "memory-address-format": "hexadecimal",
-        "memory-value-format": "decimal",
+        "memory-value-format": "int",
         "memory-value-granularity": "word",
     },
 };

@@ -32,27 +32,27 @@ import { render } from "./rendering.js";
     btn.innerText = getStateBtnText(val);
     await onchange(btn, val);
 };
-const getStateBtnText = function (val: string): string {
+const getStateBtnText = function (val: string, long: boolean = false): string {
     switch (val) {
         case "decimal":
-            return "Dec";
+            return long ? "Decimal" : "Dec";
         case "uint":
-            return "Unsigned Int";
+            return long ? "Unsigned Int" : "Uint";
         case "int":
-            return "Signed Int";
+            return long ? "Signed Int" : "Int";
         case "hexadecimal":
         case "hex":
-            return "Hex";
+            return long ? "Hexadecimal" : "Hex";
         case "binary":
-            return "Bin";
+            return long ? "Binary" : "Bin";
         case "ascii":
             return "ASCII";
         case "asm":
-            return "Instruction";
+            return long ? "Instruction" : "Asm";
         case "name":
-            return "name";
+            return "Name";
         case "number":
-            return "num";
+            return long ? "number" : "Num";
         default:
             return val;
     }
