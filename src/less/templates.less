@@ -1,5 +1,8 @@
 @import "variables.less";
 
+@width-registers: 20%;
+@width-memory: 40%;
+
 #app {
   position: absolute;
   top: 0;
@@ -20,13 +23,15 @@
   position: absolute;
   top: calc(@toolbar-h * 2);
   left: @sidebar-w-close;
-  right: 20%;
+  right: @width-registers;
   height: @toolbar-h;
   &.sidebar-open {
     left: @sidebar-w-open;
   }
   &.execute {
     left: 0;
+  }
+  &.memory-shown {
     right: 60%;
   }
 }
@@ -35,14 +40,18 @@
   position: absolute;
   top: calc(@toolbar-h * 3);
   left: @sidebar-w-close;
-  right: 20%;
+  right: @width-registers;
   bottom: 0;
   &.sidebar-open {
     left: @sidebar-w-open;
   }
-  &.execute {
-    left: 0;
+  &.memory-shown {
     right: 60%;
+  }
+  &.execute {
+    left: 0; // hides sidebar
+  }
+  &.console-shown {
     bottom: 25%;
   }
 }
@@ -51,24 +60,30 @@
   position: absolute;
   top: calc(@toolbar-h * 2);
   left: 80%;
-  width: 20%;
+  width: @width-registers;
   bottom: 0;
 }
 
 #memory {
   position: absolute;
   top: calc(@toolbar-h * 2);
-  left: 40%;
-  width: 40%;
+  right: @width-registers;
+  width: @width-memory;
   bottom: 0;
 }
 
 #console {
   position: absolute;
   left: 0;
-  height: 25%;
   bottom: 0;
-  width: 40%;
+  height: 0%;
+  width: calc(100% - @width-registers);
+  &.console-shown {
+    height: 25%;
+  }
+  &.memory-shown {
+    width: calc(100% - @width-registers - @width-memory);
+  }
 }
 
 #sidebar-content {

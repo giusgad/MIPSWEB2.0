@@ -1,4 +1,8 @@
 <div class="component">
+  <div class="button default toggle-btn" onclick="toggleMemoryOnClick();">
+      <div class="icon gray-4"><%-ctx.memoryShown ? Icons.render('angleDown') : Icons.render('angleUp')%></div>
+      <div class="label"><%= ctx.memoryShown ? "Hide memory" : "Show Memory"%></div>
+  </div>
   <div class="title">Memory</div>
   <div class="tables">
     <%ctx.memoryIntervals.forEach((interval) => {%>
@@ -27,7 +31,7 @@
             <div class="col-name">Value</div>
             <%
               const valueFormatOptions = ["int", "uint", "hexadecimal", "ascii", "binary", "asm"];
-              let valueFormat = (interval.formats && interval.formats.value) || "decimal";
+              let valueFormat = (interval.formats && interval.formats.value) || "int";
             %>
             <div class="col-format">
               <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">

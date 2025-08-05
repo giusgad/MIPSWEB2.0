@@ -11,7 +11,7 @@ import { Colors } from "./lib/Colors.js";
 import { addClass, removeClass } from "./utils.js";
 import { sidebar } from "./sidebar.js";
 import { editorState, interfaceState, renderApp } from "./app.js";
-import { vm } from "./virtual-machine.js";
+import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
 
 export type editor = {
     fileId: number;
@@ -141,6 +141,16 @@ export function resizeEditors() {
         addClass("execute", "editors");
     } else {
         removeClass("execute", "editors");
+    }
+    if (memoryShown) {
+        addClass("memory-shown", "editors");
+    } else {
+        removeClass("memory-shown", "editors");
+    }
+    if (consoleShown) {
+        addClass("console-shown", "editors");
+    } else {
+        removeClass("console-shown", "editors");
     }
     if (sidebar) {
         document.getElementById("editors")!.classList.add("sidebar-open");

@@ -4,10 +4,9 @@ import { Colors } from "./lib/Colors.js";
 import { getFiles, getOpenedFiles, getSelectedFile } from "./files.js";
 import { sidebar } from "./sidebar.js";
 import { editorState, interfaceState } from "./app.js";
-import { vm } from "./virtual-machine.js";
+import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
 import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
-import { memoryMapActive } from "./memorymap.js";
 import { getMemoryIntervals } from "./intervals.js";
 
 declare const ejs: any;
@@ -23,7 +22,8 @@ export function getContext() {
         editorState: editorState,
         settings: getFromStorage("local", "settings"),
         memoryIntervals: getMemoryIntervals(),
-        memoryMapActive: memoryMapActive,
+        memoryShown: memoryShown,
+        consoleShown: consoleShown,
         selectedInstructionAddresses: getSelectedInstructionAddresses(),
         vm: vm,
     };

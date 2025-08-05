@@ -19,11 +19,16 @@
 <%}%>
 
 <% if (ctx.openedFiles.length > 0) { %>
-    <div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% } else if (ctx.sidebar) { %>sidebar-open<% } %>"><%- await renderTemplate('/app/opened-files.ejs', ctx) %></div>
+
+    <div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% }%> <%=ctx.memoryShown?"memory-shown":""%> <%=ctx.sidebar?"sidebar-open":""%>">
+      <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
+    </div>
+
     <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
-    <% if (ctx.interfaceState === 'execute') { %>
-    <div id="memory" <%if(ctx.memoryMapActive){%>class="map-active"<%}%>><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
-    <div id="console"><%-await renderTemplate('/app/console.ejs', ctx)%></div>
-    <!--<%if(ctx.memoryMapActive){%><div id="memorymap" class="map-active"><%-await renderTemplate('/app/memorymap.ejs', ctx)%></div><%}%>-->
-    <% } %>
+
+    <% if (ctx.memoryShown) {%><div id="memory"><%-await renderTemplate('/app/memory.ejs', ctx)%></div><%}%>
+
+    <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
+      <%-await renderTemplate('/app/console.ejs', ctx)%>
+    </div>
 <%}%>

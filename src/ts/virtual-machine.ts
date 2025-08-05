@@ -10,15 +10,25 @@ import { Binary } from "./virtual-machine/Utils.js";
 import { render } from "./rendering.js";
 
 export const vm = new VirtualMachine(new CPU());
+export let memoryShown = false;
+export let consoleShown = false;
+
+export function setMemoryShown(val: boolean) {
+    memoryShown = val;
+}
+
+export function setConsoleShown(val: boolean) {
+    consoleShown = val;
+}
 
 export async function assemble(files: file[]) {
     vm.assemble(files);
-    await renderApp("execute", "execute");
     if (vm.nextInstructionEditorPosition) {
         await changeFile(vm.nextInstructionEditorPosition.fileId);
         selectNextInstruction();
         moveCursorToNextInstruction();
     }
+    await renderApp("execute", "execute");
 }
 
 export async function stop() {
@@ -37,9 +47,11 @@ export async function step() {
         selectNextInstruction();
         moveCursorToNextInstruction();
     }
-    await render("memory", "/app/memory.ejs", undefined, false);
+    if (memoryShown)
+        await render("memory", "/app/memory.ejs", undefined, false);
     await render("registers", "/app/registers.ejs", undefined, false);
-    await render("console", "/app/console.ejs", undefined, false);
+    if (consoleShown)
+        await render("console", "/app/console.ejs", undefined, false);
 }
 
 export async function run() {

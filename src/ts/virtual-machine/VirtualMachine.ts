@@ -37,6 +37,8 @@ export class VirtualMachine {
 
     assemble(files: file[]) {
         this.stop();
+        this.assembler.reset();
+        this.cpu.reset();
         try {
             this.assembler.assembleFiles(files);
             this.nextInstructionEditorPosition =
@@ -58,8 +60,6 @@ export class VirtualMachine {
     }
 
     reset() {
-        this.cpu.reset();
-        this.assembler.reset();
         this.running = false;
         this.nextInstructionEditorPosition = undefined;
         this.lastChangedRegister = undefined;

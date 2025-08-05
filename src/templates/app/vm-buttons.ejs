@@ -22,6 +22,6 @@
     <% } %>
     <div class="button default" onclick="assembleOnClick()">
         <div class="icon gray-4"><%-Icons.render('assemble')%></div>
-        <div class="label">Assemble</div>
+        <div class="label"><%=ctx.vm.running ? "Reset" : "Assemble"%></div>
     </div>
 </div>

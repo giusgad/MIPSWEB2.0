@@ -1,4 +1,5 @@
 import { renderApp } from "../app.js";
+import { setConsoleShown } from "../virtual-machine.js";
 
 type LineSeverity = "success" | "error" | "warn";
 type ConsoleLine = {
@@ -21,6 +22,7 @@ export class Console {
             waitingInput: false,
             isPrintString: false,
         });
+        setConsoleShown(true);
     }
 
     /**Used for the print_string syscall, if the last line was printed with a syscall, appends to it.*/
@@ -40,6 +42,7 @@ export class Console {
                 });
             }
         }
+        setConsoleShown(true);
     }
 
     async clear() {

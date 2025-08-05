@@ -1,5 +1,9 @@
 <div class="component">
     <div class="title">Registers</div>
+    <div class="button default toggle-btn <%=ctx.memoryShown ? "memory-shown" : ""%>" onclick="toggleMemoryOnClick();">
+        <div class="icon gray-4"><%-ctx.memoryShown ? Icons.render('angleDown') : Icons.render('angleUp')%></div>
+        <div class="label"><%= ctx.memoryShown ? "Hide memory" : "Show Memory"%></div>
+    </div>
     <div class="table">
         <div class="cols-names">
             <div class="col name">

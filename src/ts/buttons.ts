@@ -14,10 +14,22 @@ import {
     renameFile,
 } from "./files.js";
 import { hideFilePopover, showFilePopover } from "./popovers.js";
-import { assemble, stop, step, run, pause, vm } from "./virtual-machine.js";
+import {
+    assemble,
+    stop,
+    step,
+    run,
+    pause,
+    vm,
+    memoryShown,
+    setMemoryShown,
+    setConsoleShown,
+    consoleShown,
+} from "./virtual-machine.js";
 import { colFormatSelect } from "./settings.js";
 import { highlightInterval, toggleMemoryMap } from "./memorymap.js";
 import { render } from "./rendering.js";
+import { renderApp } from "./app.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -82,11 +94,14 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).stopOnClick = async function () {
+    setConsoleShown(false);
+    setMemoryShown(false);
     await stop();
 };
 
 (window as any).assembleOnClick = async function () {
     const openedFiles = getOpenedFiles();
+    setMemoryShown(true);
     await assemble(openedFiles);
 };
 
@@ -112,8 +127,13 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     await toggleSidebar(sidebarButton);
 };
 
-(window as any).toggleMemoryMapOnClick = async function () {
-    await toggleMemoryMap();
+(window as any).toggleMemoryOnClick = async function () {
+    setMemoryShown(!memoryShown);
+    await renderApp();
+};
+(window as any).toggleConsoleOnClick = async function () {
+    setConsoleShown(!consoleShown);
+    await renderApp();
 };
 
 (window as any).newFileOnClick = async function () {
