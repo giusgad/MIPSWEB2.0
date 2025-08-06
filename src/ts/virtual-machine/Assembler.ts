@@ -182,8 +182,13 @@ export class Assembler {
         }
 
         globals.forEach((value, key) => {
-            if (value === undefined) {
-                globals.delete(key);
+            if (value == null) {
+                const addr = labels.get(key);
+                if (addr) globals.set(key, addr);
+                if (!addr)
+                    throw new Error(
+                        `Global declaration ".globl ${key}" has no corresponding label.`,
+                    );
             }
         });
     }
