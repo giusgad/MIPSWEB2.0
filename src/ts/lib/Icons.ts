@@ -51,6 +51,10 @@ export class Icons {
                 path: "M384 256L0 32V480L384 256z",
                 viewBox: "0 0 384 512",
             },
+            rewind: {
+                path: "M6 14H8L8 9L13 14H15L15 2H13L8 7L8 2H6L0 8L6 14Z",
+                viewBox: "0 0 16 16",
+            },
             pause: {
                 path: "M7 1H2V15H7V1Z M14 1H9V15H14V1Z",
                 viewBox: "0 0 16 16",

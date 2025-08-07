@@ -72,7 +72,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 (window as any).getStateBtnText = getStateBtnText;
 
 (window as any).colFormatSelectOnChange = async function (
-    element: HTMLButtonElement,
+    element: HTMLButtonElement | HTMLSelectElement,
     value: string | undefined,
 ) {
     await colFormatSelect(element, value || element?.value);

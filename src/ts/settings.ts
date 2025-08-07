@@ -38,7 +38,7 @@ export function clearMemorySelectedFormats() {
 }
 
 export async function colFormatSelect(
-    element: HTMLButtonElement,
+    element: HTMLButtonElement | HTMLSelectElement,
     value: string,
 ) {
     let settings = getFromStorage("local", "settings");
