@@ -17,8 +17,9 @@ export function setMemoryShown(val: boolean) {
     memoryShown = val;
 }
 
-export function setConsoleShown(val: boolean) {
+export async function setConsoleShown(val: boolean) {
     consoleShown = val;
+    await renderApp();
 }
 
 export async function assemble(files: file[]) {

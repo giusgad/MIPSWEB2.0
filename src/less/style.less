@@ -7,6 +7,7 @@
 
 @border-gray-10: solid 1px var(--rgb-gray-10);
 @border-gray-11: solid 1px var(--rgb-gray-11);
+
 .after-whiteout() {
   content: "";
   position: absolute;
@@ -34,6 +35,11 @@
   left: calc(-@h / 2 - @w / 2);
   transform: rotate(-90deg);
   border-radius: 4px 4px 0 0;
+}
+
+.memory-addr-style {
+  background-color: var(--rgb-gray-11);
+  border: 0.5px solid var(--rgb-gray-10);
 }
 
 body {
@@ -152,6 +158,9 @@ body {
 
   .cols-names {
     display: flex;
+    & > .col {
+      border: none !important;
+    }
 
     .col {
       display: flex;
@@ -288,6 +297,7 @@ body {
         &.name {
           width: calc(1% * 25);
           min-width: 6ch;
+          .memory-addr-style();
         }
 
         &.value {
@@ -364,13 +374,13 @@ body {
 
               &.tags {
                 display: flex;
-                flex-wrap: nowrap;
+                flex-wrap: wrap;
                 .static-tags {
                   flex: 1;
                   display: flex;
                   justify-content: flex-start;
                   align-items: center;
-                  flex-wrap: nowrap;
+                  flex-wrap: wrap;
                 }
 
                 .dynamic-tags {
@@ -378,7 +388,7 @@ body {
                   display: flex;
                   justify-content: flex-end;
                   align-items: center;
-                  flex-wrap: nowrap;
+                  flex-wrap: wrap;
                 }
 
                 .tag {
@@ -425,7 +435,7 @@ body {
           &.address {
             width: calc(100% / 100 * 25);
             min-width: 11ch;
-            background-color: var(--rgb-gray-10);
+            .memory-addr-style();
           }
 
           &.value {
@@ -547,7 +557,6 @@ body {
   }
 
   &.waiting-input {
-    //border: 1px solid var(--rib-gray-9);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   }
 }

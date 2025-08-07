@@ -94,8 +94,6 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).stopOnClick = async function () {
-    setConsoleShown(false);
-    setMemoryShown(false);
     await stop();
 };
 
@@ -132,8 +130,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     await renderApp();
 };
 (window as any).toggleConsoleOnClick = async function () {
-    setConsoleShown(!consoleShown);
-    await renderApp();
+    await setConsoleShown(!consoleShown);
 };
 
 (window as any).newFileOnClick = async function () {
