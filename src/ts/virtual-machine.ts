@@ -48,11 +48,19 @@ export async function step() {
         selectNextInstruction();
         moveCursorToNextInstruction();
     }
-    if (memoryShown)
-        await render("memory", "/app/memory.ejs", undefined, false);
-    await render("registers", "/app/registers.ejs", undefined, false);
-    if (consoleShown)
-        await render("console", "/app/console.ejs", undefined, false);
+    // last call was most likely a syscall, rerender everything. Syscalls halting the cpu otherwise generate ui glitches.
+    if (
+        vm.lastReadRegisters?.length === 1 &&
+        vm.lastReadRegisters[0] === "$v0"
+    ) {
+        await renderApp(undefined, undefined, false);
+    } else {
+        if (memoryShown)
+            await render("memory", "/app/memory.ejs", undefined, false);
+        await render("registers", "/app/registers.ejs", undefined, false);
+        if (consoleShown)
+            await render("console", "/app/console.ejs", undefined, false);
+    }
 }
 
 export async function run() {
