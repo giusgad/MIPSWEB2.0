@@ -19,6 +19,7 @@ import {
 import { clearMemorySelectedFormats, default_settings } from "./settings.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 import { endDrag } from "./drag.js";
+import { stop } from "./virtual-machine.js";
 
 let online = false;
 initLoaders();
@@ -64,6 +65,13 @@ window.addEventListener("offline", () => {
 
 window.addEventListener("resize", () => {
     hideFilePopover();
+});
+
+// clicking editor while executing goes back to edit state
+document.getElementById("editors")?.addEventListener("click", () => {
+    if (editorState === "execute") {
+        stop();
+    }
 });
 
 /* window.addEventListener("focus", async () => {
