@@ -1,6 +1,7 @@
 import { Binary } from "./Utils.js";
 import { Assembler } from "./Assembler";
 import { assert } from "console";
+import { intFromStr } from "../utils.js";
 
 export abstract class Directive {
     abstract assemble(
@@ -214,7 +215,7 @@ export class spaceDirective extends Directive {
     }
 
     size(tokens: string[]): number {
-        const spaceAmount = parseInt(tokens[0]);
+        const spaceAmount = intFromStr(tokens[0]);
         return spaceAmount;
     }
 }
@@ -233,7 +234,7 @@ export class alignDirective extends Directive {
     }
 
     size(tokens: string[], address: number): number {
-        const n = parseInt(tokens[0]);
+        const n = intFromStr(tokens[0]);
         const alignment = 2 ** n;
         const filled = address % alignment;
         // already aligned

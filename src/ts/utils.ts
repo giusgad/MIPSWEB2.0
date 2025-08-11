@@ -1,3 +1,12 @@
+/**Gets an integer from a string, throws if the string is not strictly a numeric value*/
+export function intFromStr(str: string): number {
+    const num = Number(str);
+    if (str === "" || isNaN(num)) {
+        throw new Error(`Invalid literal: "${str}" is not a number.`);
+    }
+    return num;
+}
+
 export function getFromStorage(storage: "local" | "session", key: string): any {
     let item = undefined;
     if (storage === "local") {

@@ -3,6 +3,7 @@ import { Instruction } from "./Instructions.js";
 import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { register } from "./Registers.js";
+import { intFromStr } from "../utils.js";
 
 export interface Format {
     assemble(
@@ -48,7 +49,7 @@ export class R_Format implements Format {
             if (param === "rd, rt, sa") {
                 rd = cpu.registers.get(tokens[1]);
                 rt = cpu.registers.get(tokens[2]);
-                shamt.set(Number(tokens[3]));
+                shamt.set(intFromStr(tokens[3]));
             } else if (param === "rd, rt, rs") {
                 rd = cpu.registers.get(tokens[1]);
                 rt = cpu.registers.get(tokens[2]);
@@ -173,22 +174,22 @@ export class I_Format implements Format {
                     ].includes(instruction.symbol)
                 ) {
                     // immediate signed
-                    immediate.set(Number(tokens[3]));
+                    immediate.set(intFromStr(tokens[3]));
                 } else if (
                     ["ANDI", "ORI", "XORI"].includes(instruction.symbol)
                 ) {
                     // immediate unsigned
-                    immediate.set(Number(tokens[3]), false);
+                    immediate.set(intFromStr(tokens[3]), false);
                 } else
                     console.error(
                         `Unhandled I-format instruction: ${instruction.symbol} ${param}`,
                     );
             } else if (param === "rt, immediate") {
                 rt = cpu.registers.get(tokens[1]);
-                immediate.set(Number(tokens[2]));
+                immediate.set(intFromStr(tokens[2]));
             } else if (param === "rs, immediate") {
                 rs = cpu.registers.get(tokens[1]);
-                immediate.set(Number(tokens[2]));
+                immediate.set(intFromStr(tokens[2]));
             } else if (param === "cop_fun") {
                 throw new Error(
                     `TO-DO: Assemble I ${instruction.symbol} ${param}`,
@@ -197,7 +198,7 @@ export class I_Format implements Format {
                 rt = cpu.registers.get(tokens[1]);
                 const offsetBaseMatch = tokens[2].match(/(-?\d*)\((\$\w+)\)/);
                 if (offsetBaseMatch != null) {
-                    const offset = Number(offsetBaseMatch[1]);
+                    const offset = intFromStr(offsetBaseMatch[1]);
                     immediate.set(offset);
                     const base = cpu.registers.get(offsetBaseMatch[2]);
                     rs = base;
