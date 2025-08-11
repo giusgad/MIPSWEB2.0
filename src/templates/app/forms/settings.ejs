@@ -1,0 +1,41 @@
+<form class="form settings" method="POST" onsubmit="return saveSettings(event)">
+    <div class="title">Settings</div>
+    <div>
+      <%ctx.possibleOptions.forEach(section => {%>
+        <fieldset class="section">
+          <legend class="title"><%=section.name%></legend>
+          <%section.settings.forEach(opt => {
+            const currVal = ctx.settings.options[opt.name]%>
+            <div>
+              <label for="<%=opt.name%>"><%=opt.desc%></label>
+              <%switch (opt.inputType) {
+                case "checkbox":%>
+                  <input type="checkbox" id="<%=opt.name%>" name="<%=opt.name%>" <%=currVal?"checked":""%>/>
+                <%break;
+                case "dropdown":%>
+                  <select id="<%=opt.name%>" name="<%=opt.name%>">
+                    <%opt.dropdownOptions.forEach(o => {%>
+                      <option value="<%=o.value%>" <%=currVal === o.value ? "selected" : ""%>>
+                        <%=o.desc%>
+                      </option>
+                    <%})%>
+                  </select>
+              <%
+              }
+              %>
+            </div>
+          <%})%>
+        </fieldset>
+      <%})%>
+    </div>
+    <div class="buttons">
+        <button class="button default" onclick="hideFormOnClick();">
+            <div class="icon gray-4"><%-Icons.render('x')%></div>
+            <div class="label">Cancel</div>
+        </button>
+        <button class="button default" type="submit">
+            <div class="icon gray-4"><%-Icons.render('save')%></div>
+            <div class="label">Save settings</div>
+        </button>
+    </div>
+</form>

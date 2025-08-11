@@ -8,6 +8,7 @@ import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
 import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
 import { getMemoryIntervals } from "./intervals.js";
+import { possibleOptions } from "./settings.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -20,7 +21,10 @@ export function getContext() {
         sidebar: sidebar,
         interfaceState: interfaceState,
         editorState: editorState,
+        /** currently set options*/
         settings: getFromStorage("local", "settings"),
+        /** possible options as defined in settings.ts*/
+        possibleOptions: possibleOptions,
         memoryIntervals: getMemoryIntervals(),
         memoryShown: memoryShown,
         consoleShown: consoleShown,

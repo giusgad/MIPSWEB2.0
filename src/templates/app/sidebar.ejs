@@ -3,5 +3,8 @@
         <div class="button <%if(ctx.sidebar === 'all-files'){%>active<%}%>" onclick="toggleSidebarOnClick('all-files')">
             <div class="icon gray-4"><%-Icons.render('files')%></div>
         </div>
+        <div class="button" onclick="showFormOnClick('settings')">
+            <div class="icon gray-4"><%-Icons.render('settings')%></div>
+        </div>
     </div>
 </div>

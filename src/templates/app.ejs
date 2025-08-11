@@ -14,7 +14,10 @@
 </div>
 
 <% if ((ctx.files.length > 0) && ctx.interfaceState === 'edit') { %>
-<div id="sidebar" <%if(ctx.sidebar){%>class="sidebar-open"<%}%>><%-await renderTemplate('/app/sidebar.ejs', ctx)%></div>
+<div id="sidebar" class="<%=ctx.sidebar?"sidebar-open":""%> <%=ctx.consoleShown?"console-shown":""%>">
+  <%-await renderTemplate('/app/sidebar.ejs', ctx)%>
+</div>
+
 <%if (ctx.sidebar === 'all-files') {%><div id="sidebar-content"><%-await renderTemplate('/app/sidebar-contents/all-files.ejs', ctx)%></div><%}%>
 <%}%>
 

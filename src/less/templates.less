@@ -2,6 +2,7 @@
 
 @width-registers: 20%;
 @width-memory: 40%;
+@height-console: 25%;
 
 #app {
   position: absolute;
@@ -17,6 +18,9 @@
   left: 0;
   width: @sidebar-w-close;
   bottom: 0;
+  &.console-shown {
+    bottom: @height-console;
+  }
 }
 
 #opened-files {
@@ -79,7 +83,7 @@
   height: 0%;
   width: calc(100% - @width-registers);
   &.console-shown {
-    height: 25%;
+    height: @height-console;
   }
   &.memory-shown {
     width: calc(100% - @width-registers - @width-memory);
