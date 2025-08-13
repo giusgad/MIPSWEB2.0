@@ -10,10 +10,28 @@ window
         Colors.generateCSSVariables();
         updateEditorsTheme();
     });
+// load setting from query string if set
+window.addEventListener("load", () => {
+    const params = new URLSearchParams(window.location.search);
+    const queryFlags = params.get("opts");
+    if (queryFlags != null) {
+        const newOpts = optsFromFlags(queryFlags);
+        updateOpts(newOpts);
+
+        // remove opts from the url
+        params.delete("opts");
+        const newUrl =
+            window.location.pathname +
+            (params.toString() ? "?" + params.toString() : "");
+        history.replaceState(null, "", newUrl);
+    }
+});
 
 type setting = {
     name: string;
     desc: string;
+    /**Invariant: all flags must start with a capital letter.
+     * Note: in case inputType is "checkbox" the flag becomes `${flag}${optionValue}` */
     flag: string;
     defaultValue: any;
     inputType: settingsInput;
@@ -21,11 +39,66 @@ type setting = {
     dropdownOptions?: dropdownOptions;
 };
 type dropdownOptions = { value: string; desc: string }[];
-type settingsInput = "checkbox" | "text" | "dropdown";
+type settingsInput = "checkbox" | "dropdown";
 type settingsSection = {
     name: string;
     settings: setting[];
 };
+
+/**Retrives the current value of a setting and returns the corrseponding flag encoding*/
+function settingToFlag(opt: setting): string {
+    const opts = getFromStorage("local", "settings").options;
+    const currVal = opts[opt.name];
+    let s = "";
+    switch (opt.inputType) {
+        // flag is only shown if the value is true
+        case "checkbox":
+            if (currVal) s = opt.flag;
+        case "dropdown":
+            s = `${opt.flag}${currVal}`;
+    }
+    return s;
+}
+
+function optsFromFlags(queryFlags: string): { [key: string]: any } {
+    const opts: { [key: string]: any } = {};
+    if (queryFlags === "") return opts;
+    // split by whitespace
+    const flags = queryFlags.split(/(?=[A-Z])/);
+    for (const opt of possibleOptions.flatMap((sect) => sect.settings)) {
+        for (const flag of flags) {
+            if (flag.startsWith(opt.flag)) {
+                switch (opt.inputType) {
+                    case "checkbox":
+                        opts[opt.name] = true;
+                        break;
+                    case "dropdown":
+                        const value = flag.slice(opt.flag.length);
+                        if (opt.dropdownOptions!.find((v) => v.value === value))
+                            opts[opt.name] = value;
+                        break;
+                }
+            }
+        }
+    }
+    return opts;
+}
+
+/**Merges the currently saved options in localStorage, overwriting them with values from newOpts if present.
+ * Note that boolean values are all set to false before merging with the new options, which mean that any option
+ * that needs to be true, has to be specified in the opts.*/
+export function updateOpts(newOpts: { [key: string]: any }) {
+    const settings = getFromStorage("local", "settings");
+    // set all the boolean options to false, because only the one in newOpts are set to true
+    const oldOpts = settings.options;
+    for (const [key, val] of Object.entries(oldOpts)) {
+        if (typeof val === "boolean") {
+            oldOpts[key] = false;
+        }
+    }
+    settings.options = { ...oldOpts, ...newOpts };
+    setIntoStorage("local", "settings", settings);
+}
 
 export const possibleOptions: settingsSection[] = [
     {
@@ -48,12 +121,12 @@ export const possibleOptions: settingsSection[] = [
             {
                 name: "entry-point",
                 desc: "Where to initialize the program counter",
-                flag: "s",
+                flag: "S",
                 defaultValue: "main",
                 inputType: "dropdown",
                 dropdownOptions: [
                     { value: "main", desc: "Global main" },
-                    { value: "currFile", desc: "Current file .text" },
+                    { value: "curr", desc: "Current file .text" },
                 ],
             },
         ],
@@ -146,14 +219,12 @@ export async function colFormatSelect(
                 if (!opt) continue;
                 val = rawVal;
                 break;
-            case "text":
             default:
                 val = rawVal;
         }
         settings.options[name] = val;
     }
     setIntoStorage("local", "settings", settings);
-    console.log(getFromStorage("local", "settings").options);
     await hideForm();
     await renderApp();
 };
