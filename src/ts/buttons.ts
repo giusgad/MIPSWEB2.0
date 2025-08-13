@@ -77,7 +77,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 ) {
     await colFormatSelect(element, value || element?.value);
     const id = element.id.split("_")[1];
-    highlightInterval(id, { behavior: "instant", block: "center" });
+    highlightInterval(id, { behavior: "instant", block: "end" });
 };
 
 (window as any).stepOnClick = async function () {
