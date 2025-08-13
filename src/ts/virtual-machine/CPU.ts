@@ -5,6 +5,7 @@ import { Binary } from "./Utils.js";
 import { Memory } from "./Memory.js";
 import { Syscalls } from "./Syscalls.js";
 import { VirtualMachine } from "./VirtualMachine.js";
+import { getOptions } from "../settings.js";
 
 export class CPU {
     instructionsSet: Instructions = new Instructions();
@@ -158,8 +159,13 @@ export class CPU {
     }
 
     reset() {
-        this.memory.reset();
-        this.registers.reset();
+        const opts = getOptions();
+        if (opts["reset-mem"] === true) {
+            this.memory.reset();
+        }
+        if (opts["reset-regs"] === true) {
+            this.registers.reset();
+        }
         this.pc.set(0);
         this.lo.set(0);
         this.hi.set(0);

@@ -3,6 +3,7 @@ import { Colors } from "./lib/Colors.js";
 import { updateEditorsTheme } from "./editors.js";
 import { renderApp } from "./app.js";
 import { hideForm } from "./forms.js";
+import { render } from "./rendering.js";
 
 window
     .matchMedia("(prefers-color-scheme: dark)")
@@ -27,26 +28,36 @@ window.addEventListener("load", () => {
     }
 });
 
-type setting = {
+type Setting = {
     name: string;
     desc: string;
     /**Invariant: all flags must start with a capital letter.
      * Note: in case inputType is "checkbox" the flag becomes `${flag}${optionValue}` */
     flag: string;
     defaultValue: any;
-    inputType: settingsInput;
+    inputType: SettingsInput;
     /**Needs to be used if inputType is "dropdown"*/
-    dropdownOptions?: dropdownOptions;
+    dropdownOptions?: DropdownOptions;
 };
-type dropdownOptions = { value: string; desc: string }[];
-type settingsInput = "checkbox" | "dropdown";
-type settingsSection = {
+type DropdownOptions = { value: string; desc: string }[];
+type SettingsInput = "checkbox" | "dropdown";
+type SettingsSection = {
     name: string;
-    settings: setting[];
+    settings: Setting[];
 };
 
+export type OptionName =
+    (typeof possibleOptions)[number]["settings"][number]["name"];
+export type OptionsObject = {
+    [K in OptionName]?: any;
+};
+
+export function getOptions(): OptionsObject {
+    return getFromStorage("local", "settings").options;
+}
+
 /**Retrives the current value of a setting and returns the corrseponding flag encoding*/
-function settingToFlag(opt: setting): string {
+function settingToFlag(opt: Setting): string {
     const opts = getFromStorage("local", "settings").options;
     const currVal = opts[opt.name];
     let s = "";
@@ -60,8 +71,8 @@ function settingToFlag(opt: setting): string {
     return s;
 }
 
-function optsFromFlags(queryFlags: string): { [key: string]: any } {
-    const opts: { [key: string]: any } = {};
+function optsFromFlags(queryFlags: string): OptionsObject {
+    const opts: OptionsObject = {};
     if (queryFlags === "") return opts;
     // split by whitespace
     const flags = queryFlags.split(/(?=[A-Z])/);
@@ -87,7 +98,7 @@ function optsFromFlags(queryFlags: string): { [key: string]: any } {
 /**Merges the currently saved options in localStorage, overwriting them with values from newOpts if present.
  * Note that boolean values are all set to false before merging with the new options, which mean that any option
  * that needs to be true, has to be specified in the opts.*/
-export function updateOpts(newOpts: { [key: string]: any }) {
+export function updateOpts(newOpts: OptionsObject) {
     const settings = getFromStorage("local", "settings");
     // set all the boolean options to false, because only the one in newOpts are set to true
     const oldOpts = settings.options;
@@ -100,7 +111,7 @@ export function updateOpts(newOpts: { [key: string]: any }) {
     setIntoStorage("local", "settings", settings);
 }
 
-export const possibleOptions: settingsSection[] = [
+export const possibleOptions = [
     {
         name: "Execution",
         settings: [
@@ -131,7 +142,7 @@ export const possibleOptions: settingsSection[] = [
             },
         ],
     },
-] as const;
+] as const satisfies readonly SettingsSection[];
 
 // EXTRACTED for ease of use later
 const optionNames = possibleOptions.flatMap((section) =>
@@ -198,7 +209,10 @@ export async function colFormatSelect(
         }
     }
     setIntoStorage("local", "settings", settings);
-    await renderApp();
+    if (element.id.startsWith("memory"))
+        await render("memory", "/app/memory.ejs", undefined, false);
+    if (element.id.startsWith("register"))
+        await render("registers", "/app/registers.ejs", undefined, false);
 }
 
 (window as any).saveSettings = async function (event: SubmitEvent) {
