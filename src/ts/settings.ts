@@ -53,7 +53,7 @@ export type OptionsObject = {
 };
 
 export function getOptions(): OptionsObject {
-    return getFromStorage("local", "settings").options;
+    return getFromStorage("local", "settings").options ?? default_options;
 }
 
 /**Retrives the current value of a setting and returns the corrseponding flag encoding*/
@@ -76,17 +76,19 @@ function optsFromFlags(queryFlags: string): OptionsObject {
     if (queryFlags === "") return opts;
     // split by whitespace
     const flags = queryFlags.split(/(?=[A-Z])/);
-    for (const opt of possibleOptions.flatMap((sect) => sect.settings)) {
+    for (const opt of possibleOptions.flatMap(
+        (sect: SettingsSection) => sect.settings,
+    )) {
         for (const flag of flags) {
             if (flag.startsWith(opt.flag)) {
                 switch (opt.inputType) {
                     case "checkbox":
-                        opts[opt.name] = true;
+                        opts[opt.name as OptionName] = true;
                         break;
                     case "dropdown":
                         const value = flag.slice(opt.flag.length);
                         if (opt.dropdownOptions!.find((v) => v.value === value))
-                            opts[opt.name] = value;
+                            opts[opt.name as OptionName] = value;
                         break;
                 }
             }
@@ -113,6 +115,26 @@ export function updateOpts(newOpts: OptionsObject) {
 
 export const possibleOptions = [
     {
+        name: "ISA",
+        settings: [
+            {
+                name: "pseudo-enabled",
+                desc: "Enable pseudo-instructions",
+                flag: "P",
+                defaultValue: true,
+                inputType: "checkbox",
+            },
+            {
+                //TODO: support this
+                name: "allow-literals",
+                desc: "Allow literals instead of registers",
+                flag: "L",
+                defaultValue: true,
+                inputType: "checkbox",
+            },
+        ],
+    },
+    {
         name: "Execution",
         settings: [
             {
@@ -130,6 +152,7 @@ export const possibleOptions = [
                 inputType: "checkbox",
             },
             {
+                //TODO: check this after implementing projects
                 name: "entry-point",
                 desc: "Where to initialize the program counter",
                 flag: "S",
@@ -137,7 +160,7 @@ export const possibleOptions = [
                 inputType: "dropdown",
                 dropdownOptions: [
                     { value: "main", desc: "Global main" },
-                    { value: "curr", desc: "Current file .text" },
+                    { value: "text", desc: "Text segment start" },
                 ],
             },
         ],

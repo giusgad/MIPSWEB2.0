@@ -13,6 +13,7 @@ import {
     spaceDirective,
     wordDirective,
 } from "./Directives.js";
+import { getOptions } from "../settings.js";
 
 export class Assembler {
     cpu: CPU;
@@ -73,9 +74,11 @@ export class Assembler {
         this.cpu.registers.get("$gp")!.binary = new Binary(0x10008000);
         this.cpu.registers.get("$sp")!.binary = new Binary(0x7fffeffc);
 
-        if (globals.has("main")) {
+        const opts = getOptions();
+        if (opts["entry-point"] === "main" && globals.has("main")) {
             this.cpu.pc.set(globals.get("main")!.getValue());
         } else {
+            // entry-point == current file's text
             this.cpu.pc.set(this.textSegmentStart.getValue());
         }
 

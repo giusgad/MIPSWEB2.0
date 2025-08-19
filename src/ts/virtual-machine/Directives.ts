@@ -2,6 +2,7 @@ import { Binary } from "./Utils.js";
 import { Assembler } from "./Assembler";
 import { assert } from "console";
 import { intFromStr } from "../utils.js";
+import { getOptions } from "../settings.js";
 
 export abstract class Directive {
     abstract assemble(
@@ -31,11 +32,17 @@ export class asmDirective extends Directive {
         const symbol = tokens[0];
         const pseudo = assembler.cpu.instructionsSet.getPseudoBySymbol(symbol);
         const args = tokens.slice(1);
+        const opts = getOptions();
 
         if (
             pseudo &&
             (args.length === pseudo.params.length || pseudo.params[0] === "")
         ) {
+            if (opts["pseudo-enabled"] === false)
+                throw new Error(
+                    `Pseudoinstruction "${symbol}" is not allowed. You can enable pseudo-instructions in settings.`,
+                );
+
             const expandedInstructions = pseudo.expand(
                 assembler,
                 tokens,

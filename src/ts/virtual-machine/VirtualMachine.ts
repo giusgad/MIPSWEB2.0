@@ -51,7 +51,7 @@ export class VirtualMachine {
         } catch (error) {
             // @ts-ignore
             this.console.addLine(`Assemble: ${error.message}`, "error");
-            console.error(error);
+            throw error;
         }
     }
 

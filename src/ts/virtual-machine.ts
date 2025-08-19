@@ -23,13 +23,17 @@ export async function setConsoleShown(val: boolean) {
 }
 
 export async function assemble(files: file[]) {
-    vm.assemble(files);
-    if (vm.nextInstructionEditorPosition) {
-        await changeFile(vm.nextInstructionEditorPosition.fileId);
-        selectNextInstruction();
-        moveCursorToNextInstruction();
+    try {
+        vm.assemble(files);
+        if (vm.nextInstructionEditorPosition) {
+            await changeFile(vm.nextInstructionEditorPosition.fileId);
+            selectNextInstruction();
+            moveCursorToNextInstruction();
+        }
+        await renderApp("execute", "execute");
+    } catch (error) {
+        await renderApp("edit", "edit");
     }
-    await renderApp("execute", "execute");
 }
 
 export async function stop() {
