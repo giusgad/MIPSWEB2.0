@@ -29,14 +29,18 @@ window.addEventListener("load", () => {
 });
 
 type Setting = {
+    /*The key which with they will be saved in localstorage**/
     name: string;
+    /**Brief description of the option that is shown to the user*/
     desc: string;
+    /**Additional info about this option, if present will be showed to the user*/
+    help?: string;
     /**Invariant: all flags must start with a capital letter.
      * Note: in case inputType is "checkbox" the flag becomes `${flag}${optionValue}` */
     flag: string;
     defaultValue: any;
     inputType: SettingsInput;
-    /**Needs to be used if inputType is "dropdown"*/
+    /**Needs to be used only if inputType is "dropdown"*/
     dropdownOptions?: DropdownOptions;
 };
 type DropdownOptions = { value: string; desc: string }[];
@@ -120,6 +124,7 @@ export const possibleOptions = [
             {
                 name: "pseudo-enabled",
                 desc: "Enable pseudo-instructions",
+                help: "If this is not checked, pseudo-instructions won't be allowed and will generate an assembler error",
                 flag: "P",
                 defaultValue: true,
                 inputType: "checkbox",
@@ -128,6 +133,7 @@ export const possibleOptions = [
                 //TODO: support this
                 name: "allow-literals",
                 desc: "Allow literals instead of registers",
+                help: "Syntactic sugar that automatically transforms some R instructions in their immediate correspondent, for example `add $t0 $t0 1` will be interpreted as an `addi` without generating an error",
                 flag: "L",
                 defaultValue: true,
                 inputType: "checkbox",

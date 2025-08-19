@@ -6,8 +6,11 @@
           <legend class="title"><%=section.name%></legend>
           <%section.settings.forEach(opt => {
             const currVal = ctx.settings.options[opt.name]%>
-            <div>
+            <div class="line">
               <label for="<%=opt.name%>"><%=opt.desc%></label>
+              <%if (opt.help && opt.help !== "") {%>
+                <div class="help" title="<%=opt.help%>">?</div>
+              <%}%>
               <%switch (opt.inputType) {
                 case "checkbox":%>
                   <input type="checkbox" id="<%=opt.name%>" name="<%=opt.name%>" <%=currVal?"checked":""%>/>

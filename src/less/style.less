@@ -152,6 +152,29 @@ body {
   display: flex;
 }
 
+.settings {
+  .line {
+    display: flex;
+    gap: 5px;
+    .help {
+      background-color: var(--rgb-gray-8);
+      border-radius: 50%;
+      user-select: none;
+      margin: auto 0;
+      width: 1.5ch;
+      height: 1.5ch;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 80%;
+      padding: 1.2ch;
+      &:hover {
+        background-color: var(--rgb-gray-7);
+      }
+    }
+  }
+}
+
 .table {
   font-size: @font-size-small;
   overflow-y: scroll;
