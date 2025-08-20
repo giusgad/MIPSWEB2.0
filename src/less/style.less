@@ -64,6 +64,21 @@ body {
   display: none;
 }
 
+input {
+  background-color: var(--rgb-gray-11);
+  border: 1px solid transparent;
+  color: var(--rgb-gray-1);
+  outline: none;
+  box-shadow: none;
+  border-radius: 4px;
+  font-family: "Prompt", sans-serif;
+  font-size: @font-size;
+
+  &:focus {
+    border: 1px solid var(--rgb-gray-8);
+  }
+}
+
 .header {
   background-color: var(--rgb-gray-10);
   height: @toolbar-h;
@@ -154,6 +169,7 @@ body {
 
 .settings {
   .line {
+    margin-bottom: 5px;
     display: flex;
     gap: 5px;
     .help {
@@ -172,6 +188,9 @@ body {
         background-color: var(--rgb-gray-7);
       }
     }
+  }
+  .error {
+    background-color: var(--rgba-red-60);
   }
 }
 
@@ -732,21 +751,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: left;
-
     input {
       width: 100%;
-      background-color: var(--rgb-gray-11);
-      border: 1px solid transparent;
-      color: var(--rgb-gray-1);
-      outline: none;
-      box-shadow: none;
-      border-radius: 4px;
-      font-family: "Prompt", sans-serif;
-      font-size: @font-size;
-
-      &:focus {
-        border: 1px solid var(--rgb-gray-8);
-      }
     }
   }
 

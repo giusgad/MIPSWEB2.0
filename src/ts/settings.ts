@@ -17,6 +17,7 @@ window.addEventListener("load", () => {
     const queryFlags = params.get("opts");
     if (queryFlags != null) {
         const newOpts = optsFromFlags(queryFlags);
+        if (!newOpts) return;
         updateOpts(newOpts);
 
         // remove opts from the url
@@ -61,21 +62,31 @@ export function getOptions(): OptionsObject {
 }
 
 /**Retrives the current value of a setting and returns the corrseponding flag encoding*/
-function settingToFlag(opt: Setting): string {
-    const opts = getFromStorage("local", "settings").options;
-    const currVal = opts[opt.name];
+function settingToFlag(opt: Setting, currVal: any): string {
     let s = "";
     switch (opt.inputType) {
         // flag is only shown if the value is true
         case "checkbox":
             if (currVal) s = opt.flag;
+            break;
         case "dropdown":
             s = `${opt.flag}${currVal}`;
+            break;
     }
     return s;
 }
 
-function optsFromFlags(queryFlags: string): OptionsObject {
+export function getFlagsFromOpts(opts: OptionsObject): string {
+    let flags = "";
+    for (const opt of possibleOptions.flatMap(
+        (sect: SettingsSection) => sect.settings,
+    )) {
+        flags += settingToFlag(opt, opts[opt.name as OptionName]);
+    }
+    return flags;
+}
+
+export function optsFromFlags(queryFlags: string): OptionsObject | null {
     const opts: OptionsObject = {};
     if (queryFlags === "") return opts;
     // split by whitespace
@@ -83,20 +94,28 @@ function optsFromFlags(queryFlags: string): OptionsObject {
     for (const opt of possibleOptions.flatMap(
         (sect: SettingsSection) => sect.settings,
     )) {
-        for (const flag of flags) {
+        for (let i = 0; i < flags.length; i++) {
+            const flag = flags[i];
             if (flag.startsWith(opt.flag)) {
                 switch (opt.inputType) {
                     case "checkbox":
+                        if (flag !== opt.flag) return null;
                         opts[opt.name as OptionName] = true;
                         break;
                     case "dropdown":
                         const value = flag.slice(opt.flag.length);
                         if (opt.dropdownOptions!.find((v) => v.value === value))
                             opts[opt.name as OptionName] = value;
+                        else return null;
                         break;
                 }
+                flags.splice(i, 1);
+                break;
             }
         }
+    }
+    if (flags.length > 0) {
+        return null;
     }
     return opts;
 }
@@ -174,7 +193,7 @@ export const possibleOptions = [
 ] as const satisfies readonly SettingsSection[];
 
 // EXTRACTED for ease of use later
-const optionNames = possibleOptions.flatMap((section) =>
+const optionNames: OptionName[] = possibleOptions.flatMap((section) =>
     section.settings.map((setting) => setting.name),
 );
 const optionsByName = Object.fromEntries(
@@ -244,10 +263,8 @@ export async function colFormatSelect(
         await render("registers", "/app/registers.ejs", undefined, false);
 }
 
-(window as any).saveSettings = async function (event: SubmitEvent) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const settings = getFromStorage("local", "settings");
+export function getOptionsFromForm(formData: FormData): OptionsObject {
+    const opts: { [K in OptionName]?: any } = {};
     for (const name of optionNames) {
         const rawVal = formData.get(name);
         let val;
@@ -265,9 +282,27 @@ export async function colFormatSelect(
             default:
                 val = rawVal;
         }
-        settings.options[name] = val;
+        opts[name] = val;
     }
+    return opts;
+}
+
+(window as any).saveSettings = async function (event: SubmitEvent) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const settings = getFromStorage("local", "settings");
+    settings.options = getOptionsFromForm(formData);
     setIntoStorage("local", "settings", settings);
     await hideForm();
     await renderApp();
+};
+(window as any).backupOptions = function () {
+    const opts = getFromStorage("local", "settings").options;
+    setIntoStorage("session", "opts-backup", opts);
+};
+(window as any).restoreOptions = function () {
+    const settings = getFromStorage("local", "settings");
+    settings.options =
+        getFromStorage("session", "opts-backup") ?? default_options;
+    setIntoStorage("local", "settings", settings);
 };

@@ -26,7 +26,13 @@ import {
     setConsoleShown,
     consoleShown,
 } from "./virtual-machine.js";
-import { colFormatSelect } from "./settings.js";
+import {
+    colFormatSelect,
+    getFlagsFromOpts,
+    getOptionsFromForm,
+    optsFromFlags,
+    updateOpts,
+} from "./settings.js";
 import { highlightInterval, toggleMemoryMap } from "./memorymap.js";
 import { render } from "./rendering.js";
 import { renderApp } from "./app.js";
@@ -113,8 +119,13 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 (window as any).showFormOnClick = async function (
     form: string,
     dataString: string,
+    autofocus: boolean = true,
 ) {
-    await showForm(form, dataString ? JSON.parse(dataString) : undefined);
+    await showForm(
+        form,
+        dataString ? JSON.parse(dataString) : undefined,
+        autofocus,
+    );
 };
 
 (window as any).hideFormOnClick = async function () {
@@ -131,6 +142,29 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 (window as any).toggleConsoleOnClick = async function () {
     await setConsoleShown(!consoleShown);
+};
+
+(window as any).getOptionFlagsOnClick = function () {
+    const form = document.getElementById("settings-form");
+    if (!form) return;
+    const opts = getOptionsFromForm(new FormData(form as HTMLFormElement));
+    const flags = getFlagsFromOpts(opts);
+    const input = document.getElementById("option-tags");
+    if (!input) return;
+    (input as HTMLInputElement).value = flags;
+};
+(window as any).setOptionsByFlagsOnClick = async function () {
+    const input = document.getElementById("option-tags");
+    if (!input) return;
+    const newOpts = optsFromFlags((input as HTMLInputElement).value);
+    if (!newOpts) {
+        input.classList.add("error");
+        return;
+    }
+    input.classList.remove("error");
+    updateOpts(newOpts);
+    await hideForm();
+    await showForm("settings", undefined, false);
 };
 
 (window as any).newFileOnClick = async function () {
