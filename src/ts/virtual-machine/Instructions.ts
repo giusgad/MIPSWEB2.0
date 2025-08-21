@@ -202,6 +202,27 @@ export abstract class Instruction {
         }
         return undefined;
     }
+
+    getImmediateCorrespondent(): string | null {
+        if (
+            [
+                "ADD",
+                "AND",
+                "OR",
+                "XOR",
+                "SLT",
+                "TGE",
+                "TLT",
+                "TEQ",
+                "TNE",
+            ].includes(this.symbol)
+        ) {
+            return `${this.symbol}I`;
+        } else if (["TLTU", "ADDU", "SLTU", "TGEU"].includes(this.symbol)) {
+            return `${this.symbol.slice(0, this.symbol.length - 1)}IU`;
+        }
+        return null;
+    }
 }
 
 export abstract class PseudoInstruction {

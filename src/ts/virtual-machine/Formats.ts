@@ -4,6 +4,7 @@ import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { register } from "./Registers.js";
 import { intFromStr } from "../utils.js";
+import { getOptions } from "../settings.js";
 
 export interface Format {
     assemble(
@@ -38,13 +39,19 @@ export class R_Format implements Format {
         let rd: register | undefined = cpu.registers.get("$zero");
         let shamt: Binary = new Binary(0, 5);
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
+        if (
+            possible_params.length === 0 &&
+            possible_params.find((p) => p === "SYSCALL" || p === "")
+        )
+            rt = rd = rs = undefined;
+
         for (const param of possible_params) {
-            if (param !== "SYSCALL" && param !== "") {
-                if (possible_params.length === 0) {
-                    throw new Error(
-                        `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
-                    );
-                }
+            if (
+                param.split(",").length !== tokens.length - 1 ||
+                (["SYSCALL", ""].includes(param) && tokens.length !== 1)
+            ) {
+                rs = rd = rt = undefined;
+                continue;
             }
             if (param === "rd, rt, sa") {
                 rd = cpu.registers.get(tokens[1]);
@@ -79,8 +86,32 @@ export class R_Format implements Format {
         }
 
         if (!rs || !rt || !rd) {
+            // instructions that have an "immediate" correspondent can be interpreted as immediate (syntactic sugar)
+            if (getOptions()["allow-literals"]) {
+                const newSymbol = instruction.getImmediateCorrespondent();
+                if (newSymbol) {
+                    const newInstruction =
+                        cpu.instructionsSet.getBySymbol(newSymbol)!;
+                    if (newInstruction.format === "I") {
+                        return cpu
+                            .getFormat("I")!
+                            .assemble(
+                                tokens,
+                                newInstruction,
+                                cpu,
+                                assembler,
+                                globals,
+                                labels,
+                                address,
+                            );
+                    }
+                }
+            }
+            const extra = instruction.getImmediateCorrespondent()
+                ? "\nTo allow literals in R instructions you can enable the corresponding option in settings."
+                : "";
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
+                `Invalid params for instruction "${tokens.join(" ")}". Expected: ${instruction.params.map((p) => (p === "SYSCALL" ? '""' : `"${p}"`)).join(" or ")}.${extra}`,
             );
         }
 
@@ -129,9 +160,10 @@ export class I_Format implements Format {
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
         if (possible_params.length === 0) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
+                `Invalid params for instruction "${tokens.join(" ")}". Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
+
         for (const param of possible_params) {
             if (param === "rs, rt, offset") {
                 rs = cpu.registers.get(tokens[1]);
@@ -216,7 +248,7 @@ export class I_Format implements Format {
 
         if (!rs || !rt) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
+                `Invalid params for instruction "${tokens.join(" ")}". Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
 
@@ -264,7 +296,7 @@ export class J_Format implements Format {
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
         if (possible_params.length === 0) {
             throw new Error(
-                `Invalid params for instruction ${tokens.join(" ")}. Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
+                `Invalid params for instruction "${tokens.join(" ")}". Expected: ${instruction.params.map((p) => `"${p}"`).join(" or ")}`,
             );
         }
         for (const param of possible_params) {

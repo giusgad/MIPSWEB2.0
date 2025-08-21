@@ -149,7 +149,6 @@ export const possibleOptions = [
                 inputType: "checkbox",
             },
             {
-                //TODO: support this
                 name: "allow-literals",
                 desc: "Allow literals instead of registers",
                 help: "Syntactic sugar that automatically transforms some R instructions in their immediate correspondent, for example `add $t0 $t0 1` will be interpreted as an `addi` without generating an error",

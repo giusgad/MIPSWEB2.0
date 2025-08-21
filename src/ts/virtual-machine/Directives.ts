@@ -34,14 +34,20 @@ export class asmDirective extends Directive {
         const args = tokens.slice(1);
         const opts = getOptions();
 
-        if (
-            pseudo &&
-            (args.length === pseudo.params.length || pseudo.params[0] === "")
-        ) {
+        if (pseudo) {
             if (opts["pseudo-enabled"] === false)
                 throw new Error(
                     `Pseudoinstruction "${symbol}" is not allowed. You can enable pseudo-instructions in settings.`,
                 );
+
+            if (
+                (pseudo.params[0] === "" && args.length !== 0) ||
+                args.length !== pseudo.params.length
+            ) {
+                throw new Error(
+                    `Invalid params for pseudoinstruction "${tokens.join(" ")}". Expected: "${pseudo.params}".`,
+                );
+            }
 
             const expandedInstructions = pseudo.expand(
                 assembler,
