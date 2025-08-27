@@ -11,6 +11,7 @@ import "./settings.js";
 import "./memorymap.js";
 import "./intervals.js";
 import "./execution-speed.js";
+import "./keyboard-shortcuts.js";
 import {
     getFromStorage,
     scrollSelectedIntoView,

@@ -1,12 +1,12 @@
 <div class="buttons">
     <% if (ctx.interfaceState === "execute") { %>
         <%if ((ctx.vm.nextInstructionEditorPosition !== undefined) && (ctx.editorState === "execute") && (!ctx.vm.cpu.isHalted())) {%>
-            <div class="button default" onclick="stepOnClick();">
+            <div class="button default" onclick="stepOnClick();" title="s">
                 <div class="icon gray-4"><%-Icons.render('step')%></div>
                 <div class="label">Step</div>
             </div>
             <div class="button-group">
-              <div class="button default" onclick="runOnClick();">
+              <div class="button default" onclick="runOnClick();" title="space">
                   <div class="icon gray-4"><%-ctx.vm.running ? Icons.render('pause') : Icons.render('run')%></div>
                   <div class="label"><%=ctx.vm.running ? "Pause" : "Run" %></div>
               </div>
@@ -15,12 +15,12 @@
               </div>
             </div>
         <%}%>
-        <div class="button default" onclick="stopOnClick();">
+        <div class="button default" onclick="stopOnClick();" title="shift+s">
             <div class="icon gray-4"><%-Icons.render('stop')%></div>
             <div class="label">Stop</div>
         </div>
     <% } %>
-    <div class="button default" onclick="assembleOnClick()">
+    <div class="button default" onclick="assembleOnClick()" title="ctrl+shift+a">
         <div class="icon gray-4"><%-ctx.interfaceState==="execute" ? Icons.render('rewind') : Icons.render('assemble')%></div>
         <div class="label"><%=ctx.interfaceState==="execute" ? "Reset" : "Assemble"%></div>
     </div>
