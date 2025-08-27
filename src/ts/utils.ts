@@ -36,7 +36,9 @@ export function addClass(className: string, id: string) {
     if (element) {
         element.classList.add(className);
     } else {
-        console.error(`Element with id "${id}" not found.`);
+        console.warn(
+            `Element with id "${id}" not found. Can't add class ${className}`,
+        );
     }
 }
 
@@ -45,7 +47,9 @@ export function removeClass(className: string, id: string) {
     if (element) {
         element.classList.remove(className);
     } else {
-        console.error(`Element with id "${id}" not found.`);
+        console.warn(
+            `Element with id "${id}" not found. Can't remove class ${className}`,
+        );
     }
 }
 
