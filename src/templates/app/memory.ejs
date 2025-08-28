@@ -59,6 +59,7 @@
                 data-values="<%=granularityValues%>"
                 data-current="<%=currentGranularity%>"
                 data-id="<%=interval.id%>"
+                <%= granularityValues.length<=1 ? "disabled" : "" %>
               ><%=getStateBtnText(valueGranularity)%></button>
             </div>
           </div>
