@@ -121,7 +121,11 @@
                   </div>
                 <%} else {%>
                   <div class="col value <%=valueFormat%> <%=highlightClass%>">
-                    <%=convert(valueFormat, cell.binary)%>
+                      <%let inner = convert(valueFormat, cell.binary)
+                        if (valueFormat==="binary")
+                          inner = inner.split(" ").map(byte => `<span>${byte}</span>`).join("")
+                      %>
+                      <%-inner%>
                   </div>
                 <%}%>
               </div>

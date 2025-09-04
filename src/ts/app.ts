@@ -21,6 +21,7 @@ import { clearMemorySelectedFormats, default_settings } from "./settings.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 import { endDrag } from "./drag.js";
 import { stop } from "./virtual-machine.js";
+import { adjustBinaryWidth } from "./style.js";
 
 let online = false;
 initLoaders();
@@ -54,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     document.body.style.opacity = "1";
+    adjustBinaryWidth();
 });
 
 window.addEventListener("online", () => {
@@ -66,6 +68,7 @@ window.addEventListener("offline", () => {
 
 window.addEventListener("resize", () => {
     hideFilePopover();
+    adjustBinaryWidth();
 });
 
 // clicking editor while executing goes back to edit state

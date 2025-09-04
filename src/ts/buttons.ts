@@ -36,6 +36,7 @@ import {
 import { highlightInterval, toggleMemoryMap } from "./memorymap.js";
 import { render } from "./rendering.js";
 import { renderApp } from "./app.js";
+import { adjustBinaryWidth } from "./style.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -83,6 +84,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 ) {
     await colFormatSelect(element, value || element?.value);
     const id = element.id.split("_")[1];
+    adjustBinaryWidth();
     highlightInterval(id, { behavior: "instant", block: "end" });
 };
 

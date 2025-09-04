@@ -56,7 +56,11 @@
                         <% } %>
                     </div>
                     <div class="col value <%=valueFormat%>">
-                        <%=convert(valueFormat, register.binary)%>
+                      <%let inner = convert(valueFormat, register.binary)
+                        if (valueFormat==="binary")
+                          inner = inner.split(" ").map(byte => `<span>${byte}</span>`).join("")
+                      %>
+                      <%-inner%>
                     </div>
                 </div>
             <%});%>

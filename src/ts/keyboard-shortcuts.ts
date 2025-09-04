@@ -46,7 +46,6 @@ document.addEventListener("keydown", (ev) => {
         (shortcut) => shortcut.key === pressedKeys,
     );
     if (shortcut) {
-        ev.preventDefault();
         shortcut.action();
     }
 });
