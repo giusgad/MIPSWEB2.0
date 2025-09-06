@@ -67,7 +67,6 @@ export function renderEditors() {
                     aceEditor.session.removeMarker(markers[i].id);
                 }
             }
-            aceEditor.session.clearBreakpoints();
             aceEditor.focus();
         } else if (editorState === "execute") {
             aceEditor.setOptions({
@@ -85,7 +84,6 @@ export function renderEditors() {
                     aceEditor.session.removeMarker(markers[i].id);
                 }
             }
-            aceEditor.session.clearBreakpoints();
 
             selectNextInstruction();
         }
@@ -112,10 +110,6 @@ export function selectNextInstruction() {
                         "next-instruction",
                         "fullLine",
                         false,
-                    );
-                    aceEditor.session.setBreakpoint(
-                        nextInstructionLine - 1,
-                        "breakpoint",
                     );
                 }
             }
@@ -253,6 +247,27 @@ export function showEditor(fileId: number | null) {
                 editor.aceEditor.clearSelection();
             }
         }
+
+        // add event listeners for breakpoints after rendering the editor
+        requestAnimationFrame(() => {
+            for (const lineDiv of document.getElementsByClassName(
+                "ace_gutter-cell",
+            )) {
+                (lineDiv as HTMLDivElement).addEventListener("click", (ev) => {
+                    ev.preventDefault();
+                    let row = Number(lineDiv.childNodes[0].textContent);
+                    if (!row) {
+                        console.error("Invalid row number for breakpoint");
+                        return;
+                    }
+                    row = row - 1;
+                    const session = getAceEditor()?.getSession();
+                    if (session?.getBreakpoints()[row])
+                        session?.clearBreakpoint(row);
+                    else session?.setBreakpoint(row, "breakpoint-line");
+                });
+            }
+        });
     } else console.error("File id is null.", fileId);
 }
 

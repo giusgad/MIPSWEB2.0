@@ -303,6 +303,26 @@ input {
   }
 }
 
+#editors {
+  .next-instruction {
+    position: absolute;
+    background-color: var(--rgba-blue-10) !important;
+  }
+
+  .breakpoint-line {
+    background-color: var(--rgba-red-20);
+    &::before {
+      content: "●";
+      color: var(--rgb-red);
+      position: absolute;
+      left: 5px;
+      top: 0;
+      bottom: 0;
+      margin: auto 0;
+    }
+  }
+}
+
 #registers {
   .button.toggle-btn {
     .toggle-mem-btn();
@@ -778,11 +798,6 @@ input {
 
 .pointer-events-none {
   pointer-events: none !important;
-}
-
-.next-instruction {
-  position: absolute;
-  background-color: var(--rgba-blue-10) !important;
 }
 
 select {

@@ -1,11 +1,12 @@
 import { CPU } from "./CPU.js";
-import { file } from "../files.js";
+import { file, getFile } from "../files.js";
 import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
 import { Binary } from "./Utils.js";
 import { renderApp } from "../app.js";
 import { getExecutionSpeedTimeOut } from "../execution-speed.js";
 import { step } from "../virtual-machine.js";
+import { getAceEditor } from "../editors.js";
 
 export class VirtualMachine {
     cpu: CPU;
@@ -70,6 +71,15 @@ export class VirtualMachine {
         this.asyncToken++;
     }
 
+    nextInstructionHasBreakPoint(): boolean {
+        const pos = this.nextInstructionEditorPosition;
+        if (!pos) return false;
+        const bps = getAceEditor(
+            getFile(pos.fileId),
+        )?.session?.getBreakpoints();
+        return bps![pos.lineNumber - 1] != null;
+    }
+
     async step() {
         try {
             if (
@@ -83,6 +93,7 @@ export class VirtualMachine {
                             this.cpu.pc.getValue(),
                         );
                 }
+                if (this.nextInstructionHasBreakPoint()) this.pause();
             } else {
                 this.pause();
             }
