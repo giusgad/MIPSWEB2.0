@@ -9,6 +9,7 @@ import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
 import { getMemoryIntervals } from "./intervals.js";
 import { possibleOptions } from "./settings.js";
+import { drawMemoryMap } from "./memorymap.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -45,6 +46,9 @@ export async function render(
     if (!element) throw new Error(`No element found by Id: ${id}`);
     element.innerHTML = await renderTemplate(templatePath, ctx);
     if (showLoaders) removeLoader(`render: ${id}`);
+    if (id === "memory" || id === "app") {
+        drawMemoryMap();
+    }
 }
 
 (window as any).renderTemplate = renderTemplate;

@@ -90,8 +90,16 @@
   right: @width-registers;
   bottom: 0;
   width: 0%;
+  & .title,
+  & #memorymap-container {
+    display: none;
+  }
   &.memory-shown {
     width: @width-memory;
+    & .title,
+    & #memorymap-container {
+      display: initial;
+    }
   }
 }
 
