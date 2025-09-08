@@ -42,6 +42,12 @@ export class Colors {
         "gray-12": { light: "rgb(255,255,255)", dark: "rgb(0,0,0)" },
     };
 
+    public static get(name: string): string | null {
+        return this.isDarkMode()
+            ? this.items[name].dark
+            : this.items[name].light;
+    }
+
     public static isDarkMode(): boolean {
         const system =
             window.matchMedia &&

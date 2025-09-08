@@ -4,6 +4,9 @@ import { getFromStorage, setIntoStorage } from "./utils.js";
 import { vm } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
+export const minAddress = 4194304;
+export const maxAddress = 4294967295;
+
 interface cell {
     address: number;
     binary: Binary;
@@ -19,6 +22,18 @@ interface interval {
         value: string;
         valueGranularity: string;
     };
+}
+
+export function getIntervalExtremes(interval: interval): {
+    start: number;
+    end: number;
+} | null {
+    if (interval.cells.length > 0)
+        return {
+            start: interval.cells[0].address,
+            end: interval.cells[interval.cells.length - 1].address,
+        };
+    else return null;
 }
 
 interface userInterval {
@@ -216,8 +231,6 @@ function isIntervalValid(
     end: number,
 ): { valid: boolean; msg: string } {
     const hex = (n: number) => new Binary(n).getHex();
-    const minAddress = 4194304;
-    const maxAddress = 4294967295;
     if (isNaN(start) || isNaN(end)) {
         return {
             valid: false,

@@ -69,6 +69,22 @@
 }
 
 #memory {
+  @mm-width: 20px;
+  #memorymap-container {
+    position: absolute;
+    width: @mm-width;
+    z-index: 2;
+    height: calc(100% - @toolbar-h);
+    top: @toolbar-h;
+  }
+  #memorymap-canvas {
+    position: absolute;
+    width: calc(100% / 100 * 20);
+    z-index: 2;
+    height: calc(100% - @toolbar-h);
+    top: @toolbar-h;
+    left: @mm-width;
+  }
   position: absolute;
   top: calc(@toolbar-h * 2);
   right: @width-registers;

@@ -1,4 +1,6 @@
 <div class="component">
+  <div id="memorymap-container"><canvas id="memorymap"></canvas></div>
+  <canvas id="memorymap-canvas"></canvas>
   <div class="button default toggle-btn" onclick="toggleMemoryOnClick();">
       <div class="icon gray-4"><%-ctx.memoryShown ? Icons.render('angleDown') : Icons.render('angleUp')%></div>
       <div class="label"><%= ctx.memoryShown ? "Hide memory" : "Show Memory"%></div>

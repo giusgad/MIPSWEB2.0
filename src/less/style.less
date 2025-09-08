@@ -35,7 +35,7 @@
   left: calc(-@h / 2 - @w / 2);
   transform: rotate(-90deg);
   border-radius: 4px 4px 0 0;
-  z-index: 5;
+  z-index: 10;
 }
 
 .memory-addr-style {
@@ -372,6 +372,20 @@ input {
 }
 
 #memory {
+  #memorymap-container {
+    padding: 2.5px;
+    #memorymap {
+      width: 100%;
+      height: 100%;
+      background-color: var(--rgb-gray-9);
+      opacity: 0.2;
+      transition: opacity 0.5s;
+      &:hover {
+        opacity: 0.8;
+        transition: opacity 0.5s;
+      }
+    }
+  }
   .button.toggle-btn {
     .toggle-mem-btn();
   }
