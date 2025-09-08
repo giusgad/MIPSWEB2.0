@@ -72,8 +72,11 @@
   position: absolute;
   top: calc(@toolbar-h * 2);
   right: @width-registers;
-  width: @width-memory;
   bottom: 0;
+  width: 0%;
+  &.memory-shown {
+    width: @width-memory;
+  }
 }
 
 #console {

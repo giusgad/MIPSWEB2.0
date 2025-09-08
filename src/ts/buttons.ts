@@ -33,7 +33,7 @@ import {
     optsFromFlags,
     updateOpts,
 } from "./settings.js";
-import { highlightInterval, toggleMemoryMap } from "./memorymap.js";
+import { highlightInterval } from "./memorymap.js";
 import { render } from "./rendering.js";
 import { renderApp } from "./app.js";
 import { adjustBinaryWidth } from "./style.js";
@@ -107,7 +107,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 
 (window as any).assembleOnClick = async function () {
     const openedFiles = getOpenedFiles();
-    setMemoryShown(true);
+    await setMemoryShown(true);
     await assemble(openedFiles);
 };
 
@@ -139,9 +139,9 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).toggleMemoryOnClick = async function () {
-    setMemoryShown(!memoryShown);
-    await renderApp();
+    await setMemoryShown(!memoryShown);
 };
+
 (window as any).toggleConsoleOnClick = async function () {
     await setConsoleShown(!consoleShown);
 };

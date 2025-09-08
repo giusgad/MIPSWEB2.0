@@ -14,8 +14,14 @@ export const vm = new VirtualMachine(new CPU());
 export let memoryShown = false;
 export let consoleShown = false;
 
-export function setMemoryShown(val: boolean) {
+export async function setMemoryShown(val: boolean) {
     memoryShown = val;
+    const classAction = val ? addClass : removeClass;
+    classAction("memory-shown", "opened-files");
+    classAction("memory-shown", "editors");
+    classAction("memory-shown", "memory");
+    classAction("memory-shown", "console");
+    await render("memory", "/app/memory.ejs", undefined, false);
 }
 
 export async function setConsoleShown(val: boolean) {
