@@ -7,6 +7,7 @@
 
 @border-gray-10: solid 1px var(--rgb-gray-10);
 @border-gray-11: solid 1px var(--rgb-gray-11);
+@tags-width: 20%;
 
 .after-whiteout() {
   content: "";
@@ -415,6 +416,8 @@ input {
           position: relative;
           &::after {
             .after-whiteout();
+            left: @tags-width;
+            width: calc(100% - @tags-width);
             transition: opacity 0.2s ease-out;
           }
           &.highlighted::after {
@@ -505,23 +508,23 @@ input {
             .last-read-mixin();
           }
           &.tags {
-            width: calc(100% / 100 * 20);
+            width: @tags-width;
           }
 
           &.address {
-            width: calc(100% / 100 * 25);
+            width: 25%;
             min-width: 11ch;
             .memory-addr-style();
           }
 
           &.value {
-            width: calc(100% / 100 * 55);
+            width: 55%;
             background-color: var(--rgb-gray-10);
           }
 
           &.granular {
             display: flex;
-            width: calc(100% / 100 * 55);
+            width: 55%;
             padding: 0;
             border: none;
 
