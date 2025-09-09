@@ -69,21 +69,26 @@
 }
 
 #memory {
-  @mm-width: 20px;
   #memorymap-container {
+    @mm-width: 15px;
+    @padding: 2.5px;
     position: absolute;
-    width: @mm-width;
+    padding: @padding;
+    width: calc(20% + 4px);
     z-index: 2;
     height: calc(100% - @toolbar-h);
     top: @toolbar-h;
-  }
-  #memorymap-canvas {
-    position: absolute;
-    width: calc(100% / 100 * 20);
-    z-index: 2;
-    height: calc(100% - @toolbar-h);
-    top: @toolbar-h;
-    left: @mm-width;
+    #memorymap {
+      width: @mm-width;
+      height: 100%;
+    }
+    #memorymap-canvas {
+      position: absolute;
+      top: @padding;
+      left: calc(@padding + @mm-width);
+      width: calc(100% - @mm-width);
+      height: 100%;
+    }
   }
   position: absolute;
   top: calc(@toolbar-h * 2);
