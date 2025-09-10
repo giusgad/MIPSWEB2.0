@@ -39,21 +39,12 @@ export class R_Format implements Format {
         let rd: register | undefined = cpu.registers.get("$zero");
         let shamt: Binary = new Binary(0, 5);
         let possible_params = instruction.getPossibleParams(tokens.length - 1);
-        if (
-            possible_params.length === 0 &&
-            possible_params.find((p) => p === "SYSCALL" || p === "")
-        )
-            rt = rd = rs = undefined;
+        if (possible_params.length === 0) rt = rd = rs = undefined;
 
         for (const param of possible_params) {
-            if (
-                param.split(",").length !== tokens.length - 1 ||
-                (["SYSCALL", ""].includes(param) && tokens.length !== 1)
-            ) {
-                rs = rd = rt = undefined;
-                continue;
-            }
-            if (param === "rd, rt, sa") {
+            if (param === "SYSCALL" || param === "") {
+                if (tokens.length !== 1) rd = rs = rt = undefined;
+            } else if (param === "rd, rt, sa") {
                 rd = cpu.registers.get(tokens[1]);
                 rt = cpu.registers.get(tokens[2]);
                 shamt.set(intFromStr(tokens[3]));

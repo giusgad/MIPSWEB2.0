@@ -58,8 +58,10 @@ export abstract class Instruction {
         vm: VirtualMachine | undefined,
     ): void;
 
-    /** returns the possible params acceptable for the instruction given the number of params found*/
+    /** returns the possible params acceptable for the instruction given the number of params found in the user's code*/
     getPossibleParams(n_found_params: number): ParamsFormat[] {
+        if (n_found_params === 0)
+            return this.params.filter((p) => ["SYSCALL", ""].includes(p));
         return this.params.filter(
             (p) => p.split(",").length === n_found_params,
         );

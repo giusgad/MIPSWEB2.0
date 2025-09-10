@@ -33,6 +33,8 @@ export class asmDirective extends Directive {
         const pseudo = assembler.cpu.instructionsSet.getPseudoBySymbol(symbol);
         const args = tokens.slice(1);
         const opts = getOptions();
+        const isPseudoAndRegular =
+            pseudo && assembler.cpu.instructionsSet.getBySymbol(symbol);
 
         if (pseudo) {
             if (opts["pseudo-enabled"] === false)
@@ -40,10 +42,24 @@ export class asmDirective extends Directive {
                     `Pseudoinstruction "${symbol}" is not allowed. You can enable pseudo-instructions in settings.`,
                 );
 
+            // check if the number of arguments is correct for the pseudo instruction
             if (
                 (pseudo.params[0] === "" && args.length !== 0) ||
                 args.length !== pseudo.params.length
             ) {
+                // if the number of arguments is incorrect but the pseudo can also be interpreted as a regular instruction
+                // then try parsing it as a regular instruction instead of erroring out.
+                if (isPseudoAndRegular) {
+                    this.assembleInstruction(
+                        tokens,
+                        globals,
+                        labels,
+                        address,
+                        assembler,
+                        editorPosition,
+                    );
+                    return;
+                }
                 throw new Error(
                     `Invalid params for pseudoinstruction "${tokens.join(" ")}". Expected: "${pseudo.params}".`,
                 );

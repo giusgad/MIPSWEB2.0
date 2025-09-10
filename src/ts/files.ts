@@ -2,6 +2,7 @@ import { addEditor, editors, removeEditor, showEditor } from "./editors.js";
 import { renderApp } from "./app.js";
 import { setSidebar, sidebar } from "./sidebar.js";
 import { getFromStorage, scrollToEnd, setIntoStorage } from "./utils.js";
+import { setConsoleShown } from "./virtual-machine.js";
 
 export type file = {
     id: number;
@@ -66,6 +67,7 @@ export async function closeFile(fileId: number) {
             await changeFile(openedFiles[openedFiles.length - 1].id);
         }
     } else {
+        setConsoleShown(false);
         localStorage.removeItem("selectedFileId");
     }
     await renderApp("edit", "edit");
