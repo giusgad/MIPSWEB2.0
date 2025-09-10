@@ -121,6 +121,8 @@ function findClosetInterval(y: number): CanvasInterval | null {
     return closest;
 }
 
+let mouseOnMemoryMap = false;
+
 export function drawMemoryMap() {
     if (!memoryShown) return;
     let canvasElem = document.getElementById("memorymap");
@@ -132,6 +134,7 @@ export function drawMemoryMap() {
     let hoverTimeout: number | null = null;
     const hoverDelay = 500; // milliseconds
     canvas.addEventListener("mouseenter", () => {
+        mouseOnMemoryMap = true;
         // Start a delay before triggering hover effect
         hoverTimeout = window.setTimeout(() => {
             memoryMapOnHover(true);
@@ -139,6 +142,7 @@ export function drawMemoryMap() {
         }, hoverDelay);
     });
     canvas.addEventListener("mouseleave", () => {
+        mouseOnMemoryMap = false;
         // If we're still waiting on the mouseenter delay, cancel it
         if (hoverTimeout !== null) {
             clearTimeout(hoverTimeout);
@@ -179,7 +183,7 @@ export function highlightInterval(
     id: string,
     opts: ScrollIntoViewOptions = {
         behavior: "smooth",
-        block: "center",
+        block: "nearest",
     },
     do_blink: boolean = false,
 ) {
@@ -187,9 +191,14 @@ export function highlightInterval(
         document.getElementsByName("memoryIntervalTable"),
     ).find((e) => e.dataset["intervalid"] === id);
     elem?.parentElement?.scrollIntoView(opts);
+    if (mouseOnMemoryMap) memoryMapOnHover(false);
 
     if (do_blink) {
         elem?.classList.add("highlighted");
         setTimeout(() => elem?.classList.remove("highlighted"), 1500);
     }
+
+    setTimeout(() => {
+        if (mouseOnMemoryMap) memoryMapOnHover(true);
+    }, 1000);
 }
