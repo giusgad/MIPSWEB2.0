@@ -138,7 +138,7 @@ export function updateOpts(newOpts: OptionsObject) {
 
 export const possibleOptions = [
     {
-        name: "ISA",
+        name: "Assembler",
         settings: [
             {
                 name: "pseudo-enabled",
@@ -151,11 +151,11 @@ export const possibleOptions = [
             {
                 name: "allow-literals",
                 desc: "Allow literals instead of registers",
-                help: "Syntactic sugar that automatically transforms some R instructions in their immediate correspondent, for example `add $t0 $t0 1` will be interpreted as an `addi` without generating an error",
+                help: "Syntactic sugar that automatically transforms some R instructions in their immediate correspondent, for example `add $t0 $t0 1` will be interpreted as an `addi` without generating an error. Also pseudo-instructions like `mul` and `div` have different translations to load the literal into `$at`.",
                 flag: "L",
                 defaultValue: true,
                 inputType: "checkbox",
-            },
+            }, //TODO: add assembler mode: single-file, files-in-project, (or files-opened maybe)
         ],
     },
     {

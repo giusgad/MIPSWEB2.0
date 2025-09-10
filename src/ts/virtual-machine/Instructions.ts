@@ -3,8 +3,9 @@ import { Binary, Utils } from "./Utils.js";
 import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { VirtualMachine } from "./VirtualMachine.js";
-import { getFromStorage } from "../utils.js";
+import { getFromStorage, intFromStr } from "../utils.js";
 import { register, Registers } from "./Registers.js";
+import { getOptions } from "../settings.js";
 
 type ParamsFormat =
     | "rt, rs, immediate"
@@ -784,7 +785,6 @@ export class Instructions {
                         console.warn(
                             "DIV instruction: Division by zero. Result undefined.",
                         );
-                        return;
                     }
 
                     const quotient = Math.floor(rsValue / rtValue);
@@ -824,7 +824,6 @@ export class Instructions {
                         console.warn(
                             "DIVU instruction: Division by zero. Result undefined.",
                         );
-                        return;
                     }
 
                     const quotient = Math.floor(rsValue / rtValue);
@@ -3378,10 +3377,26 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [
-                        ["mult", params["rs"], params["rt"]],
-                        ["mflo", params["rd"]],
-                    ];
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    ) {
+                        return [
+                            [
+                                "addi",
+                                "$at",
+                                "$zero",
+                                `${intFromStr(params["rt"])}`,
+                            ],
+                            ["mult", params["rs"], "$at"],
+                            ["mflo", params["rd"]],
+                        ];
+                    } else {
+                        return [
+                            ["mult", params["rs"], params["rt"]],
+                            ["mflo", params["rd"]],
+                        ];
+                    }
                 }
             })(),
         );
@@ -3400,12 +3415,30 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    return [
-                        ["bne", params["rt"], "$zero", "1"],
-                        ["break"],
-                        ["div", params["rs"], params["rt"]],
-                        ["mflo", params["rd"]],
-                    ];
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    ) {
+                        return [
+                            [
+                                "addi",
+                                "$at",
+                                "$zero",
+                                `${intFromStr(params["rt"])}`,
+                            ],
+                            ["bne", "$at", "$zero", "1"],
+                            ["break"],
+                            ["div", params["rs"], "$at"],
+                            ["mflo", params["rd"]],
+                        ];
+                    } else {
+                        return [
+                            ["bne", params["rt"], "$zero", "1"],
+                            ["break"],
+                            ["div", params["rs"], params["rt"]],
+                            ["mflo", params["rd"]],
+                        ];
+                    }
                 }
             })(),
         );
