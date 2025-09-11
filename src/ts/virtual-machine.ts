@@ -15,6 +15,7 @@ export let memoryShown = false;
 export let consoleShown = false;
 
 export async function setMemoryShown(val: boolean) {
+    if (val === memoryShown) return;
     memoryShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("memory-shown", "opened-files");
@@ -25,6 +26,7 @@ export async function setMemoryShown(val: boolean) {
 }
 
 export async function setConsoleShown(val: boolean) {
+    if (val === consoleShown) return;
     consoleShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("console-shown", "console");

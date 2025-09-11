@@ -714,8 +714,8 @@ export class Instructions {
                     const rs = registers[params.rs!.getValue()].binary;
                     const rt = registers[params.rt!.getValue()].binary;
 
-                    const rsValue = rs.getValue();
-                    const rtValue = rt.getValue();
+                    const rsValue = rs.getSignedValue();
+                    const rtValue = rt.getSignedValue();
                     const result = BigInt(rsValue) * BigInt(rtValue);
 
                     cpu.lo.set(Number(result & BigInt(0xffffffff)));
@@ -784,8 +784,8 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const rt = registers[params.rt.getValue()].binary;
 
-                    const rsValue = rs.getValue();
-                    const rtValue = rt.getValue();
+                    const rsValue = rs.getSignedValue();
+                    const rtValue = rt.getSignedValue();
 
                     if (rtValue === 0) {
                         console.warn(
@@ -943,8 +943,8 @@ export class Instructions {
                     const rs = registers[params.rs!.getValue()].binary;
                     const rt = registers[params.rt!.getValue()].binary;
 
-                    const rsValue = rs.getValue();
-                    const rtValue = rt.getValue();
+                    const rsValue = rs.getSignedValue();
+                    const rtValue = rt.getSignedValue();
                     const result = rsValue + rtValue;
 
                     const overflow =
@@ -955,7 +955,7 @@ export class Instructions {
                         throw new Error("Integer Overflow");
                     }
 
-                    rd.set(result);
+                    rd.set(result, true);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -982,7 +982,7 @@ export class Instructions {
                     const rs = registers[params.rs!.getValue()].binary;
                     const rt = registers[params.rt!.getValue()].binary;
 
-                    rd.set(rs.getValue() + rt.getValue());
+                    rd.set(rs.getSignedValue() + rt.getSignedValue());
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -1009,8 +1009,8 @@ export class Instructions {
                     const rs = registers[params.rs!.getValue()].binary;
                     const rt = registers[params.rt!.getValue()].binary;
 
-                    const rsValue = rs.getValue();
-                    const rtValue = rt.getValue();
+                    const rsValue = rs.getSignedValue();
+                    const rtValue = rt.getSignedValue();
                     const result = rsValue - rtValue;
 
                     const overflow =
@@ -1021,7 +1021,7 @@ export class Instructions {
                         throw new Error("Integer Overflow");
                     }
 
-                    rd.set(result);
+                    rd.set(result, true);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -1199,7 +1199,7 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const rt = registers[params.rt.getValue()].binary;
 
-                    if (rs.getValue() < rt.getValue()) {
+                    if (rs.getSignedValue() < rt.getSignedValue()) {
                         rd.set(1);
                     } else {
                         rd.set(0);
@@ -1300,7 +1300,7 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const rt = registers[params.rt.getValue()].binary;
 
-                    if (rs.getValue() >= rt.getValue()) {
+                    if (rs.getSignedValue() >= rt.getSignedValue()) {
                         vm.console.addLine(`Trap by ${this.symbol}`, "warn");
                     }
 
@@ -1357,7 +1357,7 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const imm = params.immediate!;
 
-                    if (rs.getValue() >= imm.getValue()) {
+                    if (rs.getSignedValue() >= imm.getValue()) {
                         vm.console.addLine(`Trap by ${this.symbol}`, "warn");
                     }
 
@@ -1414,7 +1414,7 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const rt = registers[params.rt.getValue()].binary;
 
-                    if (rs.getValue() < rt.getValue()) {
+                    if (rs.getSignedValue() < rt.getSignedValue()) {
                         vm.console.addLine(`Trap by ${this.symbol}`, "warn");
                     }
 
@@ -1443,7 +1443,7 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const imm = params.immediate!;
 
-                    if (rs.getValue() < imm.getValue()) {
+                    if (rs.getSignedValue() < imm.getSignedValue()) {
                         vm.console.addLine(`Trap by ${this.symbol}`, "warn");
                     }
 
@@ -2105,7 +2105,7 @@ export class Instructions {
                     const rs = registers[params.rs!.getValue()].binary;
                     const immediate = params.immediate!.getValue();
 
-                    const rsValue = rs.getValue();
+                    const rsValue = rs.getSignedValue();
                     const result = rsValue + immediate;
 
                     const overflow =
@@ -2118,7 +2118,7 @@ export class Instructions {
                         );
                     }
 
-                    rt.set(result);
+                    rt.set(result, true);
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
@@ -2171,7 +2171,7 @@ export class Instructions {
                     const rs = registers[params.rs.getValue()].binary;
                     const imm = params.immediate!;
 
-                    if (rs.getValue() < imm.getValue()) {
+                    if (rs.getSignedValue() < imm.getSignedValue()) {
                         rt.set(1);
                     } else {
                         rt.set(0);

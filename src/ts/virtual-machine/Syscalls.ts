@@ -1,3 +1,4 @@
+import { intFromStr } from "../utils.js";
 import { CPU } from "./CPU.js";
 import { Binary } from "./Utils.js";
 import { VirtualMachine } from "./VirtualMachine.js";
@@ -42,7 +43,7 @@ export class Syscalls {
                 ): Promise<void> {
                     const address = cpu.registers.get("$a0");
                     if (address) {
-                        const int = address.binary.getValue();
+                        const int = address.binary.getSignedValue();
                         vm.console.printString(int.toString());
                     }
 
@@ -122,14 +123,10 @@ export class Syscalls {
                     }
 
                     vm.cpu.resume();
-                    const value = parseInt(input);
-                    if (value) {
-                        const v0 = vm.cpu.getRegisters()[2].binary;
-                        v0.set(value);
-                        cpu.pc.set(cpu.pc.getValue() + 4);
-                    } else {
-                        throw new Error(`Invalid input: ${input}`);
-                    }
+                    const value = intFromStr(input);
+                    const v0 = vm.cpu.getRegisters()[2].binary;
+                    v0.set(value);
+                    cpu.pc.set(cpu.pc.getValue() + 4);
                 }
             })(),
         );
@@ -194,7 +191,7 @@ export class Syscalls {
                     terminated[terminated.length - 1] = 0; // null byte terminator
 
                     for (let i = 0; i < terminated.length; i++) {
-                        if (i >= maxLength) {
+                        if (i >= maxLength - 1) {
                             vm.console.addLine(
                                 `Input string too long, ignoring last ${terminated.length - maxLength} bytes`,
                                 "warn",

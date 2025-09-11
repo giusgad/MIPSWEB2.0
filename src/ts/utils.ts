@@ -2,7 +2,7 @@
 export function intFromStr(str: string): number {
     const num = Number(str);
     if (str === "" || isNaN(num)) {
-        throw new Error(`Invalid literal: "${str}" is not a number.`);
+        throw new Error(`Invalid number: "${str}" is not a number.`);
     }
     return num;
 }
