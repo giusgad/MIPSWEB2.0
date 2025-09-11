@@ -1,6 +1,5 @@
 import { Binary } from "./Utils.js";
 import { Assembler } from "./Assembler";
-import { assert } from "console";
 import { intFromStr } from "../utils.js";
 import { getOptions } from "../settings.js";
 
@@ -13,7 +12,11 @@ export abstract class Directive {
         assembler: Assembler,
         editorPosition: { fileId: number; lineNumber: number },
     ): void;
-    abstract size(tokens: string[], address?: number): number;
+    abstract size(
+        tokens: string[],
+        address?: number,
+        assembler?: Assembler,
+    ): number;
     tokenize(tokens: string[]) {
         tokens = tokens.map((token) => token.replace(/,/g, ""));
         return tokens;
@@ -113,10 +116,39 @@ export class asmDirective extends Directive {
             address,
         );
         assembler.cpu.storeWord(address, code);
-        address.set(address.getValue() + this.size(tokens));
+        address.set(
+            address.getValue() + this.size(tokens, undefined, assembler),
+        );
     }
 
-    size(tokens: string[]): number {
+    /**Finds whether the instruction is a pseudoinstruction or not. If it is gets its expansion's size.*/
+    size(tokens: string[], address?: number, assembler?: Assembler): number {
+        if (!assembler) return 4;
+        const symbol = tokens[0];
+        const pseudo = assembler.cpu.instructionsSet.getPseudoBySymbol(symbol);
+        const regular = assembler.cpu.instructionsSet.getBySymbol(symbol);
+        const isPseudoAndRegular = pseudo && regular;
+        if (regular || (!pseudo && !regular)) return 4;
+        // If an instruction can be interpreted as both pseudo and regular instruction:
+        // if the number of arguments is incorrect for the pseudo return 4 since it's a regular instruction
+        if (isPseudoAndRegular && pseudo.params.length !== tokens.length - 1)
+            return 4;
+        if (pseudo) {
+            const staticSize = pseudo.size();
+            if (staticSize) return staticSize * 4;
+            try {
+                const expanded = pseudo.expand(
+                    assembler,
+                    tokens,
+                    new Map(),
+                    new Map(),
+                    new Binary(0),
+                );
+                return expanded.length * 4;
+            } catch {
+                return 4;
+            }
+        }
         return 4;
     }
 }

@@ -254,6 +254,10 @@ export abstract class PseudoInstruction {
         labels: Map<string, Binary | undefined>,
         address: Binary,
     ): string[][];
+
+    /**Returns the number of instructions this pseudo maps to if it's always the same number.
+     * Otherwise the size needs to be found by expanding the pseudo*/
+    abstract size(): number | null;
 }
 
 export class Instructions {
@@ -1794,29 +1798,6 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
-                        "B",
-                        ["offset"],
-                        "I",
-                        new Binary(0b000100, 6),
-                        undefined,
-                    );
-                }
-                async execute(
-                    cpu: CPU,
-                    params: { [key: string]: Binary },
-                    vm: VirtualMachine,
-                ): Promise<void> {
-                    const offset =
-                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
-
-                    cpu.pc.set(cpu.pc.getValue() + 4 + offset);
-                }
-            })(),
-        );
-        this.instructions.push(
-            new (class extends Instruction {
-                constructor() {
-                    super(
                         "BAL",
                         ["offset"],
                         "I",
@@ -1866,6 +1847,29 @@ export class Instructions {
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
+                }
+            })(),
+        );
+        this.instructions.push(
+            new (class extends Instruction {
+                constructor() {
+                    super(
+                        "B",
+                        ["offset"],
+                        "I",
+                        new Binary(0b000100, 6),
+                        undefined,
+                    );
+                }
+                async execute(
+                    cpu: CPU,
+                    params: { [key: string]: Binary },
+                    vm: VirtualMachine,
+                ): Promise<void> {
+                    const offset =
+                        Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
+
+                    cpu.pc.set(cpu.pc.getValue() + 4 + offset);
                 }
             })(),
         );
@@ -3114,6 +3118,9 @@ export class Instructions {
                 ): string[][] {
                     return [["sll", "$zero", "$zero", "$zero"]];
                 }
+                size(): number {
+                    return 1;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3130,6 +3137,9 @@ export class Instructions {
                 ): string[][] {
                     const params = this.mapParams(tokens);
                     return [["addu", params["rd"], params["rs"], "$zero"]];
+                }
+                size(): number {
+                    return 1;
                 }
             })(),
         );
@@ -3148,6 +3158,9 @@ export class Instructions {
                     const params = this.mapParams(tokens);
                     return [["nor", params["rd"], params["rs"], "$zero"]];
                 }
+                size(): number {
+                    return 1;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3165,6 +3178,9 @@ export class Instructions {
                     const params = this.mapParams(tokens);
                     return [["sub", params["rd"], "$zero", params["rs"]]];
                 }
+                size(): number {
+                    return 1;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3181,6 +3197,9 @@ export class Instructions {
                 ): string[][] {
                     const params = this.mapParams(tokens);
                     return [["subu", params["rd"], "$zero", params["rs"]]];
+                }
+                size(): number {
+                    return 1;
                 }
             })(),
         );
@@ -3208,6 +3227,9 @@ export class Instructions {
                         ["bgez", params["rs"], skipLabel],
                         ["sub", params["rd"], "$zero", params["rs"]],
                     ];
+                }
+                size(): number {
+                    return 3;
                 }
             })(),
         );
@@ -3248,6 +3270,9 @@ export class Instructions {
                         ];
                     }
                 }
+                size(): null {
+                    return null;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3280,6 +3305,9 @@ export class Instructions {
                         ["ori", params["rd"], "$at", `${lower}`],
                     ];
                 }
+                size(): number {
+                    return 2;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3299,6 +3327,9 @@ export class Instructions {
                         ["slt", "$at", params["rs"], params["rt"]],
                         ["bne", "$at", "$zero", params["label"]],
                     ];
+                }
+                size(): number {
+                    return 2;
                 }
             })(),
         );
@@ -3321,6 +3352,9 @@ export class Instructions {
                         ["beq", "$at", "$zero", params["label"]],
                     ];
                 }
+                size(): number {
+                    return 2;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3342,6 +3376,9 @@ export class Instructions {
                         ["bne", "$at", "$zero", params["label"]],
                     ];
                 }
+                size(): number {
+                    return 2;
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3362,6 +3399,9 @@ export class Instructions {
                         ["slt", "$at", params["rs"], params["rt"]],
                         ["beq", "$at", "$zero", params["label"]],
                     ];
+                }
+                size(): number {
+                    return 2;
                 }
             })(),
         );
@@ -3399,6 +3439,9 @@ export class Instructions {
                             ["mflo", params["rd"]],
                         ];
                     }
+                }
+                size(): null {
+                    return null;
                 }
             })(),
         );
@@ -3441,6 +3484,9 @@ export class Instructions {
                             ["mflo", params["rd"]],
                         ];
                     }
+                }
+                size(): null {
+                    return null;
                 }
             })(),
         );

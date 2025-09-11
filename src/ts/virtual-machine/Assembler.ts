@@ -59,14 +59,15 @@ export class Assembler {
             Map<string, Binary | undefined>
         >();
 
+        // the following two for loops are the two assembly passes. The first one doesn't actually
+        // assemble the instruction but is needed to find the positions of the labels, the second one
+        // compiles everything inserting the labels positions.
         for (const file of files) {
             labels.set(file.id, new Map<string, Binary | undefined>());
-            this.assembleFile(file, globals, labels.get(file.id)!);
+            this.assembleFile(file, globals, labels.get(file.id)!, false);
         }
-
         this.dataSegmentEnd.set(this.dataSegmentStart.getValue());
         this.textSegmentEnd.set(this.textSegmentStart.getValue());
-
         for (const file of files) {
             this.assembleFile(file, globals, labels.get(file.id)!, true);
         }
@@ -171,7 +172,7 @@ export class Assembler {
             } else {
                 address.set(
                     address.getValue() +
-                        directive.size(tokens, address.getValue()),
+                        directive.size(tokens, address.getValue(), this),
                 );
             }
 
@@ -239,13 +240,9 @@ export class Assembler {
         let labelAddress = undefined;
 
         if (labels.has(token)) {
-            if (labels.get(token)) {
-                labelAddress = labels.get(token)!;
-            } else {
-                if (globals.has(token)) {
-                    labelAddress = globals.get(token)!;
-                }
-            }
+            labelAddress = labels.get(token)!;
+        } else if (globals.has(token)) {
+            labelAddress = globals.get(token)!;
         }
 
         if (labelAddress === undefined) {

@@ -1,3 +1,4 @@
+import { render } from "./rendering.js";
 import { vm } from "./virtual-machine.js";
 
 document.addEventListener("input", (event) => {
@@ -27,6 +28,7 @@ export function watchingConsole() {
                 const target = event.target as HTMLTextAreaElement;
                 await vm.console.setInput(target.value);
             }
+            await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);
         });
     }
 }
