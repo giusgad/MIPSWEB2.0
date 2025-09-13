@@ -50,8 +50,10 @@ export class VirtualMachine {
             const staticDataEnd = Math.max(...this.cpu.memory.get().keys());
             this.cpu.memory.initHeapPointer(staticDataEnd);
         } catch (error) {
-            // @ts-ignore
-            this.console.addLine(`Assemble: ${error.message}`, "error");
+            this.console.addErrorWithPos(
+                `Assemble: ${(error as Error).message}`,
+                this.assembler.currentEditorPosition,
+            );
             throw error;
         }
     }

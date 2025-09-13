@@ -301,6 +301,56 @@ input {
       border-top: @border-gray-10;
       border-bottom: 1px solid transparent;
     }
+    .console {
+      position: absolute;
+      top: @toolbar-h;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      padding: 12px;
+      background-color: var(--rgb-gray-11);
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+
+      .line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+
+        &.error {
+          color: var(--rgb-red);
+        }
+        &.warn {
+          color: var(--rgb-yellow);
+        }
+        .editor-pos {
+          cursor: pointer;
+          user-select: none;
+          &:hover {
+            background-color: var(--rgba-red-20);
+          }
+        }
+      }
+
+      textarea {
+        border: none;
+        outline: none;
+        font-family: "Prompt", sans-serif;
+        font-size: @font-size;
+        background-color: var(--rgb-gray-11);
+        color: var(--rgb-gray-1);
+        width: 100%;
+        padding: 0;
+        resize: none;
+        overflow: hidden;
+      }
+
+      &.waiting-input {
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+      }
+    }
   }
 }
 
@@ -308,6 +358,10 @@ input {
   .next-instruction {
     position: absolute;
     background-color: var(--rgba-blue-10) !important;
+  }
+  .error {
+    position: absolute;
+    background-color: var(--rgba-red-20);
   }
 
   .breakpoint-line {
@@ -590,50 +644,6 @@ input {
         fill-opacity: 0.8;
       }
     }
-  }
-}
-
-.console {
-  position: absolute;
-  top: @toolbar-h;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
-  padding: 12px;
-  background-color: var(--rgb-gray-11);
-  display: flex;
-  flex-direction: column;
-  overflow-y: scroll;
-
-  .line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
-
-    &.error {
-      color: var(--rgb-red);
-    }
-    &.warn {
-      color: var(--rgb-yellow);
-    }
-  }
-
-  textarea {
-    border: none;
-    outline: none;
-    font-family: "Prompt", sans-serif;
-    font-size: @font-size;
-    background-color: var(--rgb-gray-11);
-    color: var(--rgb-gray-1);
-    width: 100%;
-    padding: 0;
-    resize: none;
-    overflow: hidden;
-  }
-
-  &.waiting-input {
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   }
 }
 

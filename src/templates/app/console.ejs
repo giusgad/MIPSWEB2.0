@@ -9,9 +9,19 @@
         <div class="label"><%= ctx.consoleShown ? "Hide console" : "Show console"%></div>
     </div>
     <div class="title">Console</div>
-    <div class="console <% if (ctx.vm.console.state === "waitingInput") {%> waiting-input <% } %>">
+    <div class="console <% if (ctx.vm.console.state === "waiting Input") {%> waiting-input <% } %>">
         <%ctx.vm.console.lines.forEach((line) => {%>
         <div class="line <%=line.type%>">
+            <% if (line.editorPos) {%>
+              <span
+                class="editor-pos"
+                onclick="goToErrPositionOnClick(this)"
+                data-linenumber="<%=line.editorPos.lineNumber%>"
+                data-fileid="<%=line.editorPos.fileId%>"
+              >
+                [<%=ctx.files.find(f => f.id===line.editorPos.fileId).name??""%>.asm:<%=line.editorPos.lineNumber%>]
+              </span>
+            <%}%>
             <%=line.text%>
             <% if (line.waitingInput) {%>
               <textarea id="console-input" name="input" autofocus autocomplete="off"></textarea>

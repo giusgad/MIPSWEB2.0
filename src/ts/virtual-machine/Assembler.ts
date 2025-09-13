@@ -14,6 +14,7 @@ import {
     wordDirective,
 } from "./Directives.js";
 import { getOptions } from "../settings.js";
+import { EditorPosition } from "../editors.js";
 
 export class Assembler {
     cpu: CPU;
@@ -34,14 +35,16 @@ export class Assembler {
     textSegmentStart: Binary = new Binary(0x00400000);
     textSegmentEnd: Binary = new Binary(this.textSegmentStart.getValue());
 
-    addressEditorsPositions: Map<
+    addressEditorsPositions: Map<number, EditorPosition> = new Map<
         number,
-        { fileId: number; lineNumber: number }
-    > = new Map<number, { fileId: number; lineNumber: number }>();
+        EditorPosition
+    >();
     allLabels: Map<string, Binary | undefined> = new Map<
         string,
         Binary | undefined
     >();
+    /** the editor position of the code currently being assembled. */
+    currentEditorPosition: EditorPosition | undefined;
 
     constructor(cpu: CPU) {
         this.cpu = cpu;
@@ -79,7 +82,7 @@ export class Assembler {
         if (opts["entry-point"] === "main" && globals.has("main")) {
             this.cpu.pc.set(globals.get("main")!.getValue());
         } else {
-            // entry-point == current file's text
+            // entry-point == text segment start
             this.cpu.pc.set(this.textSegmentStart.getValue());
         }
 
@@ -141,6 +144,11 @@ export class Assembler {
                 if (tokens.length === 0) continue;
             }
 
+            this.currentEditorPosition = {
+                fileId: file.id,
+                lineNumber: lineNumber,
+            };
+
             if (this.directives.get(tokens[0])) {
                 directive = this.directives.get(tokens[0])!;
 
@@ -153,7 +161,7 @@ export class Assembler {
                         labels,
                         address,
                         this,
-                        { fileId: file.id, lineNumber: lineNumber },
+                        this.currentEditorPosition,
                     );
                 }
             }
@@ -166,7 +174,7 @@ export class Assembler {
                         labels,
                         address,
                         this,
-                        { fileId: file.id, lineNumber: lineNumber },
+                        this.currentEditorPosition,
                     );
                 }
             } else {
@@ -267,10 +275,8 @@ export class Assembler {
         this.cpu.reset();
         this.dataSegmentEnd.set(this.dataSegmentStart.getValue());
         this.textSegmentEnd.set(this.textSegmentStart.getValue());
-        this.addressEditorsPositions = new Map<
-            number,
-            { fileId: number; lineNumber: number }
-        >();
+        this.addressEditorsPositions = new Map<number, EditorPosition>();
         this.allLabels = new Map<string, Binary | undefined>();
+        this.currentEditorPosition = undefined;
     }
 }

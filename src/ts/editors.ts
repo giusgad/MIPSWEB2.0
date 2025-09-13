@@ -17,6 +17,7 @@ export type editor = {
     fileId: number;
     aceEditor: AceAjax.Editor;
 };
+export type EditorPosition = { fileId: number; lineNumber: number };
 
 export const aceEditorLightTheme = "ace/theme/chrome";
 export const aceEditorDarkTheme = "ace/theme/one_dark";
@@ -128,6 +129,25 @@ export function moveCursorToNextInstruction() {
             }
         }
     }
+}
+
+let errorMarker: number | null = null;
+export async function moveCursorToPos(pos: EditorPosition) {
+    await changeFile(pos.fileId);
+    const aceEditor = getAceEditor();
+    if (aceEditor) {
+        const targetLine = pos.lineNumber;
+        let Range = ace.require("ace/range").Range,
+            range = new Range(targetLine - 1, 0, targetLine - 1, Infinity);
+        const session = aceEditor.getSession();
+        clearErrorMarkers();
+        errorMarker = session?.addMarker(range, "error", "fullLine", false);
+        aceEditor.gotoLine(targetLine);
+    }
+}
+export function clearErrorMarkers() {
+    if (errorMarker) getAceEditor()?.getSession()?.removeMarker(errorMarker);
+    errorMarker = null;
 }
 
 export function resizeEditors() {
@@ -248,8 +268,9 @@ export function showEditor(fileId: number | null) {
             }
         }
 
-        // add event listeners for breakpoints after rendering the editor
+        // add event listeners after rendering the editor
         requestAnimationFrame(() => {
+            // breakpoint event listeners
             for (const lineDiv of document.getElementsByClassName(
                 "ace_gutter-cell",
             )) {
@@ -268,6 +289,14 @@ export function showEditor(fileId: number | null) {
                 });
             }
         });
+        // remove error marker when editing
+        for (const editorElem of document.getElementsByClassName(
+            "ace_content",
+        )) {
+            editorElem.addEventListener("click", () => {
+                clearErrorMarkers();
+            });
+        }
     } else console.error("File id is null.", fileId);
 }
 

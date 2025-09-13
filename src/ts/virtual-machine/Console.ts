@@ -1,13 +1,16 @@
 import { renderApp } from "../app.js";
+import { EditorPosition } from "../editors.js";
 import { setConsoleShown } from "../virtual-machine.js";
 
 type LineSeverity = "success" | "error" | "warn";
+
 type ConsoleLine = {
     text: string;
     type: LineSeverity;
     waitingInput?: boolean;
     /**Whether this lines was created with a print_string syscall*/
     isPrintString: boolean;
+    editorPos?: EditorPosition;
 };
 
 export class Console {
@@ -21,6 +24,17 @@ export class Console {
             type,
             waitingInput: false,
             isPrintString: false,
+        });
+        setConsoleShown(true);
+    }
+
+    addErrorWithPos(errorMsg: string, pos: EditorPosition | undefined) {
+        this.lines.push({
+            text: `${errorMsg}\n`,
+            type: "error",
+            isPrintString: false,
+            waitingInput: false,
+            editorPos: pos,
         });
         setConsoleShown(true);
     }

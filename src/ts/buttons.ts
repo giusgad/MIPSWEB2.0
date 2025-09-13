@@ -37,6 +37,11 @@ import { highlightInterval } from "./memorymap.js";
 import { render } from "./rendering.js";
 import { renderApp } from "./app.js";
 import { adjustBinaryWidth } from "./style.js";
+import {
+    clearErrorMarkers,
+    EditorPosition,
+    moveCursorToPos,
+} from "./editors.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -109,6 +114,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     const openedFiles = getOpenedFiles();
     await setMemoryShown(true);
     await assemble(openedFiles);
+    clearErrorMarkers();
 };
 
 (window as any).showFilePopoverOnClick = async function (
@@ -197,6 +203,16 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
         (document.getElementById("files-tabs") as HTMLElement).scrollLeft =
             scrollLeft;
     }
+};
+
+(window as any).goToErrPositionOnClick = async function (
+    target: HTMLDivElement,
+) {
+    const pos = {
+        lineNumber: Number(target.dataset["linenumber"]),
+        fileId: Number(target.dataset["fileid"]),
+    };
+    await moveCursorToPos(pos);
 };
 
 (window as any).openFileOnDbClick = async function (
