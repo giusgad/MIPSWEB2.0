@@ -44,3 +44,14 @@ export function adjustBinaryWidth() {
         }
     }
 }
+
+export function highlightElementAnimation(elem: HTMLElement | string) {
+    if (typeof elem === "string") {
+        const found = document.getElementById(elem);
+        if (!found) return;
+        elem = found;
+    }
+    elem.classList.add("highlighted");
+    console.log(elem.classList);
+    setTimeout(() => elem.classList.remove("highlighted"), 1500);
+}

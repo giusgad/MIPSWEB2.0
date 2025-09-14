@@ -4,7 +4,6 @@ import {
     getOpenedFiles,
     getSelectedFile,
     getSelectedFileId,
-    setSelectedFileId,
     updateFile,
 } from "./files.js";
 import { Colors } from "./lib/Colors.js";

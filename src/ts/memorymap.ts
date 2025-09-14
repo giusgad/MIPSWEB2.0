@@ -5,6 +5,7 @@ import {
     minAddress,
 } from "./intervals.js";
 import { Colors } from "./lib/Colors.js";
+import { highlightElementAnimation } from "./style.js";
 import { memoryShown } from "./virtual-machine.js";
 
 type CanvasInterval = { intervalId: number; startY: number; endY: number };
@@ -180,6 +181,7 @@ export function drawMemoryMap() {
 }
 
 export function highlightInterval(
+    /**id of the interval to highlight, not an html element's id*/
     id: string,
     opts: ScrollIntoViewOptions = {
         behavior: "smooth",
@@ -193,11 +195,11 @@ export function highlightInterval(
     elem?.parentElement?.scrollIntoView(opts);
     if (mouseOnMemoryMap) memoryMapOnHover(false);
 
-    if (do_blink) {
-        elem?.classList.add("highlighted");
-        setTimeout(() => elem?.classList.remove("highlighted"), 1500);
+    if (do_blink && elem) {
+        highlightElementAnimation(elem);
     }
 
+    // redraw memorymap after scrolling
     setTimeout(() => {
         if (mouseOnMemoryMap) memoryMapOnHover(true);
     }, 1000);

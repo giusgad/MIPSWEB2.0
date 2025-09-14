@@ -19,7 +19,7 @@
   height: 100%;
   opacity: 0;
   background-color: var(--rgba-gray-3-40);
-  transition: opacity 0.1s linear;
+  transition: opacity 0.2s ease-out;
 }
 
 // toggle memory button
@@ -470,7 +470,6 @@ input {
             .after-whiteout();
             left: @tags-width;
             width: calc(100% - @tags-width);
-            transition: opacity 0.2s ease-out;
           }
           &.highlighted::after {
             opacity: 1;
@@ -482,6 +481,14 @@ input {
                 &.value {
                   background-color: var(--rgb-gray-9) !important;
                 }
+              }
+              &::after {
+                .after-whiteout();
+                left: @tags-width;
+                width: calc(100% - @tags-width);
+              }
+              &.highlighted::after {
+                opacity: 1;
               }
             }
 
