@@ -35,13 +35,8 @@ import {
 } from "./settings.js";
 import { highlightInterval } from "./memorymap.js";
 import { render } from "./rendering.js";
-import { renderApp } from "./app.js";
-import { adjustBinaryWidth } from "./style.js";
-import {
-    clearErrorMarkers,
-    EditorPosition,
-    moveCursorToPos,
-} from "./editors.js";
+import { adjustBinaryWidth, highlightElementAnimation } from "./style.js";
+import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -205,14 +200,19 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     }
 };
 
-(window as any).goToErrPositionOnClick = async function (
-    target: HTMLDivElement,
-) {
+(window as any).goToEditorPosOnClick = async function (target: HTMLDivElement) {
     const pos = {
         lineNumber: Number(target.dataset["linenumber"]),
         fileId: Number(target.dataset["fileid"]),
     };
     await moveCursorToPos(pos);
+};
+(window as any).goToMemoryPosOnClick = async function (target: HTMLDivElement) {
+    const addr = target.dataset["address"]!;
+    const elem = document.getElementById(addr);
+    if (!elem) return;
+    highlightElementAnimation(`${addr}`, true);
+    elem.classList.add("error");
 };
 
 (window as any).openFileOnDbClick = async function (

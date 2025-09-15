@@ -3116,7 +3116,7 @@ export class Instructions {
                     labels: Map<string, Binary | undefined>,
                     address: Binary,
                 ): string[][] {
-                    return [["sll", "$zero", "$zero", "$zero"]];
+                    return [["sll", "$zero", "$zero", "0"]];
                 }
                 size(): number {
                     return 1;

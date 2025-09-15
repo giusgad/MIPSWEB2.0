@@ -100,12 +100,11 @@ export class VirtualMachine {
                 this.pause();
             }
         } catch (error) {
-            this.console.addLine(
-                // @ts-ignore
-                `Runtime Error at 0x${this.cpu.pc.getHex()}: ${error.message}`,
-                "error",
+            this.console.addErrorWithPos(
+                `Runtime Error : ${(error as Error).message}`,
+                this.cpu.pc.getValue(),
             );
-            console.error(error);
+            console.warn(error);
             this.pause();
         }
         if (

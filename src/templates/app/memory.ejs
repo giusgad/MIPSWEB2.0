@@ -72,9 +72,12 @@
           <%interval.cells.forEach((cell) => {%>
             <%if (cell) {%>
               <div class="row
-              <%=ctx.selectedInstructionAddresses.includes(cell.address) && (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')
-                  ? "selected-instruction" : "" %>
-                <%=cell.userDefined ? "userDefined" : ""%>">
+                <%=ctx.selectedInstructionAddresses.includes(cell.address) &&
+                   (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')
+                   ? "selected-instruction" : "" %>
+                <%=cell.userDefined ? "userDefined" : ""%>"
+                id="<%=cell.address%>"
+              >
                 <div class="col tags">
                   <%if (cell.tags.length > 0) {%>
                   <div class="static-tags">

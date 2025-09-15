@@ -10,7 +10,10 @@ type ConsoleLine = {
     waitingInput?: boolean;
     /**Whether this lines was created with a print_string syscall*/
     isPrintString: boolean;
+    /**Position of text in the editor that relates to the current line (used for error reporting)*/
     editorPos?: EditorPosition;
+    /**Memory address that relates to the current line (used for error reporting)*/
+    memoryPos?: number;
 };
 
 export class Console {
@@ -28,13 +31,24 @@ export class Console {
         setConsoleShown(true);
     }
 
-    addErrorWithPos(errorMsg: string, pos: EditorPosition | undefined) {
+    /**Add an error line with a position to which it relates.
+     * @param pos if this param is of type number it means it's an address and the position
+     * is in memory of the assembled program, otherwise it's of type EditorPosition and it
+     * indicates a position in the assembly code*/
+    addErrorWithPos(
+        errorMsg: string,
+        pos: EditorPosition | number | undefined,
+    ) {
+        let memoryPos,
+            editorPos = undefined;
+        typeof pos === "number" ? (memoryPos = pos) : (editorPos = pos);
         this.lines.push({
             text: `${errorMsg}\n`,
             type: "error",
             isPrintString: false,
             waitingInput: false,
-            editorPos: pos,
+            editorPos: editorPos,
+            memoryPos: memoryPos,
         });
         setConsoleShown(true);
     }

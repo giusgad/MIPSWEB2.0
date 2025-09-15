@@ -1,3 +1,5 @@
+import { scrollSelectedIntoView } from "./utils";
+
 /**
  * Calculates the pixel width of 1ch for a given element.
  * @param {HTMLElement} element The element to use for font-family and font-size.
@@ -45,13 +47,18 @@ export function adjustBinaryWidth() {
     }
 }
 
-export function highlightElementAnimation(elem: HTMLElement | string) {
+export function highlightElementAnimation(
+    elem: HTMLElement | string,
+    scroll = false,
+) {
     if (typeof elem === "string") {
         const found = document.getElementById(elem);
         if (!found) return;
         elem = found;
     }
+    if (scroll) {
+        elem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
     elem.classList.add("highlighted");
-    console.log(elem.classList);
     setTimeout(() => elem.classList.remove("highlighted"), 1500);
 }

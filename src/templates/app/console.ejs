@@ -14,13 +14,17 @@
         <div class="line <%=line.type%>">
             <% if (line.editorPos) {%>
               <span
-                class="editor-pos"
-                onclick="goToErrPositionOnClick(this)"
+                class="clickable-pos"
+                onclick="goToEditorPosOnClick(this)"
                 data-linenumber="<%=line.editorPos.lineNumber%>"
                 data-fileid="<%=line.editorPos.fileId%>"
-              >
-                [<%=ctx.files.find(f => f.id===line.editorPos.fileId).name??""%>.asm:<%=line.editorPos.lineNumber%>]
-              </span>
+              >[<%=ctx.files.find(f => f.id===line.editorPos.fileId).name??""%>.asm:<%=line.editorPos.lineNumber%>]</span>
+            <%} else if (line.memoryPos) {%>
+              <span
+                class="clickable-pos"
+                onclick="goToMemoryPosOnClick(this)"
+                data-address="<%=line.memoryPos%>"
+              >[0x<%=convert("hex", line.memoryPos)%>]</span>
             <%}%>
             <%=line.text%>
             <% if (line.waitingInput) {%>

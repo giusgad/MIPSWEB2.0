@@ -48,7 +48,8 @@ export class asmDirective extends Directive {
             // check if the number of arguments is correct for the pseudo instruction
             if (
                 (pseudo.params[0] === "" && args.length !== 0) ||
-                args.length !== pseudo.params.length
+                (pseudo.params[0] !== "" &&
+                    args.length !== pseudo.params.length)
             ) {
                 // if the number of arguments is incorrect but the pseudo can also be interpreted as a regular instruction
                 // then try parsing it as a regular instruction instead of erroring out.
