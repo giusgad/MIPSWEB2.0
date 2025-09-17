@@ -274,27 +274,21 @@ export async function exportFile(fileId: number) {
             throw new Error(`File with ID ${fileId} not found.`);
         }
 
-        const handle = await (window as any).showSaveFilePicker({
-            suggestedName: `${file.name}.${file.type}`,
-            types: [
-                {
-                    description: "ASM Files",
-                    accept: { "text/plain": [".asm"] },
-                },
-            ],
-        });
+        const blob = new Blob([file.content], { type: "text/plain" });
 
-        const writableStream = await handle.createWritable();
-        await writableStream.write(file.content);
-        await writableStream.close();
+        // Create a temporary download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${file.name}.${file.type}`;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     } catch (error: any) {
         console.error(`Error exporting the file with ID: ${fileId}`, error);
-
-        if (error.name === "AbortError") {
-            //alert("Export operation was canceled.");
-        } else {
-            //alert("Error exporting the file. Please try again.");
-        }
     }
 }
 
