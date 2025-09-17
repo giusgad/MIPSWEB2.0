@@ -3313,6 +3313,46 @@ export class Instructions {
         this.pseudoInstructions.push(
             new (class extends PseudoInstruction {
                 constructor() {
+                    super("BEQZ", "rs, label");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [["beq", params["rs"], "$zero", params["label"]]];
+                }
+                size(): number {
+                    return 1;
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("BNEZ", "rs, label");
+                }
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [["bne", params["rs"], "$zero", params["label"]]];
+                }
+                size(): number {
+                    return 1;
+                }
+            })(),
+        );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
                     super("BLT", "rs, rt, label");
                 }
                 expand(
