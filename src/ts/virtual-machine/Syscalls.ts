@@ -191,7 +191,7 @@ export class Syscalls {
                     terminated[terminated.length - 1] = 0; // null byte terminator
 
                     for (let i = 0; i < terminated.length; i++) {
-                        if (i >= maxLength - 1) {
+                        if (i >= maxLength) {
                             vm.console.addLine(
                                 `Input string too long, ignoring last ${terminated.length - maxLength} bytes`,
                                 "warn",
