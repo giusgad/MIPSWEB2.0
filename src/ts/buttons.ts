@@ -13,7 +13,11 @@ import {
     openFile,
     renameFile,
 } from "./files.js";
-import { hideFilePopover, showFilePopover } from "./popovers.js";
+import {
+    hideFilePopover,
+    showFileActionsPopover,
+    showPopover,
+} from "./popovers.js";
 import {
     assemble,
     stop,
@@ -112,11 +116,17 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     clearErrorMarkers();
 };
 
-(window as any).showFilePopoverOnClick = async function (
+(window as any).showFileActionsOnClick = async function (
     id: string,
     toggleButton: HTMLElement,
 ) {
-    await showFilePopover(id, toggleButton);
+    await showFileActionsPopover(id, toggleButton);
+};
+
+(window as any).showFileMenuOnClick = async function (button: HTMLElement) {
+    const rect = button.getBoundingClientRect();
+    await showPopover(rect, "menu");
+    await render("popover", "/app/popovers/file-menu-popover.ejs");
 };
 
 (window as any).showFormOnClick = async function (

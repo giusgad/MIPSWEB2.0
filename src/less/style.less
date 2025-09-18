@@ -280,6 +280,22 @@ input {
   }
 }
 
+#files-buttons {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  height: 100%;
+  .button {
+    height: 100%;
+    padding: 0 1em;
+    border-right: @btn-border;
+    &:hover {
+      background-color: var(--rgb-gray-9);
+      border-color: var(--rgb-gray-8);
+    }
+  }
+}
+
 #console {
   .button.toggle-btn {
     .toggle-mem-btn();
