@@ -89,7 +89,7 @@ function isElemVerticallyInView(el: HTMLElement): boolean {
 
     const toolbarH = 40;
     const verticallyInView =
-        rect.top < windowHeight && rect.bottom > toolbarH * 3;
+        rect.top < windowHeight && rect.bottom > toolbarH * 2;
 
     return verticallyInView;
 }

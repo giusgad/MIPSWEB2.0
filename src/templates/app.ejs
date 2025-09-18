@@ -1,16 +1,14 @@
-<div class="header flex justify-between align-center">
-    <div class="flex align-center">
-        <!--<div class="icon app-logo app-color"><%-//Icons.render('microchip')%></div>-->
-        <div class="app-name">MIPSWEB</div>
-    </div>
-    <div id="header-buttons"><%-await renderTemplate('/app/header-buttons.ejs', ctx)%></div>
-</div>
-
 <div class="toolbar flex justify-between align-center">
+  <div class="flex left">
+    <div class="flex align-center">
+      <!--<div class="icon app-logo app-color"><%-//Icons.render('microchip')%></div>-->
+      <div class="app-name">MIPSWEB</div>
+    </div>
     <div id="files-buttons"><%-await renderTemplate('/app/files-buttons.ejs', ctx)%></div>
-    <% if (ctx.openedFiles.length > 0) { %>
-    <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', ctx)%></div>
-    <%}%>
+  </div>
+  <% if (ctx.openedFiles.length > 0) { %>
+  <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', ctx)%></div>
+  <%}%>
 </div>
 
 <% if ((ctx.files.length > 0) && ctx.interfaceState === 'edit') { %>
@@ -22,15 +20,14 @@
 <%}%>
 
 <% if (ctx.openedFiles.length > 0) { %>
+  <div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% }%> <%=ctx.memoryShown?"memory-shown":""%> <%=ctx.sidebar?"sidebar-open":""%>">
+    <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
+  </div>
 
-    <div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% }%> <%=ctx.memoryShown?"memory-shown":""%> <%=ctx.sidebar?"sidebar-open":""%>">
-      <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
-    </div>
+  <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
 
-    <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
-
-    <div id="memory" class="<%=ctx.memoryShown ? "memory-shown": ""%>"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
-    <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
-      <%-await renderTemplate('/app/console.ejs', ctx)%>
-    </div>
+  <div id="memory" class="<%=ctx.memoryShown ? "memory-shown": ""%>"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
+  <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
+    <%-await renderTemplate('/app/console.ejs', ctx)%>
+  </div>
 <%}%>

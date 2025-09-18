@@ -80,16 +80,13 @@ input {
   }
 }
 
-.header {
-  background-color: var(--rgb-gray-10);
-  height: @toolbar-h;
-  border-bottom: solid 1px var(--rgb-gray-11);
-}
-
 .toolbar {
   background-color: var(--rgb-gray-10);
   height: @toolbar-h;
   border-bottom: solid 1px var(--rgb-gray-11);
+  .left {
+    height: 100%;
+  }
 }
 
 .address.hexadecimal,
@@ -128,8 +125,7 @@ input {
   font-size: @font-size-big;
   line-height: @font-size-big;
   font-weight: bold;
-  height: 100%;
-  padding-left: 12px;
+  padding: 0 12px;
   color: var(--rgb-app-color);
 }
 
@@ -289,6 +285,9 @@ input {
     height: 100%;
     padding: 0 1em;
     border-right: @btn-border;
+    &:first-of-type {
+      border-left: @btn-border;
+    }
     &:hover {
       background-color: var(--rgb-gray-9);
       border-color: var(--rgb-gray-8);

@@ -1,7 +1,7 @@
 @import "variables.less";
 
 @width-registers: 20%;
-@width-memory: 40%;
+@width-memory: 35%;
 @height-console: 25%;
 
 #app {
@@ -14,7 +14,7 @@
 
 #sidebar {
   position: absolute;
-  top: calc(@toolbar-h * 2);
+  top: @toolbar-h;
   left: 0;
   width: @sidebar-w-close;
   bottom: 0;
@@ -25,7 +25,7 @@
 
 #opened-files {
   position: absolute;
-  top: calc(@toolbar-h * 2);
+  top: @toolbar-h;
   left: @sidebar-w-close;
   right: @width-registers;
   height: @toolbar-h;
@@ -36,13 +36,13 @@
     left: 0;
   }
   &.memory-shown {
-    right: 60%;
+    right: calc(@width-memory + @width-registers);
   }
 }
 
 #editors {
   position: absolute;
-  top: calc(@toolbar-h * 3);
+  top: calc(@toolbar-h * 2);
   left: @sidebar-w-close;
   right: @width-registers;
   bottom: 0;
@@ -50,7 +50,7 @@
     left: @sidebar-w-open;
   }
   &.memory-shown {
-    right: 60%;
+    right: calc(@width-registers + @width-memory);
   }
   &.execute {
     left: 0; // hides sidebar
@@ -62,7 +62,7 @@
 
 #registers {
   position: absolute;
-  top: calc(@toolbar-h * 2);
+  top: @toolbar-h;
   left: 80%;
   width: @width-registers;
   bottom: 0;
@@ -91,7 +91,7 @@
     }
   }
   position: absolute;
-  top: calc(@toolbar-h * 2);
+  top: @toolbar-h;
   right: @width-registers;
   bottom: 0;
   width: 0%;
@@ -101,7 +101,9 @@
   }
   &.memory-shown {
     width: @width-memory;
-    & .title,
+    & .title {
+      display: flex;
+    }
     & #memorymap-container {
       display: initial;
     }
@@ -124,7 +126,7 @@
 
 #sidebar-content {
   position: absolute;
-  top: calc(@toolbar-h * 2);
+  top: @toolbar-h;
   left: @sidebar-w-close;
   width: @sidebar-w-open - @sidebar-w-close;
   bottom: 0;
