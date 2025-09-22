@@ -14,5 +14,11 @@
           <div class="label">Close all sources</div>
       </div>
     <%}%>
+    <%if (ctx.files.length > 0) {%>
+        <div class="button default" onclick="exportAllOnClick()">
+            <div class="icon gray-4"><%-Icons.render('exportFile')%></div>
+            <div class="label">Export zip</div>
+        </div>
+    <%}%>
   </div>
 </div>

@@ -5,6 +5,7 @@ import {
     closeAllFiles,
     closeFile,
     deleteFile,
+    exportAllFiles,
     exportFile,
     getOpenedFiles,
     getSelectedFileId,
@@ -273,6 +274,10 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     const fileId = parseInt(stringFileId);
     await exportFile(fileId);
     hideFilePopover();
+};
+
+(window as any).exportAllOnClick = async function () {
+    exportAllFiles();
 };
 
 (window as any).renameFileOnClick = async function (stringFileId: string) {

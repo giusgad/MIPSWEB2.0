@@ -4,6 +4,8 @@ import { setSidebar, sidebar } from "./sidebar.js";
 import { getFromStorage, scrollToEnd, setIntoStorage } from "./utils.js";
 import { setConsoleShown } from "./virtual-machine.js";
 
+declare const JSZip: any;
+
 export type file = {
     id: number;
     name: string;
@@ -275,21 +277,35 @@ export async function exportFile(fileId: number) {
         }
 
         const blob = new Blob([file.content], { type: "text/plain" });
-
-        // Create a temporary download link
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${file.name}.${file.type}`;
-        document.body.appendChild(a);
-        a.click();
-
-        // Cleanup
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        showDownloadPrompt(blob, `${file.name}.${file.type}`);
     } catch (error: any) {
         console.error(`Error exporting the file with ID: ${fileId}`, error);
     }
+}
+
+export async function exportAllFiles() {
+    const zip = new JSZip();
+    for (const file of getFiles()) {
+        if (!file.name.endsWith(".asm")) file.name = `${file.name}.asm`;
+        zip.file(file.name, file.content);
+    }
+    const blob = await zip.generateAsync({ type: "blob" });
+    //TODO: project name
+    showDownloadPrompt(blob, `project.zip`);
+}
+
+/**Download the given blob named as the specified download string*/
+function showDownloadPrompt(blob: Blob, download: string) {
+    // Create a temporary download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = download;
+    document.body.appendChild(a);
+    a.click();
+    // Cleanup
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 export async function newFile() {
