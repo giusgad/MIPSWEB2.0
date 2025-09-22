@@ -1,24 +1,28 @@
 <div class="popover file-menu">
   <div class="buttons">
-    <div class="button default" onclick="newFileOnClick()">
+    <div class="button default" onclick="newFileOnClick()" title="Create a new source file inside the editor">
         <div class="icon gray-4"><%-Icons.render('newFile')%></div>
         <div class="label">New source</div>
     </div>
-    <div class="button default" onclick="importFilesOnClick()">
+    <div class="button default" onclick="importFilesOnClick()" title="Add the imported files to the current project">
         <div class="icon gray-4"><%-Icons.render('importFiles')%></div>
-        <div class="label">Import sources</div>
+        <div class="label">Import files</div>
     </div>
-    <% if (ctx.openedFiles.length > 0) { %>
-      <div class="button default"  onclick="closeAllFilesOnClick()">
-          <div class="icon gray-4"><%-Icons.render('closeAll')%></div>
-          <div class="label">Close all sources</div>
-      </div>
-    <%}%>
+    <div class="button default" onclick="importZipOnClick()" title="Open a new project replacing the current one">
+        <div class="icon gray-4"><%-Icons.render('newProject')%></div>
+        <div class="label">Import project zip</div>
+    </div>
     <%if (ctx.files.length > 0) {%>
-        <div class="button default" onclick="exportAllOnClick()">
-            <div class="icon gray-4"><%-Icons.render('exportFile')%></div>
-            <div class="label">Export zip</div>
+        <div class="button default" onclick="exportAllOnClick()", title="Exports all the current project's files to a zip archive">
+            <div class="icon gray-4"><%-Icons.render('exportProject')%></div>
+            <div class="label">Export project zip</div>
         </div>
+    <%}%>
+    <% if (ctx.openedFiles.length > 0) { %>
+      <div class="button default"  onclick="closeAllFilesOnClick()" title="Close all open editor tabs, doesn't delete the files">
+          <div class="icon gray-4"><%-Icons.render('x')%></div>
+          <div class="label">Close all tabs</div>
+      </div>
     <%}%>
   </div>
 </div>

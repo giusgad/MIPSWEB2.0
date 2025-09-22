@@ -7,9 +7,11 @@ import {
     deleteFile,
     exportAllFiles,
     exportFile,
+    getFiles,
     getOpenedFiles,
     getSelectedFileId,
     importFiles,
+    importZip,
     newFile,
     openFile,
     renameFile,
@@ -278,6 +280,17 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 
 (window as any).exportAllOnClick = async function () {
     exportAllFiles();
+};
+(window as any).importZipOnClick = async function () {
+    const noFilesInUse = getFiles().length === 0;
+    const confirmed =
+        noFilesInUse ||
+        confirm(
+            `Importing a new project will close the currently open one and all unsaved sources will be lost.
+Save your current project before proceeding.`,
+        );
+    if (!confirmed) return;
+    importZip();
 };
 
 (window as any).renameFileOnClick = async function (stringFileId: string) {

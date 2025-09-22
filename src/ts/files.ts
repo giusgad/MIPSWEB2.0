@@ -225,6 +225,29 @@ export function importFiles() {
     input.click();
 }
 
+export function importZip() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".zip";
+    input.multiple = false;
+    input.onchange = async () => {
+        if (input.files && input.files.length === 1) {
+            // delete all opened files
+            getFiles().forEach((f) => deleteFile(f.id));
+            const zip = new JSZip();
+            const zipContent = await zip.loadAsync(input.files[0]);
+            for (const file of Object.values(zipContent.files).filter(
+                (f: any) =>
+                    !f.dir && !f.name.includes("/") && f.name.endsWith(".asm"),
+            )) {
+                const fileData = await (file as any).async("text");
+                importFile(new File([fileData], (file as any).name));
+            }
+        }
+    };
+    input.click();
+}
+
 export function importFile(file: File) {
     const reader = new FileReader();
 
