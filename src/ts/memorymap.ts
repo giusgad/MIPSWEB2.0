@@ -14,7 +14,14 @@ let canvasIntervals: CanvasInterval[] = [];
 function memoryMapOnClick(ev: MouseEvent) {
     const interval = findClosetInterval(ev.offsetY);
     if (!interval) return;
-    highlightInterval(`${interval.intervalId}`, undefined, true);
+    // find all the adjacent intervals that were drawn on together
+    // since a single pixel in the minimap may represent multiple separate memory intervals
+    const memIntervalIds = canvasIntervals
+        .filter((i) => i.startY === interval.startY && i.endY === interval.endY)
+        .map((i) => i.intervalId);
+    for (const id of memIntervalIds) {
+        highlightInterval(`${id}`, undefined, true);
+    }
 }
 
 /** draw lines connecting the map's interval to the corresponding memory if displayed*/
