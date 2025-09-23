@@ -283,9 +283,10 @@ input {
   height: 100%;
   .button {
     height: 100%;
+    margin: 0;
     padding: 0 1em;
     border-right: @btn-border;
-    &:first-of-type {
+    &:first-child {
       border-left: @btn-border;
     }
     &:hover {
@@ -679,6 +680,7 @@ input {
   overflow-x: scroll;
   overflow-y: hidden;
   background-color: var(--rgb-gray-10);
+  border-bottom: 1px solid var(--rgb-gray-9);
 
   &.sortable {
     .file-tab {

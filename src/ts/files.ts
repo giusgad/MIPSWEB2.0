@@ -311,8 +311,8 @@ export async function exportFile(fileId: number) {
 export function getProjectName() {
     return getFromStorage("local", "project-name") || "MIPS_project";
 }
-export function setProjectName(val: string) {
-    if (!isValidProjectName(val)) val = "MIPS_project";
+export function setProjectName(val: string | null) {
+    if (val == null || !isValidProjectName(val)) val = "MIPS_project";
     setIntoStorage("local", "project-name", val);
 }
 export function isValidProjectName(val: string): boolean {

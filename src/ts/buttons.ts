@@ -129,10 +129,13 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     await showFileActionsPopover(id, toggleButton);
 };
 
-(window as any).showFileMenuOnClick = async function (button: HTMLElement) {
+(window as any).showMenuOnClick = async function (
+    button: HTMLElement,
+    templatePath: string,
+) {
     const rect = button.getBoundingClientRect();
     await showPopover(rect, "menu");
-    await render("popover", "/app/popovers/file-menu-popover.ejs");
+    await render("popover", templatePath);
 };
 
 (window as any).showFormOnClick = async function (
@@ -284,16 +287,27 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 (window as any).exportZipOnClick = async function () {
     exportZip();
 };
-(window as any).importZipOnClick = async function () {
+
+/**Ask confirmation from the user on whether it's safe to remove the current project's files.
+ * Returns true if the user accepted, false otherwise.*/
+export function confirmClearProject(): boolean {
     const noFilesInUse = getFiles().length === 0;
-    const confirmed =
+    return (
         noFilesInUse ||
         confirm(
             `Importing a new project will close the currently open one and all unsaved sources will be lost.
 Save your current project before proceeding.`,
-        );
-    if (!confirmed) return;
-    importZip();
+        )
+    );
+}
+(window as any).importZipOnClick = function () {
+    if (confirmClearProject()) importZip();
+};
+(window as any).newProjectOnClick = function () {
+    if (confirmClearProject()) {
+        setProjectName(null);
+        getFiles().forEach((f) => deleteFile(f.id));
+    }
 };
 
 (window as any).renameFileOnClick = async function (stringFileId: string) {
