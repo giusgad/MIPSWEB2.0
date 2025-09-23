@@ -236,6 +236,8 @@ export function importZip() {
             getFiles().forEach((f) => deleteFile(f.id));
             const zip = new JSZip();
             const zipContent = await zip.loadAsync(input.files[0]);
+            let name = input.files[0].name;
+            setProjectName(name.substring(0, name.length - 4));
             for (const file of Object.values(zipContent.files).filter(
                 (f: any) =>
                     !f.dir && !f.name.includes("/") && f.name.endsWith(".asm"),
@@ -306,15 +308,30 @@ export async function exportFile(fileId: number) {
     }
 }
 
-export async function exportAllFiles() {
+export function getProjectName() {
+    return getFromStorage("local", "project-name") || "MIPS_project";
+}
+export function setProjectName(val: string) {
+    if (!isValidProjectName(val)) val = "MIPS_project";
+    setIntoStorage("local", "project-name", val);
+}
+export function isValidProjectName(val: string): boolean {
+    if (!val || val.trim() === "") return false;
+    // only ASCII letters, digits, spaces, dashes, underscores
+    const validPattern = /^[A-Za-z0-9 _-]+$/;
+    // not: \ / : * ? " < > |
+    const invalidCharsPattern = /[\\\/:*?"<>|]/;
+    return validPattern.test(val) && !invalidCharsPattern.test(val);
+}
+
+export async function exportZip() {
     const zip = new JSZip();
     for (const file of getFiles()) {
         if (!file.name.endsWith(".asm")) file.name = `${file.name}.asm`;
         zip.file(file.name, file.content);
     }
     const blob = await zip.generateAsync({ type: "blob" });
-    //TODO: project name
-    showDownloadPrompt(blob, `project.zip`);
+    showDownloadPrompt(blob, `${getProjectName()}.zip`);
 }
 
 /**Download the given blob named as the specified download string*/

@@ -13,7 +13,7 @@
         <div class="label">Import project zip</div>
     </div>
     <%if (ctx.files.length > 0) {%>
-        <div class="button default" onclick="exportAllOnClick()", title="Exports all the current project's files to a zip archive">
+        <div class="button default" onclick="exportZipOnClick()", title="Exports all the current project's files to a zip archive">
             <div class="icon gray-4"><%-Icons.render('exportProject')%></div>
             <div class="label">Export project zip</div>
         </div>

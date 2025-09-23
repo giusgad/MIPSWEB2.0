@@ -722,6 +722,27 @@ input {
   border-right: @border-gray-11;
 
   .title {
+    input {
+      width: 100%;
+      background-color: var(--rgb-gray-10);
+    }
+    .button {
+      .save-icon {
+        display: none;
+      }
+      .edit-icon {
+        display: block;
+      }
+      &.editing {
+        .save-icon {
+          display: block;
+        }
+        .edit-icon {
+          display: none;
+        }
+      }
+    }
+    gap: 5px;
     height: @toolbar-h;
     display: flex;
     justify-content: flex-start;

@@ -5,16 +5,19 @@ import {
     closeAllFiles,
     closeFile,
     deleteFile,
-    exportAllFiles,
+    exportZip,
     exportFile,
     getFiles,
     getOpenedFiles,
+    getProjectName,
     getSelectedFileId,
     importFiles,
     importZip,
+    isValidProjectName,
     newFile,
     openFile,
     renameFile,
+    setProjectName,
 } from "./files.js";
 import {
     hideFilePopover,
@@ -278,8 +281,8 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     hideFilePopover();
 };
 
-(window as any).exportAllOnClick = async function () {
-    exportAllFiles();
+(window as any).exportZipOnClick = async function () {
+    exportZip();
 };
 (window as any).importZipOnClick = async function () {
     const noFilesInUse = getFiles().length === 0;
@@ -304,5 +307,31 @@ Save your current project before proceeding.`,
         await hideForm();
     } catch (error) {
         alert("Error renaming the file. Please try again.");
+    }
+};
+
+let editingName = false;
+(window as any).changeProjectNameOnClick = function (btn: HTMLButtonElement) {
+    const input = document.getElementById(
+        "projectNameInput",
+    )! as HTMLInputElement;
+    if (editingName) {
+        // save project name
+        if (isValidProjectName(input.value)) {
+            setProjectName(input.value);
+            btn.classList.remove("editing");
+            editingName = false;
+            input.disabled = true;
+        } else {
+            input.value = getProjectName();
+            input.focus();
+        }
+    } else {
+        // start editing
+        btn.classList.add("editing");
+        editingName = true;
+        input.disabled = false;
+        input.focus();
+        input.setSelectionRange(0, input.value.length);
     }
 };

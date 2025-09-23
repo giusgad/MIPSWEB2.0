@@ -1,7 +1,12 @@
 import { addLoader, removeLoader } from "./loaders.js";
 import { Icons } from "./lib/Icons.js";
 import { Colors } from "./lib/Colors.js";
-import { getFiles, getOpenedFiles, getSelectedFile } from "./files.js";
+import {
+    getFiles,
+    getOpenedFiles,
+    getProjectName,
+    getSelectedFile,
+} from "./files.js";
 import { sidebar } from "./sidebar.js";
 import { editorState, interfaceState } from "./app.js";
 import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
@@ -16,6 +21,7 @@ declare const ejs: any;
 
 export function getContext() {
     return {
+        projectName: getProjectName(),
         files: getFiles(),
         openedFiles: getOpenedFiles(),
         selectedFile: getSelectedFile(),

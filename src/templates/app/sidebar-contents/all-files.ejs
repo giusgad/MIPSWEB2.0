@@ -1,5 +1,11 @@
 <div class="sidebar-content">
-    <div class="title">Files</div>
+    <div class="title">
+      <input id="projectNameInput" type="text" value="<%=ctx.projectName%>" disabled></input>
+      <button class="button default" onclick="changeProjectNameOnClick(this);">
+        <div class="icon gray-4 edit-icon"><%-Icons.render('edit')%></div>
+        <div class="icon gray-4 save-icon"><%-Icons.render('save')%></div>
+      </button>
+    </div>
     <div id="all-files" class="all-files sortable">
         <%ctx.files.forEach((file) => {%>
         <div class="file-container" ondblclick="openFileOnDbClick('<%=file.id%>', this)">
