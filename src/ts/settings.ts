@@ -4,6 +4,8 @@ import { updateEditorsTheme } from "./editors.js";
 import { renderApp } from "./app.js";
 import { hideForm } from "./forms.js";
 import { render } from "./rendering.js";
+import { importPublicZip } from "./files.js";
+import { confirmClearProject } from "./buttons.js";
 
 window
     .matchMedia("(prefers-color-scheme: dark)")
@@ -11,8 +13,8 @@ window
         Colors.generateCSSVariables();
         updateEditorsTheme();
     });
-// load setting from query string if set
-window.addEventListener("load", () => {
+// load settings and/or project zip from query string if set
+window.addEventListener("load", async () => {
     const params = new URLSearchParams(window.location.search);
     const queryFlags = params.get("opts");
     if (queryFlags != null) {
@@ -20,12 +22,25 @@ window.addEventListener("load", () => {
         if (!newOpts) return;
         updateOpts(newOpts);
 
-        // remove opts from the url
+        // remove opts from the URL
         params.delete("opts");
         const newUrl =
             window.location.pathname +
             (params.toString() ? "?" + params.toString() : "");
         history.replaceState(null, "", newUrl);
+    }
+    const projectPath = params.get("project");
+    if (projectPath) {
+        const confirmed = confirmClearProject();
+        if (confirmed) {
+            await importPublicZip(projectPath);
+            // remove the project string from the URL
+            params.delete("project");
+            const newUrl =
+                window.location.pathname +
+                (params.toString() ? "?" + params.toString() : "");
+            history.replaceState(null, "", newUrl);
+        }
     }
 });
 

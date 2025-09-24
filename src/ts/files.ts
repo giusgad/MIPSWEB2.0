@@ -1,7 +1,7 @@
 import { addEditor, editors, removeEditor, showEditor } from "./editors.js";
 import { renderApp } from "./app.js";
 import { setSidebar, sidebar } from "./sidebar.js";
-import { getFromStorage, scrollToEnd, setIntoStorage } from "./utils.js";
+import { getFromStorage, setIntoStorage } from "./utils.js";
 import { setConsoleShown } from "./virtual-machine.js";
 
 declare const JSZip: any;
@@ -225,32 +225,58 @@ export function importFiles() {
     input.click();
 }
 
-export function importZip() {
+export async function importPublicZip(zipPath: string) {
+    zipPath = zipPath.trim();
+    if (!zipPath.endsWith(".zip")) return;
+    try {
+        while (zipPath.startsWith("/")) zipPath = zipPath.slice(1);
+        const res = await fetch(`/${zipPath}`);
+        const arrayBuffer = await res.arrayBuffer();
+        const zip = await JSZip.loadAsync(arrayBuffer);
+        await loadProject(zip, zipPath.split("/").pop());
+    } catch (e) {
+        alert(
+            "There was a problem loading the project specified in the url string. Please check the path and try again.",
+        );
+        console.error(e);
+    }
+}
+
+export async function importZip() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".zip";
     input.multiple = false;
     input.onchange = async () => {
         if (input.files && input.files.length === 1) {
-            // delete all opened files
-            getFiles().forEach((f) => deleteFile(f.id));
             const zip = new JSZip();
             const zipContent = await zip.loadAsync(input.files[0]);
             let name = input.files[0].name;
-            setProjectName(name.substring(0, name.length - 4));
-            for (const file of Object.values(zipContent.files).filter(
-                (f: any) =>
-                    !f.dir && !f.name.includes("/") && f.name.endsWith(".asm"),
-            )) {
-                const fileData = await (file as any).async("text");
-                importFile(new File([fileData], (file as any).name));
-            }
+            await loadProject(zipContent, name);
         }
     };
     input.click();
 }
 
-export function importFile(file: File) {
+async function loadProject(zip: any, name: string | undefined) {
+    // delete all current files
+    await closeAllFiles();
+    getFiles().forEach((f) => deleteFile(f.id));
+    // load the new files
+    for (const file of Object.values(zip.files).filter(
+        (f: any) => !f.dir && !f.name.includes("/") && f.name.endsWith(".asm"),
+    )) {
+        const fileData = await (file as any).async("text");
+        importFile(new File([fileData], (file as any).name), false);
+    }
+    // set the project name
+    if (name == null) name = "MIPS_project.zip";
+    if (name.endsWith(".zip")) name = name.substring(0, name.length - 4);
+    setProjectName(name);
+}
+
+/** specifies the file to import and whether to open a tab when loaded */
+export function importFile(file: File, openTab: boolean = true) {
     const reader = new FileReader();
 
     reader.onerror = () => {
@@ -273,7 +299,7 @@ export function importFile(file: File) {
             };
 
             addFile(fileToAdd);
-            await openFile(fileId);
+            if (openTab) await openFile(fileId);
         } catch (error) {
             console.error(`Error importing the file: ${file.name}`, error);
             alert(`Error importing the file: ${file.name}. Please try again.`);

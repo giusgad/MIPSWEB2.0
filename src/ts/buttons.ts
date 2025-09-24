@@ -300,8 +300,8 @@ Save your current project before proceeding.`,
         )
     );
 }
-(window as any).importZipOnClick = function () {
-    if (confirmClearProject()) importZip();
+(window as any).importZipOnClick = async function () {
+    if (confirmClearProject()) await importZip();
 };
 (window as any).newProjectOnClick = function () {
     if (confirmClearProject()) {
