@@ -230,7 +230,7 @@ export async function importPublicZip(zipPath: string) {
     if (!zipPath.endsWith(".zip")) return;
     try {
         while (zipPath.startsWith("/")) zipPath = zipPath.slice(1);
-        const res = await fetch(`/${zipPath}`);
+        const res = await fetch(`projects/${zipPath}`);
         const arrayBuffer = await res.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
         await loadProject(zip, zipPath.split("/").pop());
@@ -273,6 +273,7 @@ async function loadProject(zip: any, name: string | undefined) {
     if (name == null) name = "MIPS_project.zip";
     if (name.endsWith(".zip")) name = name.substring(0, name.length - 4);
     setProjectName(name);
+    await renderApp("edit", "edit");
 }
 
 /** specifies the file to import and whether to open a tab when loaded */

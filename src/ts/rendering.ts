@@ -61,16 +61,12 @@ export async function render(
 async function renderTemplate(templatePath: string, ctx: any = undefined) {
     addLoader(`renderTemplate: ${templatePath}`);
     if (!ctx) ctx = getContext();
-    const template = await fetch(`src/templates/${templatePath}`).then(
-        (res) => {
-            if (!res.ok) {
-                throw new Error(
-                    `No template found: "src/templates/${templatePath}"`,
-                );
-            }
-            return res.text();
-        },
-    );
+    const template = await fetch(`templates/${templatePath}`).then((res) => {
+        if (!res.ok) {
+            throw new Error(`No template found: "templates/${templatePath}"`);
+        }
+        return res.text();
+    });
     const data = { ctx, Icons, Colors };
     const result = ejs.render(template, data, { async: true });
     removeLoader(`renderTemplate: ${templatePath}`);

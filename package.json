@@ -6,9 +6,10 @@
   "scripts": {
     "watch:less": "less-watch-compiler src/less css",
     "watch:ts": "npx tsc --watch",
-    "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\" \"npx http-server . -p 8080 -c-1\"",
+    "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\" \"node server.js\"",
     "build:less": "npx lessc src/less/style.less css/style.css",
-    "build": "npm run build:less && npx tsc"
+    "copy:static": "rm -r build; mkdir build && cp -r -t build index.html css/ js/ projects/ && cp -r src/templates build/templates",
+    "build": "npm run build:less && npx tsc && npm run copy:static"
   },
   "repository": {
     "type": "git",
