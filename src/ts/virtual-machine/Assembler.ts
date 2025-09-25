@@ -116,6 +116,11 @@ export class Assembler {
             let tokens = this.tokenize(line);
             if (tokens.length === 0) continue;
 
+            this.currentEditorPosition = {
+                fileId: file.id,
+                lineNumber: lineNumber,
+            };
+
             if (tokens[0] === ".data") {
                 section = ".data";
                 directive = this.directives.get(".word")!;
@@ -128,8 +133,12 @@ export class Assembler {
                 continue;
             }
 
-            if (tokens[0].endsWith(":")) {
-                const label = tokens[0].slice(0, -1);
+            if (tokens[0].endsWith(":") || tokens[1] === ":") {
+                // if there are spaces before the : it's counted as a separate token
+                const label =
+                    tokens[1] === ":"
+                        ? tokens[0].trim()
+                        : tokens[0].slice(0, -1);
                 labels.set(label, new Binary(address.getValue()));
                 if (!withLabels) {
                     if (globals.has(label)) {
@@ -140,14 +149,10 @@ export class Assembler {
                         }
                     }
                 }
+                if (tokens[1] === ":") tokens.shift();
                 tokens.shift();
                 if (tokens.length === 0) continue;
             }
-
-            this.currentEditorPosition = {
-                fileId: file.id,
-                lineNumber: lineNumber,
-            };
 
             if (this.directives.get(tokens[0])) {
                 directive = this.directives.get(tokens[0])!;
@@ -193,6 +198,7 @@ export class Assembler {
             }
         }
 
+        // check that each globl has a lable with the same name in the file
         globals.forEach((value, key) => {
             if (value == null) {
                 const addr = labels.get(key);

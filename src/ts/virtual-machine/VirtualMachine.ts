@@ -54,6 +54,7 @@ export class VirtualMachine {
                 `Assemble: ${(error as Error).message}`,
                 this.assembler.currentEditorPosition,
             );
+            console.error(error);
             throw error;
         }
     }
