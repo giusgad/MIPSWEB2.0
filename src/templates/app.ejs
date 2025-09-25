@@ -10,7 +10,7 @@
   <%}%>
 </div>
 
-<% if ((ctx.files.length > 0) && ctx.interfaceState === 'edit') { %>
+<% if (ctx.interfaceState === 'edit') { %>
 <div id="sidebar" class="<%=ctx.sidebar?"sidebar-open":""%> <%=ctx.consoleShown?"console-shown":""%>">
   <%-await renderTemplate('/app/sidebar.ejs', ctx)%>
 </div>
@@ -29,4 +29,6 @@
   <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
     <%-await renderTemplate('/app/console.ejs', ctx)%>
   </div>
+<%} else {%>
+    <%-await renderTemplate("/app/no-files.ejs")%>
 <%}%>

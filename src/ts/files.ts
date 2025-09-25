@@ -263,16 +263,20 @@ async function loadProject(zip: any, name: string | undefined) {
     await closeAllFiles();
     getFiles().forEach((f) => deleteFile(f.id));
     // load the new files
+    let first = true;
     for (const file of Object.values(zip.files).filter(
         (f: any) => !f.dir && !f.name.includes("/") && f.name.endsWith(".asm"),
     )) {
         const fileData = await (file as any).async("text");
-        importFile(new File([fileData], (file as any).name), false);
+        // only load the file in a tab if it's the first one
+        importFile(new File([fileData], (file as any).name), first);
+        first = false;
     }
     // set the project name
     if (name == null) name = "MIPS_project.zip";
     if (name.endsWith(".zip")) name = name.substring(0, name.length - 4);
     setProjectName(name);
+    setSidebar("all-files");
     await renderApp("edit", "edit");
 }
 

@@ -1,11 +1,17 @@
 <div class="sidebar-content">
     <div class="title">
       <input id="projectNameInput" type="text" value="<%=ctx.projectName%>" disabled></input>
-      <button class="button default" onclick="changeProjectNameOnClick(this);">
+      <button class="button default" onclick="changeProjectNameOnClick(this);" title="Edit project name">
         <div class="icon gray-4 edit-icon"><%-Icons.render('edit')%></div>
         <div class="icon gray-4 save-icon"><%-Icons.render('save')%></div>
       </button>
     </div>
+    <%if (ctx.files.length===0) {%>
+      <div class="button default new-file-btn" onclick="newFileOnClick()" title="Create a new source file inside the editor">
+          <div class="icon gray-4"><%-Icons.render('newFile')%></div>
+          <div class="label">New file</div>
+      </div>
+    <%}%>
     <div id="all-files" class="all-files sortable">
         <%ctx.files.forEach((file) => {%>
         <div class="file-container" ondblclick="openFileOnDbClick('<%=file.id%>', this)">

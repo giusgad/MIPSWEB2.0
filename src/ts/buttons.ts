@@ -1,5 +1,5 @@
 import { hideForm, showForm } from "./forms.js";
-import { toggleSidebar } from "./sidebar.js";
+import { setSidebar, toggleSidebar } from "./sidebar.js";
 import {
     changeFile,
     closeAllFiles,
@@ -47,6 +47,7 @@ import { highlightInterval } from "./memorymap.js";
 import { render } from "./rendering.js";
 import { adjustBinaryWidth, highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
+import { renderApp } from "./app.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -303,10 +304,12 @@ Save your current project before proceeding.`,
 (window as any).importZipOnClick = async function () {
     if (confirmClearProject()) await importZip();
 };
-(window as any).newProjectOnClick = function () {
+(window as any).newProjectOnClick = async function () {
     if (confirmClearProject()) {
         setProjectName(null);
         getFiles().forEach((f) => deleteFile(f.id));
+        setSidebar("all-files");
+        await renderApp("edit", "edit");
     }
 };
 
