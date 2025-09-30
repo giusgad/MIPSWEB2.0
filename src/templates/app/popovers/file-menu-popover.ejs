@@ -8,11 +8,5 @@
         <div class="icon gray-4"><%-Icons.render('importFiles')%></div>
         <div class="label">Import files</div>
     </div>
-    <% if (ctx.openedFiles.length > 0) { %>
-      <div class="button default"  onclick="closeAllFilesOnClick()" title="Close all open editor tabs, doesn't delete the files">
-          <div class="icon gray-4"><%-Icons.render('x')%></div>
-          <div class="label">Close all tabs</div>
-      </div>
-    <%}%>
   </div>
 </div>

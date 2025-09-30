@@ -44,11 +44,6 @@ export async function showFileActionsPopover(
             }
         }
     });
-    document
-        .getElementById("all-files")
-        ?.addEventListener("scroll", (event) => {
-            hideFilePopover();
-        });
     await render("popover", "/app/popovers/file-actions-popover.ejs", {
         file: getFile(parseInt(id)),
     });

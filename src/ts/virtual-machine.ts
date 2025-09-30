@@ -1,4 +1,4 @@
-import { changeFile, file, getOpenedFiles } from "./files.js";
+import { changeFile, file } from "./files.js";
 import { VirtualMachine } from "./virtual-machine/VirtualMachine.js";
 import { CPU } from "./virtual-machine/CPU.js";
 import { renderApp } from "./app.js";
@@ -30,7 +30,6 @@ export async function setConsoleShown(val: boolean) {
     consoleShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("console-shown", "console");
-    classAction("console-shown", "sidebar");
     classAction("console-shown", "editors");
     await render("console", "/app/console.ejs", undefined, false);
 }

@@ -1,21 +1,17 @@
 import { hideForm, showForm } from "./forms.js";
-import { setSidebar, toggleSidebar } from "./sidebar.js";
 import {
     changeFile,
-    closeAllFiles,
     closeFile,
     deleteFile,
     exportZip,
     exportFile,
     getFiles,
-    getOpenedFiles,
     getProjectName,
     getSelectedFileId,
     importFiles,
     importZip,
     isValidProjectName,
     newFile,
-    openFile,
     renameFile,
     setProjectName,
 } from "./files.js";
@@ -117,7 +113,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).assembleOnClick = async function () {
-    const openedFiles = getOpenedFiles();
+    const openedFiles = getFiles();
     await setMemoryShown(true);
     await assemble(openedFiles);
     clearErrorMarkers();
@@ -153,10 +149,6 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 
 (window as any).hideFormOnClick = async function () {
     await hideForm();
-};
-
-(window as any).toggleSidebarOnClick = async function (sidebarButton: string) {
-    await toggleSidebar(sidebarButton);
 };
 
 (window as any).toggleMemoryOnClick = async function () {
@@ -198,10 +190,6 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     importFiles();
 };
 
-(window as any).closeAllFilesOnClick = async function () {
-    await closeAllFiles();
-};
-
 (window as any).changeFileOnClick = async function (
     stringFileId: string,
     fileTab: HTMLElement,
@@ -233,24 +221,6 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     if (!elem) return;
     highlightElementAnimation(`${addr}`, true);
     elem.classList.add("error");
-};
-
-(window as any).openFileOnDbClick = async function (
-    stringFileId: string,
-    fileContainer: HTMLElement,
-) {
-    let allFiles = fileContainer.parentElement;
-    let scrollTop = undefined;
-    if (allFiles) {
-        scrollTop = allFiles.scrollTop;
-    }
-    const fileId = parseInt(stringFileId);
-    if (isNaN(fileId)) console.error("Invalid fileId");
-    await openFile(fileId);
-    if (scrollTop) {
-        (document.getElementById("all-files") as HTMLElement).scrollTop =
-            scrollTop;
-    }
 };
 
 (window as any).closeFileOnClick = async function (
@@ -308,7 +278,6 @@ Save your current project before proceeding.`,
     if (confirmClearProject()) {
         setProjectName(null);
         getFiles().forEach((f) => deleteFile(f.id));
-        setSidebar("all-files");
         await renderApp("edit", "edit");
     }
 };

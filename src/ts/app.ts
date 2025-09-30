@@ -107,7 +107,6 @@ export async function renderApp(
     initSortables();
     hideFilePopover();
     scrollSelectedIntoView("files-tabs");
-    scrollSelectedIntoView("all-files");
     endDrag();
     if (showLoaders) removeLoader("renderApp");
 }

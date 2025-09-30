@@ -1,13 +1,7 @@
 import { addLoader, removeLoader } from "./loaders.js";
 import { Icons } from "./lib/Icons.js";
 import { Colors } from "./lib/Colors.js";
-import {
-    getFiles,
-    getOpenedFiles,
-    getProjectName,
-    getSelectedFile,
-} from "./files.js";
-import { sidebar } from "./sidebar.js";
+import { getFiles, getProjectName, getSelectedFile } from "./files.js";
 import { editorState, interfaceState } from "./app.js";
 import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
 import { getFromStorage } from "./utils.js";
@@ -23,9 +17,7 @@ export function getContext() {
     return {
         projectName: getProjectName(),
         files: getFiles(),
-        openedFiles: getOpenedFiles(),
         selectedFile: getSelectedFile(),
-        sidebar: sidebar,
         interfaceState: interfaceState,
         editorState: editorState,
         /** currently set options*/

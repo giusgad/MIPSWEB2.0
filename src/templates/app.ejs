@@ -1,28 +1,20 @@
 <div class="toolbar flex justify-between align-center">
   <div class="flex left">
     <div class="flex align-center">
-      <div class="app-name">MIPSWEB</div>
+      <div class="app-name">MIPSWEB <span class="version">1.0</span></div>
     </div>
     <div id="files-buttons"><%-await renderTemplate('/app/files-buttons.ejs', ctx)%></div>
   </div>
-  <% if (ctx.openedFiles.length > 0) { %>
+  <% if (ctx.files.length > 0) { %>
   <div id="vm-buttons"><%-await renderTemplate('/app/vm-buttons.ejs', ctx)%></div>
   <%}%>
 </div>
 
-<% if (ctx.interfaceState === 'edit') { %>
-<div id="sidebar" class="<%=ctx.sidebar?"sidebar-open":""%> <%=ctx.consoleShown?"console-shown":""%>">
-  <%-await renderTemplate('/app/sidebar.ejs', ctx)%>
+<div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% }%> <%=ctx.memoryShown?"memory-shown":""%> <%=ctx.files.length>0?"registers-shown":""%>">
+  <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
 </div>
 
-<%if (ctx.sidebar === 'all-files') {%><div id="sidebar-content"><%-await renderTemplate('/app/sidebar-contents/all-files.ejs', ctx)%></div><%}%>
-<%}%>
-
-<% if (ctx.openedFiles.length > 0) { %>
-  <div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% }%> <%=ctx.memoryShown?"memory-shown":""%> <%=ctx.sidebar?"sidebar-open":""%>">
-    <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
-  </div>
-
+<% if (ctx.files.length > 0) { %>
   <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
 
   <div id="memory" class="<%=ctx.memoryShown ? "memory-shown": ""%>"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>

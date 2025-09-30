@@ -1,6 +1,6 @@
 <div class="opened-files">
     <div class="files-tabs <%if(ctx.interfaceState === 'edit'){%>sortable<%}%>" id="files-tabs">
-        <%ctx.openedFiles.forEach((file) => {%>
+        <%ctx.files.forEach((file) => {%>
         <div class="file-tab <%if((ctx.selectedFile) && (ctx.selectedFile.id === file.id)){%>selected<%}%>" onclick="changeFileOnClick('<%=file.id%>', this)">
             <div class="file-name"><%=file.name%>.<%=file.type%></div>
             <div class="buttons">

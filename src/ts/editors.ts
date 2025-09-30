@@ -1,14 +1,13 @@
 import {
     changeFile,
     file,
-    getOpenedFiles,
+    getFiles,
     getSelectedFile,
     getSelectedFileId,
     updateFile,
 } from "./files.js";
 import { Colors } from "./lib/Colors.js";
 import { addClass, removeClass } from "./utils.js";
-import { sidebar } from "./sidebar.js";
 import { editorState, interfaceState, renderApp } from "./app.js";
 import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
 
@@ -165,11 +164,6 @@ export function resizeEditors() {
     } else {
         removeClass("console-shown", "editors");
     }
-    if (sidebar) {
-        document.getElementById("editors")!.classList.add("sidebar-open");
-    } else {
-        document.getElementById("editors")!.classList.remove("sidebar-open");
-    }
     for (const editor of editors) {
         editor.aceEditor.resize();
     }
@@ -311,7 +305,7 @@ export function getAceEditor(file = getSelectedFile()) {
 }
 
 export function addEditors() {
-    const files = getOpenedFiles();
+    const files = getFiles();
     for (const file of files) {
         addEditor(file);
     }
@@ -322,7 +316,7 @@ export function initEditors() {
     if (editorsElement) {
         editorsElement.innerHTML = "";
         editors = [];
-        const files = getOpenedFiles();
+        const files = getFiles();
         if (files.length > 0) {
             addEditors();
             showEditor(getSelectedFileId());

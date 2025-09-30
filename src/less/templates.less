@@ -12,48 +12,31 @@
   right: 0;
 }
 
-#sidebar {
-  position: absolute;
-  top: @toolbar-h;
-  left: 0;
-  width: @sidebar-w-close;
-  bottom: 0;
-  &.console-shown {
-    bottom: @height-console;
-  }
-}
-
 #opened-files {
   position: absolute;
   top: @toolbar-h;
-  left: @sidebar-w-close;
-  right: @width-registers;
+  left: 0;
+  right: 0;
   height: @toolbar-h;
-  &.sidebar-open {
-    left: @sidebar-w-open;
-  }
   &.execute {
     left: 0;
   }
   &.memory-shown {
     right: calc(@width-memory + @width-registers);
   }
+  &.registers-shown {
+    right: @width-registers;
+  }
 }
 
 #editors {
   position: absolute;
   top: calc(@toolbar-h * 2);
-  left: @sidebar-w-close;
+  left: 0;
   right: @width-registers;
   bottom: 0;
-  &.sidebar-open {
-    left: @sidebar-w-open;
-  }
   &.memory-shown {
     right: calc(@width-registers + @width-memory);
-  }
-  &.execute {
-    left: 0; // hides sidebar
   }
   &.console-shown {
     bottom: 25%;
@@ -122,14 +105,6 @@
   &.memory-shown {
     width: calc(100% - @width-registers - @width-memory);
   }
-}
-
-#sidebar-content {
-  position: absolute;
-  top: @toolbar-h;
-  left: @sidebar-w-close;
-  width: @sidebar-w-open - @sidebar-w-close;
-  bottom: 0;
 }
 
 #popover {
