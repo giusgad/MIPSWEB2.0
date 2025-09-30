@@ -5,12 +5,17 @@
             <div class="file-name"><%=file.name%>.<%=file.type%></div>
             <div class="buttons">
                 <%if (ctx.interfaceState === 'edit') {%>
-                <div class="button" onclick="event.stopPropagation();closeFileOnClick('<%=file.id%>', this);">
-                    <div class="icon gray-4"><%-Icons.render('x')%></div>
+                <div class="button" onclick="showFileActionsOnClick(<%=file.id%>, this)">
+                    <div class="icon gray-4"><%-Icons.render('verticalDots')%></div>
                 </div>
                 <%}%>
             </div>
         </div>
         <%});%>
+        <%if (ctx.interfaceState === 'edit') {%>
+          <div class="file-tab new-file not-draggable" onclick="newFileOnClick();">
+            <div class="icon"><%-Icons.render('plus')%></div>
+          </div>
+        <%}%>
     </div>
 </div>

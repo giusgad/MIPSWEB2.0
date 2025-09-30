@@ -699,6 +699,22 @@ input {
   background-color: var(--rgb-gray-10);
   border-bottom: 1px solid var(--rgb-gray-9);
 
+  .new-file {
+    position: relative;
+    padding: 0 16px;
+    & > .icon {
+      margin: auto;
+    }
+    svg {
+      fill: var(--rgba-app-color-80);
+    }
+    &:hover {
+      svg {
+        fill: var(--rgb-app-color);
+      }
+    }
+  }
+
   &.sortable {
     .file-tab {
       &:hover {
@@ -714,6 +730,10 @@ input {
     padding-left: 16px;
     background-color: var(--rgb-gray-10);
     border-bottom: 2px solid transparent;
+
+    &:hover {
+      border-bottom-color: var(--rgba-app-color-50);
+    }
 
     &.selected {
       border-bottom-color: var(--rgb-app-color);

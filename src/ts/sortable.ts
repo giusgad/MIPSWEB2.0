@@ -8,6 +8,7 @@ export function initSortables() {
             // @ts-ignore
             new Sortable(filesTabs, {
                 animation: 150,
+                filter: ".not-draggable",
                 ghostClass: "ghost-class",
                 onEnd: async (evt: any) => {
                     await sortFiles(evt.oldIndex, evt.newIndex);
