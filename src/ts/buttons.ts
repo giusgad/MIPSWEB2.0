@@ -276,7 +276,9 @@ Save your current project before proceeding.`,
 (window as any).newProjectOnClick = async function () {
     if (confirmClearProject()) {
         setProjectName(null);
-        getFiles().forEach((f) => deleteFile(f.id));
+        for (const file of getFiles()) {
+            await deleteFile(file.id);
+        }
         await renderApp("edit", "edit");
     }
 };

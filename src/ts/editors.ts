@@ -304,13 +304,6 @@ export function getAceEditor(file = getSelectedFile()) {
     return undefined;
 }
 
-export function addEditors() {
-    const files = getFiles();
-    for (const file of files) {
-        addEditor(file);
-    }
-}
-
 export function initEditors() {
     const editorsElement = document.getElementById("editors");
     if (editorsElement) {
@@ -318,7 +311,9 @@ export function initEditors() {
         editors = [];
         const files = getFiles();
         if (files.length > 0) {
-            addEditors();
+            for (const file of files) {
+                addEditor(file);
+            }
             showEditor(getSelectedFileId());
         }
     }

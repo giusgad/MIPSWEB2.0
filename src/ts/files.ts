@@ -28,6 +28,10 @@ export async function deleteFile(fileId: number) {
         files.splice(index, 1);
         setFiles(files);
     }
+    const selected = getSelectedFileId();
+    if (!files.find((f) => f.id === selected)) {
+        localStorage.removeItem("selectedFileId");
+    }
     await renderApp();
 }
 
@@ -89,6 +93,7 @@ export function setSelectedFileId(fileId: number) {
     if (file) {
         setIntoStorage("local", "selectedFileId", file.id.toString());
     } else {
+        localStorage.removeItem("selectedFileId");
         console.error(`No opened file found with id: ${fileId}`);
     }
 }
@@ -142,9 +147,10 @@ export function importFiles() {
         if (input.files && input.files.length > 0) {
             const filesArray = Array.from(input.files);
             for (const selectedFile of filesArray) {
-                importFile(selectedFile);
+                await importFile(selectedFile);
             }
         }
+        await renderApp("edit", "edit");
     };
     input.click();
 }
@@ -191,7 +197,7 @@ async function loadProject(zip: any, name: string | undefined) {
     )) {
         const fileData = await (file as any).async("text");
         // only load the file in a tab if it's the first one
-        importFile(new File([fileData], (file as any).name));
+        await importFile(new File([fileData], (file as any).name));
     }
     // set the project name
     if (name == null) name = "MIPS_project.zip";
@@ -201,46 +207,55 @@ async function loadProject(zip: any, name: string | undefined) {
 }
 
 /** specifies the file to import and whether to open a tab when loaded */
-export function importFile(file: File) {
-    const reader = new FileReader();
+export async function importFile(file: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
 
-    reader.onerror = () => {
-        console.error(`Error reading the file: ${file.name}`);
-        alert(`Unable to read the file: ${file.name}. Please try again.`);
-    };
+        reader.onerror = () => {
+            const msg = `Unable to read the file: ${file.name}. Please try again.`;
+            console.error(msg);
+            alert(msg);
+            reject(new Error(msg));
+        };
 
-    reader.onload = async (event) => {
+        reader.onload = async (event) => {
+            try {
+                const fileId = generateUniqueFileId();
+                const fileName = generateUniqueName(file.name.split(".")[0]);
+                const fileContent = (event.target?.result as string) || "";
+
+                const fileToAdd: file = {
+                    id: fileId,
+                    name: fileName,
+                    type: "asm",
+                    content: fileContent,
+                };
+
+                addFile(fileToAdd);
+                await openFileTab(fileId);
+                resolve();
+            } catch (error) {
+                console.error(`Error importing the file: ${file.name}`, error);
+                alert(
+                    `Error importing the file: ${file.name}. Please try again.`,
+                );
+                reject(error);
+            }
+        };
+
         try {
-            const fileId = generateUniqueFileId();
-            const fileName = generateUniqueName(file.name.split(".")[0]);
-            const fileContent = (event.target?.result as string) || "";
-
-            const fileToAdd: file = {
-                id: fileId,
-                name: fileName,
-                type: "asm",
-                content: fileContent,
-            };
-
-            addFile(fileToAdd);
-            await openFileTab(fileId);
+            reader.readAsText(file);
         } catch (error) {
-            console.error(`Error importing the file: ${file.name}`, error);
-            alert(`Error importing the file: ${file.name}. Please try again.`);
+            console.error(
+                `Unexpected error while reading the file: ${file.name}`,
+                error,
+            );
+            alert(
+                `Unexpected error while reading the file: ${file.name}. Please check the file and try again.`,
+            );
+            reject(error);
         }
-    };
-
-    try {
-        reader.readAsText(file);
-    } catch (error) {
-        console.error(
-            `Unexpected error while reading the file: ${file.name}`,
-            error,
-        );
-        alert(
-            `Unexpected error while reading the file: ${file.name}. Please check the file and try again.`,
-        );
-    }
+    });
 }
 
 export async function exportFile(fileId: number) {
