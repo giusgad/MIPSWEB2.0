@@ -34,7 +34,7 @@ export async function renameFile(fileId: number, newName: string) {
     const files = getFiles();
     const file = files.find((file) => file.id === fileId);
     if (file) {
-        file.name = generateUniqueName(newName);
+        file.name = generateUniqueName(newName, file.name);
         setFiles(files);
     }
     await renderApp();
@@ -261,10 +261,10 @@ export function getProjectName() {
     return getFromStorage("local", "project-name") || "MIPS_project";
 }
 export function setProjectName(val: string | null) {
-    if (val == null || !isValidProjectName(val)) val = "MIPS_project";
+    if (val == null || !isValidFileName(val)) val = "MIPS_project";
     setIntoStorage("local", "project-name", val);
 }
-export function isValidProjectName(val: string): boolean {
+export function isValidFileName(val: string): boolean {
     if (!val || val.trim() === "") return false;
     // only ASCII letters, digits, spaces, dashes, underscores
     const validPattern = /^[A-Za-z0-9 _-]+$/;
@@ -315,11 +315,15 @@ function generateUniqueFileId() {
     return files.length > 0 ? Math.max(...files.map((file) => file.id)) + 1 : 0;
 }
 
-function generateUniqueName(name: string): string {
+/**Generates a unique file name by adding _{number} at the end of the given string.
+ * Can ignore a specific name, useful for example when renaming a file, so that the file's new name doesn't conflict with itself*/
+function generateUniqueName(name: string, ignore?: string): string {
     const files = getFiles();
     let newName = name;
     let i = 1;
-    while (files.find((file) => file.name === newName)) {
+    while (
+        files.find((file) => file.name === newName && file.name !== ignore)
+    ) {
         newName = `${name}_${i}`;
         i++;
     }

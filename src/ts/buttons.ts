@@ -10,7 +10,7 @@ import {
     getSelectedFileId,
     importFiles,
     importZip,
-    isValidProjectName,
+    isValidFileName,
     newFile,
     renameFile,
     setProjectName,
@@ -303,7 +303,7 @@ let editingName = false;
     )! as HTMLInputElement;
     if (editingName) {
         // save project name
-        if (isValidProjectName(input.value)) {
+        if (isValidFileName(input.value)) {
             setProjectName(input.value);
             btn.classList.remove("editing");
             editingName = false;
@@ -320,4 +320,36 @@ let editingName = false;
         input.focus();
         input.setSelectionRange(0, input.value.length);
     }
+};
+
+(window as any).enableFileNameEdit = function (elem: HTMLElement) {
+    elem.contentEditable = "true";
+    elem.focus();
+
+    const initialName = elem.innerText;
+
+    const resetEditable = () => {
+        elem.contentEditable = "false";
+        elem.innerText = initialName;
+        elem.removeEventListener("keydown", handleClick);
+    };
+
+    const handleClick = (ev: KeyboardEvent) => {
+        if (ev.key === "Enter") {
+            ev.preventDefault();
+            elem.contentEditable = "false";
+            elem.removeEventListener("keydown", handleClick);
+            const newName = elem.innerText.trim();
+            if (isValidFileName(elem.innerText)) {
+                elem.innerText = newName;
+                renameFile(Number(elem.dataset["fileid"]), newName);
+            } else {
+                resetEditable();
+            }
+        } else if (ev.key === "Escape") {
+            resetEditable();
+        }
+    };
+
+    elem.addEventListener("keydown", handleClick);
 };
