@@ -298,17 +298,34 @@ input {
   gap: 0;
   padding: 0;
   height: 100%;
-  .button {
+  .section {
     height: 100%;
     margin: 0;
-    padding: 0 1em;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
     border-right: @btn-border;
     &:first-child {
       border-left: @btn-border;
     }
-    &:hover {
-      background-color: var(--rgb-gray-9);
-      border-color: var(--rgb-gray-8);
+    .button {
+      &:hover {
+        background-color: var(--rgb-gray-9);
+        border-color: var(--rgb-gray-8);
+      }
+    }
+
+    &.project {
+      gap: 5px;
+      .project {
+        user-select: none;
+        opacity: 0.6;
+      }
+      .name {
+        max-width: 35vw;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
 }

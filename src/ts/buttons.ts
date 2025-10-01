@@ -6,7 +6,6 @@ import {
     exportZip,
     exportFile,
     getFiles,
-    getProjectName,
     getSelectedFileId,
     importFiles,
     importZip,
@@ -296,33 +295,24 @@ Save your current project before proceeding.`,
     }
 };
 
-let editingName = false;
-(window as any).changeProjectNameOnClick = function (btn: HTMLButtonElement) {
-    const input = document.getElementById(
-        "projectNameInput",
-    )! as HTMLInputElement;
-    if (editingName) {
-        // save project name
-        if (isValidFileName(input.value)) {
-            setProjectName(input.value);
-            btn.classList.remove("editing");
-            editingName = false;
-            input.disabled = true;
-        } else {
-            input.value = getProjectName();
-            input.focus();
-        }
-    } else {
-        // start editing
-        btn.classList.add("editing");
-        editingName = true;
-        input.disabled = false;
-        input.focus();
-        input.setSelectionRange(0, input.value.length);
+(window as any).renameProjectOnClick = async function () {
+    const newName = (
+        document.getElementById("new-project-name") as HTMLInputElement
+    )?.value;
+    try {
+        if (!newName) throw new Error("Invalid project name");
+        setProjectName(newName);
+        await hideForm();
+        await renderApp();
+    } catch (error) {
+        alert("Error renaming the project. Please try again.");
     }
 };
 
-(window as any).enableFileNameEdit = function (elem: HTMLElement) {
+function enableEditName(
+    elem: HTMLElement,
+    onConfirm: (newName: string) => void,
+) {
     elem.contentEditable = "true";
     elem.focus();
 
@@ -342,7 +332,7 @@ let editingName = false;
             const newName = elem.innerText.trim();
             if (isValidFileName(elem.innerText)) {
                 elem.innerText = newName;
-                renameFile(Number(elem.dataset["fileid"]), newName);
+                onConfirm(newName);
             } else {
                 resetEditable();
             }
@@ -352,4 +342,14 @@ let editingName = false;
     };
 
     elem.addEventListener("keydown", handleClick);
+}
+
+(window as any).enableProjectNameEdit = function (elem: HTMLElement) {
+    enableEditName(elem, (newName) => setProjectName(newName));
+};
+
+(window as any).enableFileNameEdit = function (elem: HTMLElement) {
+    enableEditName(elem, (newName) =>
+        renameFile(Number(elem.dataset["fileid"]), newName),
+    );
 };

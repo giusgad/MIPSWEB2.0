@@ -1,6 +1,11 @@
-<button class="button" onclick="backupOptions(); showFormOnClick('settings',undefined,false)">
-  <div class="icon gray-4"><%-Icons.render('settings')%></div>
-</button>
-<button class="button" onclick="showMenuOnClick(this, '/app/popovers/project-menu-popover.ejs')">
-  Project
-</button>
+<div class="section">
+  <button class="button" onclick="backupOptions(); showFormOnClick('settings',undefined,false)">
+    <div class="icon gray-4"><%-Icons.render('settings')%></div>
+  </button>
+</div>
+<div class="section project">
+  <span class="project">Project: </span><span class="name" ondblclick="enableProjectNameEdit(this)"><%=ctx.projectName%></span>
+  <button class="button" onclick="showMenuOnClick(this, '/app/popovers/project-menu-popover.ejs')">
+    <div class="icon gray-4"><%-Icons.render('verticalDots')%></div>
+  </button>
+</div>

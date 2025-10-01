@@ -1,0 +1,18 @@
+<div class="form">
+    <div class="text">Rename project</div>
+    <div class="input">
+        <input type="text" id="new-project-name" name="new-project-name" value="<%=ctx.projectName%>" required autocomplete="off" onkeydown="
+        if(event.key === 'Enter') { renameProjectOnClick(); }
+        ">
+    </div>
+    <div class="buttons">
+        <div class="button default" onclick="hideFormOnClick();">
+            <div class="icon gray-4"><%-Icons.render('x')%></div>
+            <div class="label">Cancel</div>
+        </div>
+        <div class="button default" onclick="renameProjectOnClick()">
+            <div class="icon gray-4"><%-Icons.render('edit')%></div>
+            <div class="label">Rename</div>
+        </div>
+    </div>
+</div>

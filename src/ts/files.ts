@@ -4,6 +4,7 @@ import { getFromStorage, setIntoStorage } from "./utils.js";
 import { setConsoleShown } from "./virtual-machine.js";
 
 declare const JSZip: any;
+const defaultProjectName = "MIPS_project";
 
 export type file = {
     id: number;
@@ -258,10 +259,10 @@ export async function exportFile(fileId: number) {
 }
 
 export function getProjectName() {
-    return getFromStorage("local", "project-name") || "MIPS_project";
+    return getFromStorage("local", "project-name") || defaultProjectName;
 }
 export function setProjectName(val: string | null) {
-    if (val == null || !isValidFileName(val)) val = "MIPS_project";
+    if (val == null || !isValidFileName(val)) val = defaultProjectName;
     setIntoStorage("local", "project-name", val);
 }
 export function isValidFileName(val: string): boolean {
