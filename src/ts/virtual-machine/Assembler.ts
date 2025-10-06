@@ -15,9 +15,11 @@ import {
 } from "./Directives.js";
 import { getOptions } from "../settings.js";
 import { EditorPosition } from "../editors.js";
+import { InstructionPreprocessor } from "./Instruction-preprocess.js";
 
 export class Assembler {
     cpu: CPU;
+    preprocessor: InstructionPreprocessor;
     directives: Map<string, Directive> = new Map<string, Directive>([
         [".asm", new asmDirective()],
         [".align", new alignDirective()],
@@ -48,6 +50,7 @@ export class Assembler {
 
     constructor(cpu: CPU) {
         this.cpu = cpu;
+        this.preprocessor = new InstructionPreprocessor();
     }
 
     assembleFiles(files: file[]) {
@@ -139,6 +142,11 @@ export class Assembler {
                     tokens[1] === ":"
                         ? tokens[0].trim()
                         : tokens[0].slice(0, -1);
+                if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(label)) {
+                    throw new Error(
+                        `Invalid label: "${label}". Labels must only contain alphanumeric characters or underscores and must not start with a number.`,
+                    );
+                }
                 labels.set(label, new Binary(address.getValue()));
                 if (!withLabels) {
                     if (globals.has(label)) {

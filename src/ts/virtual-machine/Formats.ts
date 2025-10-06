@@ -77,30 +77,10 @@ export class R_Format implements Format {
         }
 
         if (!rs || !rt || !rd) {
-            // instructions that have an "immediate" correspondent can be interpreted as immediate (syntactic sugar)
-            if (getOptions()["allow-literals"]) {
-                const newSymbol = instruction.getImmediateCorrespondent();
-                if (newSymbol) {
-                    const newInstruction =
-                        cpu.instructionsSet.getBySymbol(newSymbol)!;
-                    if (newInstruction.format === "I") {
-                        return cpu
-                            .getFormat("I")!
-                            .assemble(
-                                tokens,
-                                newInstruction,
-                                cpu,
-                                assembler,
-                                globals,
-                                labels,
-                                address,
-                            );
-                    }
-                }
-            }
-            const extra = instruction.getImmediateCorrespondent()
-                ? "\nTo allow literals in R instructions you can enable the corresponding option in settings."
-                : "";
+            const extra = getOptions()["allow-literals"]
+                ? ""
+                : "\nTo allow literals in R instructions you can enable the corresponding option in settings.";
+
             throw new Error(
                 `Invalid params for instruction "${tokens.join(" ")}". Expected: ${instruction.params.map((p) => (p === "SYSCALL" ? '""' : `"${p}"`)).join(" or ")}.${extra}`,
             );
@@ -227,7 +207,7 @@ export class I_Format implements Format {
                     rs = base;
                 } else {
                     throw new Error(
-                        `Incorrect format for offset(base) address in ${instruction.symbol} instruction: ${tokens[2]}`,
+                        `Incorrect format for address in "${tokens.join(", ")}". Accepted formats are: register with offset ('lw $t0 4($t1)'), register without offset ('lw $t0 $t1' or 'lw $t0 ($t1)'), literal address (number) ('lw $t0 1000'), label+offset ('lw $t0 data+4' or 'lw $t0 data-4'), label ('lw $t0 data')`,
                     );
                 }
             } else {

@@ -7,7 +7,7 @@ import { getFromStorage, intFromStr } from "../utils.js";
 import { register, Registers } from "./Registers.js";
 import { getOptions } from "../settings.js";
 
-type ParamsFormat =
+export type ParamsFormat =
     | "rt, rs, immediate"
     | "rd, rt, sa"
     | "rd, rt, rs"
@@ -170,6 +170,8 @@ export abstract class Instruction {
             case "":
             case "cop_fun":
             case "target":
+            case "offset":
+            default:
                 break;
         }
         return read.map((r) => r.name);
@@ -209,15 +211,15 @@ export abstract class Instruction {
     getImmediateCorrespondent(): string | null {
         if (
             [
-                "ADD",
-                "AND",
-                "OR",
-                "XOR",
-                "SLT",
-                "TGE",
-                "TLT",
-                "TEQ",
-                "TNE",
+                "ADD", // ["rd, rs, rt"],
+                "AND", // ["rd, rs, rt"],
+                "OR", // ["rd, rs, rt"],
+                "XOR", // ["rd, rs, rt"],
+                "SLT", // ["rd, rs, rt"],
+                "TGE", // ["rs, rt"],
+                "TLT", // ["rs, rt"],
+                "TEQ", // ["rs, rt"],
+                "TNE", // ["rs, rt"],
             ].includes(this.symbol)
         ) {
             return `${this.symbol}I`;
@@ -3246,29 +3248,8 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    const immediate = parseInt(params["immediate"]);
 
-                    if (immediate < -32768 || immediate > 32767) {
-                        const upper = Utils.fromSigned(
-                            (immediate >>> 16) & 0xffff,
-                            16,
-                        );
-                        const lower = immediate & 0xffff;
-
-                        return [
-                            ["lui", "$at", `${upper}`],
-                            ["ori", params["rd"], "$at", `${lower}`],
-                        ];
-                    } else {
-                        return [
-                            [
-                                "addiu",
-                                params["rd"],
-                                "$zero",
-                                params["immediate"],
-                            ],
-                        ];
-                    }
+                    return loadImmediate(params["immediate"], params["rd"]);
                 }
                 size(): null {
                     return null;
@@ -3530,5 +3511,27 @@ export class Instructions {
                 }
             })(),
         );
+    }
+}
+
+/**Load an immediate into $at or destRegister if specified.
+ * Uses one or two instructions based on the size of the immediate to load.*/
+export function loadImmediate(
+    immediate: string | number,
+    destRegister?: string,
+): string[][] {
+    const imm =
+        typeof immediate === "string" ? intFromStr(immediate) : immediate;
+    if (!destRegister) destRegister = "$at";
+    if (imm < -32768 || imm > 32767) {
+        const upper = Utils.fromSigned((imm >>> 16) & 0xffff, 16);
+        const lower = imm & 0xffff;
+
+        return [
+            ["lui", "$at", `${upper}`],
+            ["ori", destRegister, "$at", `${lower}`],
+        ];
+    } else {
+        return [["addiu", destRegister, "$zero", `${immediate}`]];
     }
 }

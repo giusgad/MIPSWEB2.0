@@ -165,8 +165,8 @@ export const possibleOptions = [
             },
             {
                 name: "allow-literals",
-                desc: "Allow literals instead of registers",
-                help: "Syntactic sugar that automatically transforms some R instructions in their immediate correspondent, for example `add $t0 $t0 1` will be interpreted as an `addi` without generating an error. Also pseudo-instructions like `mul` and `div` have different translations to load the literal into `$at`.",
+                desc: "Allow literals and syntactic sugar",
+                help: "Enables different forms of syntactic sugar. Automatically transforms some R instructions in their immediate correspondent or loads the immediate into $at automatically allowing shorter syntax. Allows direct use of labels in load/store instructions.",
                 flag: "L",
                 defaultValue: true,
                 inputType: "checkbox",

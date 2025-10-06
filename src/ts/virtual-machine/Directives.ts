@@ -106,20 +106,30 @@ export class asmDirective extends Directive {
         assembler: Assembler,
         editorPosition: { fileId: number; lineNumber: number },
     ) {
-        assembler.addressEditorsPositions.set(
-            address.getValue(),
-            editorPosition,
+        const instruction = assembler.cpu.instructionsSet.getBySymbol(
+            tokens[0],
         );
-        const code: Binary = assembler.assembleInstruction(
+        const preprocessed = assembler.preprocessor.preprocess(
+            instruction,
             tokens,
-            globals,
             labels,
-            address,
         );
-        assembler.cpu.storeWord(address, code);
-        address.set(
-            address.getValue() + this.size(tokens, undefined, assembler),
-        );
+        for (const tokens of preprocessed) {
+            assembler.addressEditorsPositions.set(
+                address.getValue(),
+                editorPosition,
+            );
+            const code: Binary = assembler.assembleInstruction(
+                tokens,
+                globals,
+                labels,
+                address,
+            );
+            assembler.cpu.storeWord(address, code);
+            address.set(
+                address.getValue() + this.size(tokens, undefined, assembler),
+            );
+        }
     }
 
     /**Finds whether the instruction is a pseudoinstruction or not. If it is gets its expansion's size.*/
