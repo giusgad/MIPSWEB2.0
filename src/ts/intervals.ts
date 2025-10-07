@@ -5,7 +5,7 @@ import { vm } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
 export const minAddress = 4194304;
-export const maxAddress = 4294967295;
+export const maxAddress = 2147483648;
 
 interface cell {
     address: number;

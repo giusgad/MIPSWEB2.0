@@ -53,22 +53,25 @@
 
 #memory {
   #memorymap-container {
-    @mm-width: 15px;
+    @mm-width: 10px;
     @padding: 2.5px;
     position: absolute;
     padding: @padding;
-    width: calc(20% + 4px);
+    padding-left: 0;
+    width: calc(10% + 8px);
     z-index: 2;
     height: calc(100% - @toolbar-h);
     top: @toolbar-h;
+    right: 0;
     #memorymap {
       width: @mm-width;
       height: 100%;
+      float: right;
     }
     #memorymap-canvas {
       position: absolute;
       top: @padding;
-      left: calc(@padding + @mm-width);
+      right: calc(@padding + @mm-width);
       width: calc(100% - @mm-width);
       height: 100%;
     }

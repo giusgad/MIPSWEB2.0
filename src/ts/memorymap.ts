@@ -6,7 +6,9 @@ import {
 } from "./intervals.js";
 import { Colors } from "./lib/Colors.js";
 import { highlightElementAnimation } from "./style.js";
+import { getFromStorage } from "./utils.js";
 import { memoryShown } from "./virtual-machine.js";
+import { Binary } from "./virtual-machine/Utils.js";
 
 type CanvasInterval = { intervalId: number; startY: number; endY: number };
 let canvasIntervals: CanvasInterval[] = [];
@@ -24,8 +26,18 @@ function memoryMapOnClick(ev: MouseEvent) {
     }
 }
 
+export function watchMemoryScroll() {
+    const elem = document.getElementById("memory-tables");
+    if (!elem) return;
+    elem.addEventListener("scroll", () => {
+        if (!memoryShown) return;
+        drawMemoryMapConnections();
+    });
+    drawMemoryMapConnections();
+}
+
 /** draw lines connecting the map's interval to the corresponding memory if displayed*/
-function memoryMapOnHover(hoverEnter: boolean) {
+function drawMemoryMapConnections() {
     const canvas = document.getElementById(
         "memorymap-canvas",
     ) as HTMLCanvasElement;
@@ -36,33 +48,31 @@ function memoryMapOnHover(hoverEnter: boolean) {
     canvas.width = canvas.clientWidth * resScaling;
     const ctx = canvas.getContext("2d")!;
 
-    if (hoverEnter) {
-        // each interval is drawn with different colors for easier distinction
-        const colors = ["mint", "orange", "yellow", "teal", "purple"];
-        let color_index = 0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // each interval is drawn with different colors for easier distinction
+    const colors = ["mint", "orange", "yellow", "teal", "purple"];
+    let color_index = 0;
 
-        for (const interval of canvasIntervals) {
-            // find the memory table that corresponds to the current interval and its corner coordinates
-            const target = Array.from(
-                document.getElementsByName("memoryIntervalTable"),
-            ).find((e) => e.dataset["intervalid"] === `${interval.intervalId}`);
-            if (!target || !isElemVerticallyInView(target)) continue;
+    for (const interval of canvasIntervals) {
+        // find the memory table that corresponds to the current interval and its corner coordinates
+        const target = Array.from(
+            document.getElementsByName("memoryIntervalTable"),
+        ).find((e) => e.dataset["intervalid"] === `${interval.intervalId}`);
+        if (!target || !isElemVerticallyInView(target)) continue;
 
-            const canvasRect = canvas.getBoundingClientRect();
-            const targetRect = target.getBoundingClientRect();
-            // get Y coordinates relative to canvas
-            const topCornerY = targetRect.top - canvasRect.top;
-            const bottomCornerY = targetRect.bottom - canvasRect.top;
-            const color = Colors.get(colors[color_index++ % colors.length])!;
-            drawBezier(ctx, interval.startY, topCornerY, resScaling, color);
-            drawBezier(ctx, interval.endY, bottomCornerY, resScaling, color);
-        }
-    } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const canvasRect = canvas.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        // get Y coordinates relative to canvas
+        const topCornerY = targetRect.top - canvasRect.top;
+        const bottomCornerY = targetRect.bottom - canvasRect.top;
+        const color = Colors.get(colors[color_index++ % colors.length])!;
+        drawLine(ctx, interval.startY, topCornerY, resScaling, color);
+        drawLine(ctx, interval.endY, bottomCornerY, resScaling, color);
     }
 }
-/**Draws a cubic bezier curve between point (0,y1) and (canvas_width, y2) on the given canvas context*/
-function drawBezier(
+
+/**Draws a cubic bezier curve between point (canvas_width,y1) and (0, y2) on the given canvas context*/
+function drawLine(
     ctx: CanvasRenderingContext2D,
     y1: number,
     y2: number,
@@ -71,20 +81,15 @@ function drawBezier(
 ) {
     y1 = y1 * resScaling;
     y2 = y2 * resScaling;
-    const x1 = 0;
-    const x2 = ctx.canvas.width;
-    const offset = ctx.canvas.width / 2;
+    const x1 = ctx.canvas.width;
+    const x2 = 0;
 
-    const cp1x = x1 + offset;
-    const cp1y = y1;
-
-    const cp2x = x2 - offset;
-    const cp2y = y2;
     ctx.beginPath();
     ctx.moveTo(x1, y1);
-    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
+    ctx.lineTo(x2, y2); // Draw straight line instead of bezier curve
     ctx.strokeStyle = color;
     ctx.lineWidth = resScaling;
+    ctx.setLineDash([16, 8]);
     ctx.stroke();
 }
 
@@ -129,35 +134,23 @@ function findClosetInterval(y: number): CanvasInterval | null {
     return closest;
 }
 
-let mouseOnMemoryMap = false;
-
 export function drawMemoryMap() {
     if (!memoryShown) return;
     let canvasElem = document.getElementById("memorymap");
     if (!canvasElem) return;
     canvasElem.addEventListener("click", memoryMapOnClick);
-    const canvas = canvasElem as HTMLCanvasElement;
-
-    // add event listeners to draw the connecting arrows
-    let hoverTimeout: number | null = null;
-    const hoverDelay = 500; // milliseconds
-    canvas.addEventListener("mouseenter", () => {
-        mouseOnMemoryMap = true;
-        // Start a delay before triggering hover effect
-        hoverTimeout = window.setTimeout(() => {
-            memoryMapOnHover(true);
-            hoverTimeout = null; // Clear timeout reference
-        }, hoverDelay);
-    });
-    canvas.addEventListener("mouseleave", () => {
-        mouseOnMemoryMap = false;
-        // If we're still waiting on the mouseenter delay, cancel it
-        if (hoverTimeout !== null) {
-            clearTimeout(hoverTimeout);
-            hoverTimeout = null;
+    canvasElem.addEventListener("mousemove", (ev) => {
+        const interval = findClosetInterval(ev.offsetY);
+        if (!interval) {
+            canvasElem.title = "";
+            return;
         }
-        memoryMapOnHover(false);
+        const newTitle = `0x${new Binary(interval.intervalId).getHex()}`;
+        if (newTitle !== canvasElem.title) {
+            canvasElem.title = newTitle;
+        }
     });
+    const canvas = canvasElem as HTMLCanvasElement;
 
     canvas.height = canvas.clientHeight;
     canvas.width = canvas.clientWidth;
@@ -200,14 +193,8 @@ export function highlightInterval(
         document.getElementsByName("memoryIntervalTable"),
     ).find((e) => e.dataset["intervalid"] === id);
     elem?.parentElement?.scrollIntoView(opts);
-    if (mouseOnMemoryMap) memoryMapOnHover(false);
 
     if (do_blink && elem) {
         highlightElementAnimation(elem);
     }
-
-    // redraw memorymap after scrolling
-    setTimeout(() => {
-        if (mouseOnMemoryMap) memoryMapOnHover(true);
-    }, 1000);
 }

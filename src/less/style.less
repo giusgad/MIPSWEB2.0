@@ -470,14 +470,14 @@ input {
 
 #memory {
   #memorymap-container {
-    #memorymap {
-      background-color: var(--rgb-gray-9);
-      opacity: 0.2;
+    opacity: 0.4;
+    transition: opacity 0.5s;
+    &:has(#memorymap:hover) {
+      opacity: 0.8;
       transition: opacity 0.5s;
-      &:hover {
-        opacity: 0.8;
-        transition: opacity 0.5s;
-      }
+    }
+    #memorymap {
+      background-color: var(--rgb-gray-7);
     }
   }
   .button.toggle-btn {
@@ -511,7 +511,7 @@ input {
           &::after {
             .after-whiteout();
             left: @tags-width;
-            width: calc(100% - @tags-width);
+            width: calc(90% - @tags-width);
           }
           &.highlighted::after {
             opacity: 1;
@@ -636,13 +636,13 @@ input {
           }
 
           &.value {
-            width: 55%;
+            width: 45%;
             background-color: var(--rgb-gray-10);
           }
 
           &.granular {
             display: flex;
-            width: 55%;
+            width: 45%;
             padding: 0;
             border: none;
 

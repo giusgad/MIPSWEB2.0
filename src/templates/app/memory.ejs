@@ -8,7 +8,7 @@
       <div class="label"><%= ctx.memoryShown ? "Hide memory" : "Show Memory"%></div>
   </div>
   <div class="title">Memory</div>
-  <div class="tables">
+  <div class="tables" id="memory-tables">
     <%ctx.memoryIntervals.forEach((interval) => {%>
       <div class="table">
         <div class="cols-names">

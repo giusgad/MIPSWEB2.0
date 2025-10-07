@@ -22,6 +22,7 @@ import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 import { endDrag } from "./drag.js";
 import { stop } from "./virtual-machine.js";
 import { adjustBinaryWidth } from "./style.js";
+import { watchMemoryScroll } from "./memorymap.js";
 
 let online = false;
 initLoaders();
@@ -104,6 +105,7 @@ export async function renderApp(
     await render("app", "app.ejs", undefined, showLoaders);
     scrollConsoleToBottom();
     watchingConsole();
+    watchMemoryScroll();
     initSortables();
     hideFilePopover();
     scrollSelectedIntoView("files-tabs");
