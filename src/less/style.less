@@ -39,11 +39,6 @@
   z-index: 10;
 }
 
-.memory-addr-style {
-  background-color: var(--rgb-gray-11);
-  border: 0.5px solid var(--rgb-gray-10);
-}
-
 body {
   color: var(--rgb-gray-1);
   background-color: var(--rgb-gray-11);
@@ -461,7 +456,8 @@ input {
         &.name {
           width: calc(1% * 25);
           min-width: 6ch;
-          .memory-addr-style();
+          background-color: var(--rgb-gray-11);
+          border: 0.5px solid var(--rgb-gray-10);
         }
 
         &.value {
@@ -563,6 +559,15 @@ input {
               line-height: @font-size-small;
               min-height: 28px;
 
+              &.hexadecimal,
+              &.binary,
+              &.ascii {
+                justify-content: center;
+              }
+              &.asm {
+                justify-content: flex-start;
+              }
+
               &.tags {
                 display: flex;
                 flex-wrap: wrap;
@@ -626,7 +631,8 @@ input {
           &.address {
             width: 25%;
             min-width: 11ch;
-            .memory-addr-style();
+            border: none;
+            background-color: transparent;
           }
 
           &.value {
