@@ -23,7 +23,7 @@
                 <div class="col-name">Value</div>
                 <div class="col-format">
                     <%
-                    const regValOptions = ["int", "hexadecimal", "binary"]
+                    const regValOptions = ["int", "uint", "hexadecimal", "binary"]
                     let valueFormat = (ctx.settings.colsFormats && ctx.settings.colsFormats['registers-value-format']) || "int";
                     let currentVal = regValOptions.indexOf(valueFormat) || 0;
                     %>

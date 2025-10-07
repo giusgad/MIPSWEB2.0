@@ -8,7 +8,11 @@ import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
 import { getMemoryIntervals } from "./intervals.js";
 import { possibleOptions } from "./settings.js";
-import { drawMemoryMap } from "./memorymap.js";
+import {
+    drawMemoryMap,
+    drawMemoryMapConnections,
+    watchMemoryScroll,
+} from "./memorymap.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -46,6 +50,8 @@ export async function render(
     if (showLoaders) removeLoader(`render: ${id}`);
     if (id === "memory" || id === "app") {
         drawMemoryMap();
+        drawMemoryMapConnections();
+        watchMemoryScroll();
     }
 }
 

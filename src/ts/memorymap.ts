@@ -37,7 +37,7 @@ export function watchMemoryScroll() {
 }
 
 /** draw lines connecting the map's interval to the corresponding memory if displayed*/
-function drawMemoryMapConnections() {
+export function drawMemoryMapConnections() {
     const canvas = document.getElementById(
         "memorymap-canvas",
     ) as HTMLCanvasElement;
@@ -50,7 +50,7 @@ function drawMemoryMapConnections() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // each interval is drawn with different colors for easier distinction
-    const colors = ["mint", "orange", "yellow", "teal", "purple"];
+    const colors = ["mint", "orange", "teal", "yellow", "purple"];
     let color_index = 0;
 
     for (const interval of canvasIntervals) {

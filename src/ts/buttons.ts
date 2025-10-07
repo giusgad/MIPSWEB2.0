@@ -62,9 +62,9 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
         case "decimal":
             return long ? "Decimal" : "Dec";
         case "uint":
-            return long ? "Unsigned Int" : "Uint";
+            return long ? "Unsigned Decimal" : "UDec";
         case "int":
-            return long ? "Signed Int" : "Int";
+            return long ? "Signed Decimal" : "Dec";
         case "hexadecimal":
         case "hex":
             return long ? "Hexadecimal" : "Hex";

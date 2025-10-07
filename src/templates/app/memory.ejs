@@ -41,7 +41,7 @@
               <select name="col-format" id="memory-value-format_<%=interval.id%>" onchange="colFormatSelectOnChange(this)" data-id="<%=interval.id%>">
                 <%valueFormatOptions.forEach(val => {%>
                 <option value="<%=val%>" <%=valueFormat === val ? "selected" : ""%>>
-                  <%=getStateBtnText(val, true)%>
+                  <%=getStateBtnText(val, false)%>
                 </option>
                 <%})%>
               </select>

@@ -96,7 +96,10 @@ export class Binary {
         this.set(value);
     }
 
-    set(value: number, signed: boolean = this.signed) {
+    set(value: number, signed?: boolean) {
+        if (typeof signed === "undefined") {
+            signed = value < 0;
+        }
         this.signed = signed;
         if (signed) {
             this.binary = Utils.toSigned(value, this.length);
