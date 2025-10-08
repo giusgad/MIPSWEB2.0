@@ -3,11 +3,10 @@
     <canvas id="memorymap"></canvas>
     <canvas id="memorymap-canvas"></canvas>
   </div>
-  <div class="button default toggle-btn" onclick="toggleMemoryOnClick();">
-      <div class="icon gray-4"><%-ctx.memoryShown ? Icons.render('angleDown') : Icons.render('angleUp')%></div>
-      <div class="label"><%= ctx.memoryShown ? "Hide memory" : "Show Memory"%></div>
+  <div class="title" onclick="toggleMemoryOnClick()">
+      <div class="icon gray-4"><%-ctx.memoryShown ? Icons.render('angleRight') : Icons.render('angleLeft')%></div>
+      Memory
   </div>
-  <div class="title">Memory</div>
   <div class="tables" id="memory-tables">
     <%ctx.memoryIntervals.forEach((interval) => {%>
       <div class="table">

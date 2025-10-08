@@ -22,23 +22,6 @@
   transition: opacity 0.2s ease-out;
 }
 
-// toggle memory button
-.toggle-mem-btn {
-  z-index: 2;
-  @w: 9em;
-  @h: 2em;
-  position: absolute;
-  margin: 0 !important;
-  width: @w;
-  height: @h;
-  margin-top: -@h;
-  top: calc(50%);
-  left: calc(-@h / 2 - @w / 2);
-  transform: rotate(-90deg);
-  border-radius: 4px 4px 0 0;
-  z-index: 10;
-}
-
 body {
   color: var(--rgb-gray-1);
   background-color: var(--rgb-gray-11);
@@ -326,25 +309,18 @@ input {
 }
 
 #console {
-  .button.toggle-btn {
-    .toggle-mem-btn();
-    transform: none;
-    left: 25%;
-    top: -@h;
-    &.waiting-input {
-      pointer-events: none;
-      &::after {
-        .after-whiteout();
-        opacity: 0.5;
-        border-radius: @btn-b-radius @btn-b-radius 0 0;
-      }
-    }
-  }
   .component {
     background-color: var(--rgb-gray-10);
     .title {
       border-top: @border-gray-10;
       border-bottom: 1px solid transparent;
+      .icon {
+        margin-left: 0;
+      }
+      &:hover {
+        cursor: pointer;
+        background-color: var(--rgb-gray-9);
+      }
     }
     .console {
       position: absolute;
@@ -480,9 +456,6 @@ input {
       background-color: var(--rgb-gray-7);
     }
   }
-  .button.toggle-btn {
-    .toggle-mem-btn();
-  }
   .component {
     background-color: var(--rgb-gray-11);
     border-left: @border-gray-10;
@@ -490,6 +463,13 @@ input {
     .title {
       border-bottom: @border-gray-10;
       border-left: @border-gray-10;
+      .icon {
+        margin-left: 0;
+      }
+      &:hover {
+        cursor: pointer;
+        background-color: var(--rgb-gray-9);
+      }
     }
 
     .tables {

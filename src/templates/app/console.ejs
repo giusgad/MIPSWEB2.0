@@ -1,14 +1,8 @@
 <div class="component">
-    <div
-    onclick="toggleConsoleOnClick();"
-    class="button default toggle-btn
-    <%=ctx.consoleShown ? "console-shown" : ""%>
-    <%=ctx.vm.console.state==="waitingInput"? "waiting-input":""%>" 
-    >
+    <div class="title" onclick="toggleConsoleOnClick()">
         <div class="icon gray-4"><%-ctx.consoleShown ? Icons.render('angleDown') : Icons.render('angleUp')%></div>
-        <div class="label"><%= ctx.consoleShown ? "Hide console" : "Show console"%></div>
+        Console
     </div>
-    <div class="title">Console</div>
     <div class="console <% if (ctx.vm.console.state === "waiting Input") {%> waiting-input <% } %>">
         <%ctx.vm.console.lines.forEach((line) => {%>
         <div class="line <%=line.type%>">

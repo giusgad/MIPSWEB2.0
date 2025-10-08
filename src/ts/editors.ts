@@ -54,6 +54,7 @@ export function renderEditors() {
             aceEditor.setOptions({
                 readOnly: false,
                 highlightActiveLine: true,
+                scrollPastEnd: 0.5,
             });
 
             for (let i = 0; i < cursors.length; i++) {

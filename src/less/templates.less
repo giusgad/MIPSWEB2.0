@@ -81,14 +81,22 @@
   right: @width-registers;
   bottom: 0;
   width: 0%;
-  & .title,
   & #memorymap-container {
     display: none;
+  }
+  & .title {
+    width: 15ch;
+    left: -15ch;
+    top: 0;
+    justify-content: center;
   }
   &.memory-shown {
     width: @width-memory;
     & .title {
       display: flex;
+      left: 0;
+      width: 100%;
+      justify-content: flex-start;
     }
     & #memorymap-container {
       display: initial;
@@ -102,8 +110,19 @@
   bottom: 0;
   height: 0%;
   width: calc(100% - @width-registers);
+  .title {
+    z-index: 5;
+    width: 15ch;
+    top: -@toolbar-h;
+    justify-content: center;
+  }
   &.console-shown {
     height: @height-console;
+    .title {
+      width: 100%;
+      top: 0;
+      justify-content: flex-start;
+    }
   }
   &.memory-shown {
     width: calc(100% - @width-registers - @width-memory);
