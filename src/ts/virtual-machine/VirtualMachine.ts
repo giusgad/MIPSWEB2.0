@@ -7,11 +7,14 @@ import { renderApp } from "../app.js";
 import { getExecutionSpeedTimeOut } from "../execution-speed.js";
 import { step } from "../virtual-machine.js";
 import { getAceEditor } from "../editors.js";
+import { INFINITE_LOOP_TRESHOLD } from "../settings.js";
 
 export class VirtualMachine {
     cpu: CPU;
     assembler: Assembler;
     running: boolean;
+    /**Count how many times the virtual machine encounters each program counter (used for infinite loop detection)*/
+    pcCounter: Map<number, number>;
 
     nextInstructionEditorPosition:
         | { fileId: number; lineNumber: number }
@@ -33,6 +36,7 @@ export class VirtualMachine {
     constructor(cpu: CPU) {
         this.cpu = cpu;
         this.assembler = new Assembler(this.cpu);
+        this.pcCounter = new Map();
         this.running = false;
     }
 
@@ -72,6 +76,7 @@ export class VirtualMachine {
         this.lastWrittenMem = undefined;
         this.console.reset();
         this.asyncToken++;
+        this.pcCounter.clear();
     }
 
     nextInstructionHasBreakPoint(): boolean {
@@ -90,6 +95,17 @@ export class VirtualMachine {
                 this.nextInstructionEditorPosition !== undefined
             ) {
                 await this.cpu.execute(this);
+                const currPC = this.cpu.pc.getValue();
+                const pcCounter = this.pcCounter.get(currPC);
+                if (pcCounter && pcCounter >= INFINITE_LOOP_TRESHOLD) {
+                    alert(
+                        `Infinite loop detected after ${INFINITE_LOOP_TRESHOLD} iterations. The simulation has been paused, but it's possible to continue with the RUN button or disable infinite loop detection in settings.`,
+                    );
+                    this.pcCounter.clear();
+                    this.pause();
+                } else {
+                    this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
+                }
                 if (!this.cpu.isHalted()) {
                     this.nextInstructionEditorPosition =
                         this.assembler.addressEditorsPositions.get(

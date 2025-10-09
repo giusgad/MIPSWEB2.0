@@ -38,9 +38,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     Icons.init();
 
     if (!online) {
-        await renderErrorPage("No Internet connection");
-        document.body.style.opacity = "1";
-        return;
+        alert(
+            "You appear to be offline, note that some parts of the editor may not load correctly.",
+        );
     }
 
     try {

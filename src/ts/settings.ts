@@ -7,6 +7,9 @@ import { render } from "./rendering.js";
 import { importPublicZip } from "./files.js";
 import { confirmClearProject } from "./buttons.js";
 
+/**How many iterations are to be considered an infinite loop*/
+export const INFINITE_LOOP_TRESHOLD = 1000;
+
 window
     .matchMedia("(prefers-color-scheme: dark)")
     .addEventListener("change", () => {
@@ -187,6 +190,14 @@ export const possibleOptions = [
                 name: "reset-mem",
                 desc: "Reset memory on restart",
                 flag: "Rm",
+                defaultValue: true,
+                inputType: "checkbox",
+            },
+            {
+                name: "detect-infinite-loops",
+                desc: "Infinite loop detection",
+                flag: "L",
+                help: `Disable this if you know your program will run very long loops that aren't infinite, otherwise loops with more than ${INFINITE_LOOP_TRESHOLD} iterations are automatically stopped.`,
                 defaultValue: true,
                 inputType: "checkbox",
             },
