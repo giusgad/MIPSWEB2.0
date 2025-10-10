@@ -68,6 +68,15 @@ export function scrollSelectedIntoView(scrollableElementId: string) {
     }
 }
 
+export function scrollSelectedInstructionIntoView() {
+    const elem = document
+        .getElementsByClassName("selected-instruction")
+        .item(0);
+    if (!elem) return;
+    console.log(elem);
+    elem.scrollIntoView({ behavior: "instant", block: "nearest" });
+}
+
 export function scrollToEnd(scrollableElementId: string, direction: "x" | "y") {
     const scrollable = document.getElementById(
         scrollableElementId,

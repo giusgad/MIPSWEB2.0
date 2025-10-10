@@ -8,7 +8,11 @@ import {
 } from "./editors.js";
 import { Binary } from "./virtual-machine/Utils.js";
 import { render } from "./rendering.js";
-import { addClass, removeClass } from "./utils.js";
+import {
+    addClass,
+    removeClass,
+    scrollSelectedInstructionIntoView,
+} from "./utils.js";
 
 export const vm = new VirtualMachine(new CPU());
 export let memoryShown = false;
@@ -69,12 +73,14 @@ export async function step() {
     await render("registers", "/app/registers.ejs", undefined, false);
     if (consoleShown)
         await render("console", "/app/console.ejs", undefined, false);
+    scrollSelectedInstructionIntoView();
 }
 
 export async function run() {
     await vm.run();
     await renderApp();
     moveCursorToNextInstruction();
+    scrollSelectedInstructionIntoView();
 }
 
 export async function pause() {
