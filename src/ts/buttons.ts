@@ -13,6 +13,7 @@ import {
     newFile,
     renameFile,
     setProjectName,
+    getSelectedFile,
 } from "./files.js";
 import {
     hideFilePopover,
@@ -34,6 +35,7 @@ import {
 import {
     colFormatSelect,
     getFlagsFromOpts,
+    getOptions,
     getOptionsFromForm,
     optsFromFlags,
     updateOpts,
@@ -112,9 +114,20 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).assembleOnClick = async function () {
-    const openedFiles = getFiles();
+    let files;
+    switch (getOptions()["assembly-mode"]) {
+        case "current":
+            const selected = getSelectedFile();
+            if (selected) files = [selected];
+            else files = getFiles();
+            break;
+        case "all":
+        default:
+            files = getFiles();
+            break;
+    }
     await setMemoryShown(true);
-    await assemble(openedFiles);
+    await assemble(files);
     clearErrorMarkers();
 };
 

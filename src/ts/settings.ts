@@ -173,7 +173,18 @@ export const possibleOptions = [
                 flag: "L",
                 defaultValue: true,
                 inputType: "checkbox",
-            }, //TODO: add assembler mode: single-file, files-in-project, (or files-opened maybe)
+            },
+            {
+                name: "assembly-mode",
+                desc: "Which files to assemble",
+                flag: "F",
+                defaultValue: "current",
+                inputType: "dropdown",
+                dropdownOptions: [
+                    { value: "all", desc: "All project files" },
+                    { value: "current", desc: "Currently open file" },
+                ],
+            },
         ],
     },
     {
@@ -202,7 +213,6 @@ export const possibleOptions = [
                 inputType: "checkbox",
             },
             {
-                //TODO: check this after implementing projects
                 name: "entry-point",
                 desc: "Where to initialize the program counter",
                 flag: "S",
