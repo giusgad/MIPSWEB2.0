@@ -134,16 +134,28 @@ export class asmDirective extends Directive {
 
     /**Finds whether the instruction is a pseudoinstruction or not. If it is gets its expansion's size.*/
     size(tokens: string[], address?: number, assembler?: Assembler): number {
+        const calcRegular = () => {
+            if (!assembler) return 4;
+            const instruction = assembler.cpu.instructionsSet.getBySymbol(
+                tokens[0],
+            );
+            const preprocessed = assembler.preprocessor.preprocess(
+                instruction,
+                tokens,
+                new Map(),
+            );
+            return preprocessed.length * 4;
+        };
         if (!assembler) return 4;
         const symbol = tokens[0];
         const pseudo = assembler.cpu.instructionsSet.getPseudoBySymbol(symbol);
         const regular = assembler.cpu.instructionsSet.getBySymbol(symbol);
         const isPseudoAndRegular = pseudo && regular;
-        if (regular || (!pseudo && !regular)) return 4;
+        if (regular || (!pseudo && !regular)) return calcRegular();
         // If an instruction can be interpreted as both pseudo and regular instruction:
         // if the number of arguments is incorrect for the pseudo return 4 since it's a regular instruction
         if (isPseudoAndRegular && pseudo.params.length !== tokens.length - 1)
-            return 4;
+            return calcRegular();
         if (pseudo) {
             const staticSize = pseudo.size();
             if (staticSize) return staticSize * 4;
@@ -157,10 +169,10 @@ export class asmDirective extends Directive {
                 );
                 return expanded.length * 4;
             } catch {
-                return 4;
+                return calcRegular();
             }
         }
-        return 4;
+        return calcRegular();
     }
 }
 
