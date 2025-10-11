@@ -13,7 +13,8 @@
                 data-linenumber="<%=line.editorPos.lineNumber%>"
                 data-fileid="<%=line.editorPos.fileId%>"
               >[<%=ctx.files.find(f => f.id===line.editorPos.fileId).name??""%>.asm:<%=line.editorPos.lineNumber%>]</span>
-            <%} else if (line.memoryPos) {%>
+            <%}
+            if (line.memoryPos) {%>
               <span
                 class="clickable-pos"
                 onclick="goToMemoryPosOnClick(this)"

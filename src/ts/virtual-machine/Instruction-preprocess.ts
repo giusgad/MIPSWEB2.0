@@ -42,6 +42,7 @@ export class InstructionPreprocessor {
         const mapped = this.mapParams(tokens, params);
 
         if (params === "rt, offset(base)") {
+            if (!tokens[2]) return [tokens];
             const offsetBaseMatch = tokens[2].match(/(-?\d+)\((\$\w+)\)/);
             // supported possibilities:
             // - register without offset: lw $t0 $t1 | lw $t0 ($t1)

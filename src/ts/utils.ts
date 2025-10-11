@@ -73,7 +73,6 @@ export function scrollSelectedInstructionIntoView() {
         .getElementsByClassName("selected-instruction")
         .item(0);
     if (!elem) return;
-    console.log(elem);
     elem.scrollIntoView({ behavior: "instant", block: "nearest" });
 }
 

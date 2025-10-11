@@ -1,6 +1,6 @@
 import { renderApp } from "../app.js";
 import { EditorPosition } from "../editors.js";
-import { setConsoleShown } from "../virtual-machine.js";
+import { setConsoleShown, vm } from "../virtual-machine.js";
 
 type LineSeverity = "success" | "error" | "warn";
 
@@ -41,7 +41,12 @@ export class Console {
     ) {
         let memoryPos,
             editorPos = undefined;
-        typeof pos === "number" ? (memoryPos = pos) : (editorPos = pos);
+        if (typeof pos === "number") {
+            memoryPos = pos;
+            editorPos = vm.assembler.addressEditorsPositions.get(pos);
+        } else {
+            editorPos = pos;
+        }
         this.lines.push({
             text: `${errorMsg}\n`,
             type: "error",

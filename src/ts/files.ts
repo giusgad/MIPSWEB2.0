@@ -200,7 +200,7 @@ async function loadProject(zip: any, name: string | undefined) {
         await importFile(new File([fileData], (file as any).name));
     }
     // set the project name
-    if (name == null) name = "MIPS_project.zip";
+    if (name == null) name = `${defaultProjectName}.zip`;
     if (name.endsWith(".zip")) name = name.substring(0, name.length - 4);
     setProjectName(name);
     await renderApp("edit", "edit");
