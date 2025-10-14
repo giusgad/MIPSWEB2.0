@@ -309,10 +309,16 @@ input {
 }
 
 #console {
+  &.console-shown {
+    .title {
+      border-right: none !important;
+      border-left: none !important;
+    }
+  }
   .component {
     background-color: var(--rgb-gray-10);
     .title {
-      border-top: @border-gray-10;
+      border: @border-gray-10;
       border-bottom: 1px solid transparent;
       .icon {
         margin-left: 0;

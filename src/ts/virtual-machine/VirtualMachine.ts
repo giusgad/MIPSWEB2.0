@@ -5,9 +5,9 @@ import { Console } from "./Console.js";
 import { Binary } from "./Utils.js";
 import { renderApp } from "../app.js";
 import { getExecutionSpeedTimeOut } from "../execution-speed.js";
-import { step } from "../virtual-machine.js";
 import { getAceEditor } from "../editors.js";
 import { INFINITE_LOOP_TRESHOLD } from "../settings.js";
+import { updateUiAfterStep } from "../virtual-machine.js";
 
 export class VirtualMachine {
     cpu: CPU;
@@ -28,6 +28,8 @@ export class VirtualMachine {
     lastReadMem?: number;
     /**word-aligned address of the memory written by the last instruction*/
     lastWrittenMem?: number;
+    /**A stack of addresses, when a step is executed and calls a function, its return address is saved on the stack in order to allow a step-out*/
+    stepOutStack: number[] = [];
 
     console: Console = new Console();
 
@@ -77,6 +79,7 @@ export class VirtualMachine {
         this.console.reset();
         this.asyncToken++;
         this.pcCounter.clear();
+        this.stepOutStack = [];
     }
 
     nextInstructionHasBreakPoint(): boolean {
@@ -88,14 +91,39 @@ export class VirtualMachine {
         return bps![pos.lineNumber - 1] != null;
     }
 
+    async stepOver() {
+        // if step over is not possible execute a normal step
+        if (!this.isNextInstructionFunction()) {
+            await this.step();
+            return;
+        }
+        const targetPc = this.cpu.pc.getValue() + 4;
+        while (this.cpu.pc.getValue() !== targetPc) {
+            await this.step();
+        }
+    }
+
+    async stepOut() {
+        if (this.stepOutStack.length <= 0) return;
+        const targetPc = this.stepOutStack.pop()!;
+        while (this.cpu.pc.getValue() !== targetPc) {
+            await this.step();
+        }
+    }
+
     async step() {
         try {
             if (
                 !this.cpu.isHalted() &&
                 this.nextInstructionEditorPosition !== undefined
             ) {
+                if (this.isNextInstructionFunction()) {
+                    this.stepOutStack.push(this.cpu.pc.getValue() + 4);
+                }
                 await this.cpu.execute(this);
                 const currPC = this.cpu.pc.getValue();
+                if (currPC === this.stepOutStack[this.stepOutStack.length - 1])
+                    this.stepOutStack.pop();
                 const pcCounter = this.pcCounter.get(currPC);
                 if (pcCounter && pcCounter >= INFINITE_LOOP_TRESHOLD) {
                     alert(
@@ -106,12 +134,7 @@ export class VirtualMachine {
                 } else {
                     this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
                 }
-                if (!this.cpu.isHalted()) {
-                    this.nextInstructionEditorPosition =
-                        this.assembler.addressEditorsPositions.get(
-                            this.cpu.pc.getValue(),
-                        );
-                }
+                this.updateEditorPosition();
                 if (this.nextInstructionHasBreakPoint()) this.pause();
             } else {
                 this.pause();
@@ -135,22 +158,38 @@ export class VirtualMachine {
         }
     }
 
+    /**Updates the next instruction's editor position*/
+    updateEditorPosition() {
+        if (!this.cpu.isHalted()) {
+            this.nextInstructionEditorPosition =
+                this.assembler.addressEditorsPositions.get(
+                    this.cpu.pc.getValue(),
+                );
+        }
+    }
+
     async run() {
         this.running = true;
         const timeout = getExecutionSpeedTimeOut();
         while (this.running && !this.cpu.isHalted()) {
+            await this.step();
             if (timeout > 0) {
-                // calls the outer step function since it also updates ui
-                await step();
+                // update ui if steps are not instant
+                updateUiAfterStep();
                 await new Promise((resolve) => setTimeout(resolve, timeout));
-            } else {
-                await this.step();
             }
         }
     }
 
     pause() {
         this.running = false;
+    }
+
+    isNextInstructionFunction(): boolean {
+        const instructionCode = this.cpu.memory.loadWord(this.cpu.pc);
+        const decodedInstruction = this.cpu.decode(instructionCode);
+        if (!decodedInstruction) return false;
+        return decodedInstruction.instruction.symbol.endsWith("AL");
     }
 
     async exit() {

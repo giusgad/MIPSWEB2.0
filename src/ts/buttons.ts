@@ -23,7 +23,6 @@ import {
 import {
     assemble,
     stop,
-    step,
     run,
     pause,
     vm,
@@ -31,6 +30,7 @@ import {
     setMemoryShown,
     setConsoleShown,
     consoleShown,
+    updateUiAfterStep,
 } from "./virtual-machine.js";
 import {
     colFormatSelect,
@@ -97,7 +97,17 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).stepOnClick = async function () {
-    await step();
+    await vm.step();
+    await updateUiAfterStep();
+};
+
+(window as any).stepOverOnClick = async function () {
+    await vm.stepOver();
+    await updateUiAfterStep(true);
+};
+(window as any).stepOutOnClick = async function () {
+    await vm.stepOut();
+    await updateUiAfterStep(true);
 };
 
 (window as any).runOnClick = async function () {

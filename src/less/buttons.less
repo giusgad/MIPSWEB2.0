@@ -73,11 +73,13 @@ button {
     border-radius: 0;
     border-right: none;
     &:first-child {
-      border-radius: @btn-b-radius 0 0 @btn-b-radius;
+      border-bottom-left-radius: @btn-b-radius;
+      border-top-left-radius: @btn-b-radius;
     }
     &:last-child {
       border-right: @btn-border;
-      border-radius: 0 @btn-b-radius @btn-b-radius 0;
+      border-bottom-right-radius: @btn-b-radius;
+      border-top-right-radius: @btn-b-radius;
     }
   }
 }

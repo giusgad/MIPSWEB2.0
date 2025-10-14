@@ -1,9 +1,23 @@
 <div class="buttons">
     <% if (ctx.interfaceState === "execute") { %>
         <%if ((ctx.vm.nextInstructionEditorPosition !== undefined) && (ctx.editorState === "execute") && (!ctx.vm.cpu.isHalted())) {%>
-            <div class="button default" onclick="stepOnClick();" title="s">
-                <div class="icon gray-4"><%-Icons.render('step')%></div>
-                <div class="label">Step</div>
+            <div class="button-group">
+              <div class="button default" onclick="stepOnClick();" title="s">
+                  <div class="icon gray-4"><%-Icons.render('step')%></div>
+                  <div class="label">Step</div>
+              </div>
+              <% if (ctx.vm.stepOutStack.length > 0) {%>
+                <div class="button default" onclick="stepOutOnClick();" title="step out">
+                    <div class="label">Out</div>
+                    <div class="icon gray-4"><%-Icons.render('stepOut')%></div>
+                </div>
+              <%}%>
+              <% if (ctx.vm.isNextInstructionFunction()) {%>
+                <div class="button default" onclick="stepOverOnClick();" title="step over">
+                    <div class="label">Over</div>
+                    <div class="icon gray-4"><%-Icons.render('stepOver')%></div>
+                </div>
+              <%}%>
             </div>
             <div class="button-group">
               <div class="button default" onclick="runOnClick();" title="space">

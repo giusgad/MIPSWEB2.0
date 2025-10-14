@@ -57,8 +57,7 @@ export async function stop() {
     await renderApp("edit", "edit");
 }
 
-export async function step() {
-    await vm.step();
+export async function updateUiAfterStep(updateButtons: boolean = false) {
     if (vm.cpu.isHalted()) {
         await renderApp();
         return;
@@ -73,6 +72,8 @@ export async function step() {
     await render("registers", "/app/registers.ejs", undefined, false);
     if (consoleShown)
         await render("console", "/app/console.ejs", undefined, false);
+    if (updateButtons || vm.isNextInstructionFunction())
+        await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);
     scrollSelectedInstructionIntoView();
 }
 
