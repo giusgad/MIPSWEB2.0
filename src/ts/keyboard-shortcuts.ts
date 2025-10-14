@@ -4,6 +4,8 @@ import { vm } from "./virtual-machine.js";
 type Shortcut = {
     key: string;
     action: () => void;
+    conditions?: () => boolean;
+    mods?: "ctrl/cmd" | "shift";
 };
 
 const isStepPossible = function (): boolean {
@@ -17,35 +19,64 @@ const isStepPossible = function (): boolean {
 
 const keyboardShortcuts: Shortcut[] = [
     {
-        key: "ctrl+A",
+        mods: "ctrl/cmd",
+        key: "b",
         action: (window as any).assembleOnClick,
     },
     {
-        key: "s",
-        action: () => {
-            if (isStepPossible()) (window as any).stepOnClick();
-        },
+        key: "F5",
+        conditions: () => isStepPossible(),
+        action: () => (window as any).stepOnClick(),
     },
     {
-        key: "S",
-        action: () => {
-            if (interfaceState === "execute") (window as any).stopOnClick();
-        },
+        key: "F11",
+        conditions: () => isStepPossible(),
+        action: () => (window as any).stepOnClick(),
+    },
+    {
+        key: "F10",
+        conditions: () => isStepPossible(),
+        action: () => (window as any).stepOverOnClick(),
+    },
+    {
+        mods: "shift",
+        key: "F11",
+        conditions: () => isStepPossible(),
+        action: () => (window as any).stepOutOnClick(),
     },
     {
         key: " ", // space
-        action: () => {
-            if (interfaceState === "execute") (window as any).runOnClick();
-        },
+        conditions: () => interfaceState === "execute",
+        action: () => (window as any).runOnClick(),
+    },
+    {
+        mods: "ctrl/cmd",
+        key: "r",
+        conditions: () => interfaceState === "execute",
+        action: () => (window as any).runOnClick(),
     },
 ];
 
+function checkMods(shortcut: Shortcut, ev: KeyboardEvent): boolean {
+    if (!shortcut.mods) {
+        return !(ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey);
+    }
+    switch (shortcut.mods) {
+        case "ctrl/cmd":
+            // on macos cmd registers as metaKey
+            return (ev.ctrlKey || ev.metaKey) && !(ev.shiftKey || ev.altKey);
+        case "shift":
+            return ev.shiftKey && !(ev.ctrlKey || ev.metaKey || ev.altKey);
+    }
+}
+
 document.addEventListener("keydown", (ev) => {
-    const pressedKeys = `${ev.ctrlKey ? "ctrl+" : ""}${ev.key}`;
     const shortcut = keyboardShortcuts.find(
-        (shortcut) => shortcut.key === pressedKeys,
+        (shortcut) => shortcut.key === ev.key && checkMods(shortcut, ev),
     );
     if (shortcut) {
+        if (shortcut.conditions && !shortcut.conditions()) return;
+        ev.preventDefault();
         shortcut.action();
     }
 });
