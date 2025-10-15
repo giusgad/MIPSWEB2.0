@@ -15,11 +15,14 @@
 </div>
 
 <% if (ctx.files.length > 0) { %>
-  <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
-
-  <div id="memory" class="<%=ctx.memoryShown ? "memory-shown": ""%>"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
-  <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
-    <%-await renderTemplate('/app/console.ejs', ctx)%>
+  <div id="components-container">
+    <div id="console-container">
+      <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
+        <%-await renderTemplate('/app/console.ejs', ctx)%>
+      </div>
+    </div>
+    <div id="memory" class="<%=ctx.memoryShown ? "memory-shown": ""%>"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
+    <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
   </div>
 <%} else {%>
     <%-await renderTemplate("/app/no-files.ejs")%>

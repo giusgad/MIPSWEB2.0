@@ -6,7 +6,6 @@ import {
 } from "./intervals.js";
 import { Colors } from "./lib/Colors.js";
 import { highlightElementAnimation } from "./style.js";
-import { getFromStorage } from "./utils.js";
 import { memoryShown } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
@@ -14,6 +13,7 @@ type CanvasInterval = { intervalId: number; startY: number; endY: number };
 let canvasIntervals: CanvasInterval[] = [];
 
 function memoryMapOnClick(ev: MouseEvent) {
+    if (!memoryShown) return;
     const interval = findClosetInterval(ev.offsetY);
     if (!interval) return;
     // find all the adjacent intervals that were drawn on together
@@ -33,11 +33,12 @@ export function watchMemoryScroll() {
         if (!memoryShown) return;
         drawMemoryMapConnections();
     });
-    drawMemoryMapConnections();
+    if (memoryShown) drawMemoryMapConnections();
 }
 
 /** draw lines connecting the map's interval to the corresponding memory if displayed*/
 export function drawMemoryMapConnections() {
+    if (!memoryShown) return;
     const canvas = document.getElementById(
         "memorymap-canvas",
     ) as HTMLCanvasElement;
@@ -100,17 +101,19 @@ function isElemVerticallyInView(el: HTMLElement): boolean {
         window.innerHeight || document.documentElement.clientHeight;
 
     const toolbarH = 40;
-    const verticallyInView =
-        rect.top < windowHeight && rect.bottom > toolbarH * 2;
+    const verticallyInView = rect.top < windowHeight && rect.bottom > toolbarH;
 
     return verticallyInView;
 }
 
-function findClosetInterval(y: number): CanvasInterval | null {
+/**Finds the closest interval given a y inside the canvas. tollerancePx indicates how many pixels away from the actual interval
+ * the given y can be to be considered a match.*/
+function findClosetInterval(
+    y: number,
+    tollerancePx: number = 15,
+): CanvasInterval | null {
     let closest: CanvasInterval | null = null;
     let minDistance = Infinity;
-    // how many pixels away an interval click is considered valid
-    const limit = 15;
 
     for (const interval of canvasIntervals) {
         const { startY, endY } = interval;
@@ -125,7 +128,7 @@ function findClosetInterval(y: number): CanvasInterval | null {
             distance = 0;
         }
 
-        if (distance <= limit && distance < minDistance) {
+        if (distance <= tollerancePx && distance < minDistance) {
             closest = interval;
             minDistance = distance;
         }
@@ -135,21 +138,8 @@ function findClosetInterval(y: number): CanvasInterval | null {
 }
 
 export function drawMemoryMap() {
-    if (!memoryShown) return;
     let canvasElem = document.getElementById("memorymap");
     if (!canvasElem) return;
-    canvasElem.addEventListener("click", memoryMapOnClick);
-    canvasElem.addEventListener("mousemove", (ev) => {
-        const interval = findClosetInterval(ev.offsetY);
-        if (!interval) {
-            canvasElem.title = "";
-            return;
-        }
-        const newTitle = `0x${new Binary(interval.intervalId).getHex()}`;
-        if (newTitle !== canvasElem.title) {
-            canvasElem.title = newTitle;
-        }
-    });
     const canvas = canvasElem as HTMLCanvasElement;
 
     canvas.height = canvas.clientHeight;
@@ -167,7 +157,9 @@ export function drawMemoryMap() {
     for (const interval of mem) {
         const extremes = getIntervalExtremes(interval);
         if (!extremes) continue;
-        const { start, end } = extremes;
+        let { start, end } = extremes;
+        start = start - minAddress;
+        end = end - minAddress;
         const yStart = Math.floor(start * pixelsPerByte);
         const height = Math.max(Math.ceil((end - start) * pixelsPerByte), 1);
         ctx.fillStyle = Colors.get("green") ?? "#ff0000";
@@ -178,6 +170,23 @@ export function drawMemoryMap() {
             endY: yStart + height,
         });
     }
+
+    // event listeners
+    canvasElem.addEventListener("click", memoryMapOnClick);
+    canvasElem.addEventListener("mousemove", (ev) => {
+        const interval = findClosetInterval(ev.offsetY, 10);
+        let addr = interval
+            ? interval.intervalId
+            : Math.round(ev.offsetY / pixelsPerByte) + minAddress;
+        const newTitle = `0x${new Binary(addr).getHex()}`;
+        if (newTitle !== canvasElem.title) {
+            canvasElem.title = newTitle;
+        }
+    });
+    window.addEventListener("resize", () => {
+        drawMemoryMap();
+        drawMemoryMapConnections();
+    });
 }
 
 export function highlightInterval(

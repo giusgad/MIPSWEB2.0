@@ -234,10 +234,9 @@ input {
 .component {
   height: 100%;
   overflow-y: scroll;
-  padding-top: calc(@toolbar-h + 0.5em);
   .title {
-    z-index: 1; // without this semitransparent elements show through (like 0x before hex)
-    position: absolute;
+    z-index: 20; // without this semitransparent elements show through (like 0x before hex)
+    position: sticky;
     width: 100%;
     top: 0;
     left: 0;
@@ -248,6 +247,10 @@ input {
     padding: 0.3em 1em;
     background-color: var(--rgb-gray-11);
     border-bottom: @border-gray-11;
+  }
+  & > .tables,
+  & > .table {
+    margin-top: 0.5em;
   }
 }
 
@@ -329,12 +332,6 @@ input {
       }
     }
     .console {
-      position: absolute;
-      top: @toolbar-h;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      padding: 12px;
       background-color: var(--rgb-gray-11);
       display: flex;
       flex-direction: column;
@@ -638,62 +635,6 @@ input {
             }
           }
         }
-      }
-    }
-  }
-}
-
-#edit-user-intervals {
-  @brdr: 0.5em;
-  .interval {
-    border: 1px solid var(--rgb-gray-8);
-    border-radius: @brdr;
-    display: flex;
-    gap: 1em;
-    padding: 0.5em;
-    .input {
-      padding: 0;
-      border: 1px solid var(--rgb-gray-8);
-      border-radius: @brdr;
-      display: flex;
-      flex-direction: row;
-      justify-content: start;
-      align-items: end;
-      background-color: var(--rgb-gray-9);
-      button {
-        width: 10%;
-        height: 100%;
-        margin: 0;
-        background-color: var(--rgb-gray-7);
-        color: var(--rgb-gray-4);
-        &:hover {
-          background-color: var(--rgb-gray-6);
-        }
-        &:active {
-          background-color: var(--rgb-gray-5);
-        }
-        &:first-of-type {
-          border-radius: @brdr 0 0 @brdr;
-        }
-        &:last-of-type {
-          border-radius: 0 @brdr @brdr 0;
-        }
-      }
-      .hex {
-        opacity: 0.5;
-        padding: 0.1em;
-      }
-      input {
-        height: 100%;
-        width: 75%;
-        border-radius: 0;
-      }
-    }
-    .button.delete {
-      border-color: var(--rgb-red);
-      svg {
-        fill: var(--rgb-red);
-        fill-opacity: 0.8;
       }
     }
   }

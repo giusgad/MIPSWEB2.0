@@ -1,8 +1,9 @@
 @import "variables.less";
 
-@width-registers: 20%;
-@width-memory: 35%;
-@height-console: 25%;
+@height-console: 25vh;
+@component-transition:
+  max-width 0.2s ease-out,
+  height 0.2s ease-out;
 
 #app {
   position: absolute;
@@ -18,40 +19,47 @@
   left: 0;
   right: 0;
   height: @toolbar-h;
-  &.execute {
-    left: 0;
-  }
-  &.memory-shown {
-    right: calc(@width-memory + @width-registers);
-  }
-  &.registers-shown {
-    right: @width-registers;
-  }
 }
 
 #editors {
   position: absolute;
   top: calc(@toolbar-h * 2);
   left: 0;
-  right: @width-registers;
+  right: 0;
   bottom: 0;
-  &.memory-shown {
-    right: calc(@width-registers + @width-memory);
-  }
-  &.console-shown {
-    bottom: 25%;
-  }
 }
 
-#registers {
+#components-container {
+  z-index: 10;
   position: absolute;
   top: @toolbar-h;
-  left: 80%;
-  width: @width-registers;
-  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - @toolbar-h);
+  display: flex;
+  pointer-events: none;
+  #console-container {
+    pointer-events: none;
+    #console {
+      pointer-events: auto;
+    }
+    flex: 1 1 auto;
+    min-width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  #memory,
+  #register {
+    pointer-events: auto;
+    flex: 0 0 auto;
+  }
 }
 
 #memory {
+  transition: @component-transition;
+  max-width: 10%;
   #memorymap-container {
     @mm-width: 10px;
     @padding: 2.5px;
@@ -76,56 +84,36 @@
       height: 100%;
     }
   }
-  position: absolute;
-  top: @toolbar-h;
-  right: @width-registers;
-  bottom: 0;
-  width: 0%;
-  & #memorymap-container {
-    display: none;
+  #memory-tables {
+    max-width: 0;
+    transition: @component-transition;
   }
-  & .title {
-    width: 15ch;
-    left: -15ch;
-    top: 0;
-    justify-content: center;
-  }
+  position: relative;
   &.memory-shown {
-    width: @width-memory;
-    & .title {
-      display: flex;
-      left: 0;
-      width: 100%;
-      justify-content: flex-start;
-    }
-    & #memorymap-container {
-      display: initial;
+    min-width: 20%;
+    max-width: 50%;
+    #memory-tables {
+      max-width: 70vw;
     }
   }
 }
 
 #console {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 0%;
-  width: calc(100% - @width-registers);
-  .title {
-    z-index: 5;
-    width: 15ch;
-    top: -@toolbar-h;
-    justify-content: center;
+  position: relative;
+  .console {
+    transition: @component-transition;
+    padding: 0;
+    height: 0;
+    border: none;
   }
+  width: 100%;
   &.console-shown {
-    height: @height-console;
-    .title {
-      width: 100%;
-      top: 0;
-      justify-content: flex-start;
+    .console {
+      border: 12px solid var(--rgb-gray-10);
+      border-top: none;
+      padding: 12px;
+      height: @height-console;
     }
-  }
-  &.memory-shown {
-    width: calc(100% - @width-registers - @width-memory);
   }
 }
 

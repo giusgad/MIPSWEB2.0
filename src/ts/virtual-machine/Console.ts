@@ -1,6 +1,7 @@
 import { renderApp } from "../app.js";
 import { EditorPosition } from "../editors.js";
-import { setConsoleShown, vm } from "../virtual-machine.js";
+import { render } from "../rendering.js";
+import { consoleShown, setConsoleShown, vm } from "../virtual-machine.js";
 
 type LineSeverity = "success" | "error" | "warn";
 
@@ -91,14 +92,16 @@ export class Console {
         }
         this.lines[this.lines.length - 1].waitingInput = true;
         this.state = "waitingInput";
-        await renderApp();
+        if (consoleShown)
+            await render("console", "/app/console.ejs", undefined, false);
+        else await setConsoleShown(true);
         return new Promise((resolve) => {
             const interval = setInterval(() => {
                 if (this.state === "ready") {
                     clearInterval(interval);
                     resolve(this.input);
                 }
-            }, 100);
+            }, 20);
         });
     }
 

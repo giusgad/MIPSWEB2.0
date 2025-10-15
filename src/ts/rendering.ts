@@ -13,6 +13,7 @@ import {
     drawMemoryMapConnections,
     watchMemoryScroll,
 } from "./memorymap.js";
+import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -50,8 +51,15 @@ export async function render(
     if (showLoaders) removeLoader(`render: ${id}`);
     if (id === "memory" || id === "app") {
         drawMemoryMap();
-        drawMemoryMapConnections();
+        if (memoryShown) drawMemoryMapConnections();
         watchMemoryScroll();
+    } else if (id === "console" && vm.console.state === "waitingInput") {
+        const consoleInput = document.getElementById("console-input");
+        if (consoleInput) {
+            consoleInput.focus();
+        }
+        watchingConsole();
+        scrollConsoleToBottom();
     }
 }
 

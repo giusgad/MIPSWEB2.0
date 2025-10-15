@@ -199,11 +199,6 @@ export function addEditor(file: file) {
     }
 
     const aceEditor = ace.edit(editorHTMLDivElement);
-    aceEditor.commands.addCommand({
-        name: "find",
-        bindKey: { win: "Ctrl-F", mac: "Ctrl-F" },
-        exec: function () {},
-    });
     if (Colors.isDarkMode()) {
         aceEditor.setTheme(aceEditorDarkTheme);
     } else {

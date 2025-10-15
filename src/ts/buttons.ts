@@ -45,6 +45,7 @@ import { render } from "./rendering.js";
 import { adjustBinaryWidth, highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
 import { renderApp } from "./app.js";
+import { removeClass } from "./utils.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -302,6 +303,9 @@ Save your current project before proceeding.`,
         for (const file of getFiles()) {
             await deleteFile(file.id);
         }
+        ["execute", "memory-shown", "registers-shown"].forEach((className) =>
+            removeClass(className, "opened-file"),
+        );
         await renderApp("edit", "edit");
     }
 };

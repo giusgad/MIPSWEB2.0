@@ -22,11 +22,11 @@ export async function setMemoryShown(val: boolean) {
     if (val === memoryShown) return;
     memoryShown = val;
     const classAction = val ? addClass : removeClass;
-    classAction("memory-shown", "opened-files");
-    classAction("memory-shown", "editors");
     classAction("memory-shown", "memory");
-    classAction("memory-shown", "console");
-    await render("memory", "/app/memory.ejs", undefined, false);
+    setTimeout(
+        async () => await render("memory", "/app/memory.ejs", undefined, false),
+        200,
+    );
 }
 
 export async function setConsoleShown(val: boolean) {
@@ -34,8 +34,10 @@ export async function setConsoleShown(val: boolean) {
     consoleShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("console-shown", "console");
-    classAction("console-shown", "editors");
-    await render("console", "/app/console.ejs", undefined, false);
+
+    setTimeout(async () => {
+        await render("console", "/app/console.ejs", undefined, false);
+    }, 200);
 }
 
 export async function assemble(files: file[]) {
