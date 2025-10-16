@@ -2,8 +2,9 @@
 
 @height-console: 25vh;
 @component-transition:
-  max-width 0.2s ease-out,
-  height 0.2s ease-out;
+  max-width 0.2s ease,
+  width 0.2s ease,
+  height 0.2s ease;
 
 #app {
   position: absolute;
@@ -51,9 +52,36 @@
     justify-content: flex-end;
   }
   #memory,
-  #register {
+  #registers {
     pointer-events: auto;
     flex: 0 0 auto;
+  }
+}
+
+#registers {
+  transition: @component-transition;
+  .col.value,
+  .title .long {
+    transition: @component-transition;
+    overflow: hidden;
+    max-width: 100%;
+  }
+  max-width: 30%;
+  &:not(.registers-shown) {
+    max-width: 8ch;
+    .title .long {
+      max-width: 0;
+    }
+    .cols-names .col.value {
+      visibility: hidden;
+    }
+    .col.value {
+      width: 0 !important;
+      padding: 0;
+    }
+    .col.name {
+      width: 100% !important;
+    }
   }
 }
 

@@ -31,6 +31,8 @@ import {
     setConsoleShown,
     consoleShown,
     updateUiAfterStep,
+    setRegistersShown,
+    registersShown,
 } from "./virtual-machine.js";
 import {
     colFormatSelect,
@@ -138,6 +140,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
             break;
     }
     await setMemoryShown(true);
+    await setRegistersShown(true);
     await assemble(files);
     clearErrorMarkers();
 };
@@ -177,7 +180,9 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 (window as any).toggleMemoryOnClick = async function () {
     await setMemoryShown(!memoryShown);
 };
-
+(window as any).toggleRegistersOnClick = async function () {
+    await setRegistersShown(!registersShown);
+};
 (window as any).toggleConsoleOnClick = async function () {
     await setConsoleShown(!consoleShown);
 };

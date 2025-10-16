@@ -3,7 +3,12 @@ import { Icons } from "./lib/Icons.js";
 import { Colors } from "./lib/Colors.js";
 import { getFiles, getProjectName, getSelectedFile } from "./files.js";
 import { editorState, interfaceState } from "./app.js";
-import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
+import {
+    consoleShown,
+    memoryShown,
+    registersShown,
+    vm,
+} from "./virtual-machine.js";
 import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
 import { getMemoryIntervals } from "./intervals.js";
@@ -32,6 +37,7 @@ export function getContext() {
         memoryIntervals: getMemoryIntervals(),
         memoryShown: memoryShown,
         consoleShown: consoleShown,
+        registersShown: registersShown,
         selectedInstructionAddresses: getSelectedInstructionAddresses(),
         vm: vm,
     };

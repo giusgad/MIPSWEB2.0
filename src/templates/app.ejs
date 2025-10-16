@@ -10,7 +10,7 @@
   <%}%>
 </div>
 
-<div id="opened-files" class="<% if (ctx.interfaceState === 'execute') { %>execute<% }%> <%=ctx.memoryShown?"memory-shown":""%> <%=ctx.files.length>0?"registers-shown":""%>">
+<div id="opened-files">
   <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
 </div>
 
@@ -22,7 +22,9 @@
       </div>
     </div>
     <div id="memory" class="<%=ctx.memoryShown ? "memory-shown": ""%>"><%-await renderTemplate('/app/memory.ejs', ctx)%></div>
-    <div id="registers" <%if(ctx.interfaceState === 'execute'){%>class="execute"<%}%>><%-await renderTemplate('/app/registers.ejs', ctx)%></div>
+    <div id="registers" class="<%=ctx.registersShown ? "registers-shown" : ""%>">
+      <%-await renderTemplate('/app/registers.ejs', ctx)%>
+    </div>
   </div>
 <%} else {%>
     <%-await renderTemplate("/app/no-files.ejs")%>

@@ -252,6 +252,16 @@ input {
   & > .table {
     margin-top: 0.5em;
   }
+  .title {
+    border-bottom: @border-gray-10;
+    .icon {
+      margin-left: 0;
+    }
+    &:hover {
+      cursor: pointer;
+      background-color: var(--rgb-gray-9);
+    }
+  }
 }
 
 #no-files {
@@ -312,24 +322,11 @@ input {
 }
 
 #console {
-  &.console-shown {
-    .title {
-      border-right: none !important;
-      border-left: none !important;
-    }
-  }
   .component {
     background-color: var(--rgb-gray-10);
     .title {
-      border: @border-gray-10;
+      border-top: @border-gray-10;
       border-bottom: 1px solid transparent;
-      .icon {
-        margin-left: 0;
-      }
-      &:hover {
-        cursor: pointer;
-        background-color: var(--rgb-gray-9);
-      }
     }
     .console {
       background-color: var(--rgb-gray-11);
@@ -403,11 +400,6 @@ input {
     background-color: var(--rgb-gray-11);
     border-left: @border-gray-10;
 
-    .title {
-      border-bottom: @border-gray-10;
-      border-left: @border-gray-10;
-    }
-
     .table {
       padding: 0 12px;
       padding-bottom: 12px;
@@ -418,17 +410,6 @@ input {
 
       .row {
         background-color: var(--rgb-gray-10);
-
-        &.last-changed {
-          .col.value {
-            .last-changed-mixin();
-          }
-        }
-        &.last-read {
-          .col.value {
-            .last-read-mixin();
-          }
-        }
       }
 
       .col {
@@ -442,6 +423,30 @@ input {
         &.value {
           width: calc(1% * 75);
         }
+      }
+    }
+  }
+  &.registers-shown .row {
+    &.last-changed {
+      .col.value {
+        .last-changed-mixin();
+      }
+    }
+    &.last-read {
+      .col.value {
+        .last-read-mixin();
+      }
+    }
+  }
+  &:not(.registers-shown) .row {
+    &.last-changed {
+      .col.name {
+        .last-changed-mixin();
+      }
+    }
+    &.last-read {
+      .col.name {
+        .last-read-mixin();
       }
     }
   }
@@ -464,15 +469,7 @@ input {
     border-left: @border-gray-10;
 
     .title {
-      border-bottom: @border-gray-10;
       border-left: @border-gray-10;
-      .icon {
-        margin-left: 0;
-      }
-      &:hover {
-        cursor: pointer;
-        background-color: var(--rgb-gray-9);
-      }
     }
 
     .tables {
@@ -648,6 +645,7 @@ input {
   overflow-y: hidden;
   background-color: var(--rgb-gray-10);
   border-bottom: 1px solid var(--rgb-gray-9);
+  padding-right: 60%;
 
   .new-file {
     position: relative;

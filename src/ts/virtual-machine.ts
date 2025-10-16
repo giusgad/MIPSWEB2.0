@@ -17,6 +17,19 @@ import {
 export const vm = new VirtualMachine(new CPU());
 export let memoryShown = false;
 export let consoleShown = false;
+export let registersShown = true;
+
+export async function setRegistersShown(val: boolean) {
+    if (val === registersShown) return;
+    registersShown = val;
+    const classAction = val ? addClass : removeClass;
+    classAction("registers-shown", "registers");
+    setTimeout(
+        async () =>
+            await render("registers", "/app/registers.ejs", undefined, false),
+        200,
+    );
+}
 
 export async function setMemoryShown(val: boolean) {
     if (val === memoryShown) return;
