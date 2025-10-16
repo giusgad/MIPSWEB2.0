@@ -125,6 +125,12 @@ export function moveCursorToNextInstruction() {
                 const nextInstructionLine =
                     vm.nextInstructionEditorPosition.lineNumber;
                 aceEditor.gotoLine(nextInstructionLine);
+                aceEditor.scrollToLine(
+                    nextInstructionLine,
+                    true,
+                    false,
+                    () => {},
+                );
             }
         }
     }
@@ -142,6 +148,7 @@ export async function moveCursorToPos(pos: EditorPosition) {
         clearErrorMarkers();
         errorMarker = session?.addMarker(range, "error", "fullLine", false);
         aceEditor.gotoLine(targetLine);
+        aceEditor.scrollToLine(targetLine, true, false, () => {});
     }
 }
 export function clearErrorMarkers() {
@@ -154,11 +161,6 @@ export function resizeEditors() {
         addClass("execute", "editors");
     } else {
         removeClass("execute", "editors");
-    }
-    if (memoryShown) {
-        addClass("memory-shown", "editors");
-    } else {
-        removeClass("memory-shown", "editors");
     }
     if (consoleShown) {
         addClass("console-shown", "editors");

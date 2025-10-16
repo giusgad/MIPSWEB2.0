@@ -308,9 +308,6 @@ Save your current project before proceeding.`,
         for (const file of getFiles()) {
             await deleteFile(file.id);
         }
-        ["execute", "memory-shown", "registers-shown"].forEach((className) =>
-            removeClass(className, "opened-file"),
-        );
         await renderApp("edit", "edit");
     }
 };
