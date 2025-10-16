@@ -2,9 +2,10 @@
 
 @height-console: 25vh;
 @component-transition:
-  max-width 0.2s ease,
-  width 0.2s ease,
-  height 0.2s ease;
+  max-width 0.2s ease-out,
+  width 0.2s ease-out,
+  transform 0.2s ease-out,
+  height 0.2s ease-out;
 
 #app {
   position: absolute;
@@ -58,6 +59,24 @@
   }
 }
 
+.title .icon {
+  transition: @component-transition;
+}
+.rotate-icon {
+  .title .icon {
+    transform: rotate(180deg);
+  }
+}
+#memory.memory-shown {
+  .rotate-icon();
+}
+#registers.registers-shown {
+  .rotate-icon();
+}
+#console.console-shown {
+  .rotate-icon();
+}
+
 #registers {
   transition: @component-transition;
   .col.value,
@@ -68,7 +87,7 @@
   }
   max-width: 30%;
   &:not(.registers-shown) {
-    max-width: 8ch;
+    max-width: 9ch;
     .title .long {
       max-width: 0;
     }
@@ -87,6 +106,7 @@
 
 #memory {
   transition: @component-transition;
+  min-width: 11ch;
   max-width: 10%;
   #memorymap-container {
     @mm-width: 10px;

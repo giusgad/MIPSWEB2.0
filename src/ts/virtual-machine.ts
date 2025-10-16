@@ -24,11 +24,6 @@ export async function setRegistersShown(val: boolean) {
     registersShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("registers-shown", "registers");
-    setTimeout(
-        async () =>
-            await render("registers", "/app/registers.ejs", undefined, false),
-        200,
-    );
 }
 
 export async function setMemoryShown(val: boolean) {

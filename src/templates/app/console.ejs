@@ -1,6 +1,6 @@
 <div class="component">
     <div class="title" onclick="toggleConsoleOnClick()">
-        <div class="icon gray-4"><%-ctx.consoleShown ? Icons.render('angleDown') : Icons.render('angleUp')%></div>
+        <div class="icon gray-4"><%-Icons.render('angleUp')%></div>
         Console
     </div>
     <div class="console <% if (ctx.vm.console.state === "waiting Input") {%> waiting-input <% } %>">

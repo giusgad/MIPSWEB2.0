@@ -55,16 +55,8 @@ export class Icons {
                 path: "M8 1h-.542L3.553 4.905l1.061 1.06 2.637-2.61v6.177h1.498V3.355l2.637 2.61 1.061-1.06L8.542 1H8zm1.956 12.013a2 2 0 1 1-4 0 2 2 0 0 1 4 0z",
                 viewBox: "0 0 16 16",
             },
-            angleDown: {
-                path: "M 192 256 L 384 0 L 0 0 z",
-                viewBox: "0 0 384 256",
-            },
             angleUp: {
-                path: "M 192 0 L 384 256 L 0 256 z",
-                viewBox: "0 0 384 256",
-            },
-            angleRight: {
-                path: "m 352,256 -256,192 v -384 z",
+                path: "m 224,128 192,256 h -384 z",
                 viewBox: "0 0 448 512",
             },
             angleLeft: {
