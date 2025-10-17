@@ -1,4 +1,5 @@
-import { editorState, interfaceState } from "./app.js";
+import { editorState, interfaceState, renderApp } from "./app.js";
+import { changeFontSize } from "./style.js";
 import { vm } from "./virtual-machine.js";
 
 type Shortcut = {
@@ -54,6 +55,22 @@ const keyboardShortcuts: Shortcut[] = [
         key: "r",
         conditions: () => interfaceState === "execute",
         action: () => (window as any).runOnClick(),
+    },
+    {
+        mods: "ctrl/cmd",
+        key: "+",
+        action: async () => {
+            changeFontSize(1);
+            await renderApp();
+        },
+    },
+    {
+        mods: "ctrl/cmd",
+        key: "-",
+        action: async () => {
+            changeFontSize(-1);
+            await renderApp();
+        },
     },
 ];
 

@@ -178,7 +178,7 @@ export const possibleOptions = [
                 name: "assembly-mode",
                 desc: "Which files to assemble",
                 flag: "F",
-                defaultValue: "current",
+                defaultValue: "all",
                 inputType: "dropdown",
                 dropdownOptions: [
                     { value: "all", desc: "All project files" },

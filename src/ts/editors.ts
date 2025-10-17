@@ -10,6 +10,7 @@ import { Colors } from "./lib/Colors.js";
 import { addClass, removeClass } from "./utils.js";
 import { editorState, interfaceState, renderApp } from "./app.js";
 import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
+import { getCurrentFontSize } from "./style.js";
 
 export type editor = {
     fileId: number;
@@ -50,6 +51,7 @@ export function renderEditors() {
     const aceEditor = getAceEditor();
     if (aceEditor) {
         const cursors = document.getElementsByClassName("ace_cursor-layer");
+        aceEditor.setFontSize(`${getCurrentFontSize()}px`);
         if (editorState === "edit") {
             aceEditor.setOptions({
                 readOnly: false,
@@ -72,6 +74,7 @@ export function renderEditors() {
             aceEditor.setOptions({
                 readOnly: true,
                 highlightActiveLine: true,
+                scrollPastEnd: 0.5,
             });
 
             for (let i = 0; i < cursors.length; i++) {
@@ -161,11 +164,6 @@ export function resizeEditors() {
         addClass("execute", "editors");
     } else {
         removeClass("execute", "editors");
-    }
-    if (consoleShown) {
-        addClass("console-shown", "editors");
-    } else {
-        removeClass("console-shown", "editors");
     }
     for (const editor of editors) {
         editor.aceEditor.resize();

@@ -1,4 +1,22 @@
-import { scrollSelectedIntoView } from "./utils";
+const fontSizeVarName = "--font-size-dyn";
+export function changeFontSize(step: number) {
+    document.documentElement.style.setProperty(
+        fontSizeVarName,
+        `${getCurrentFontSize() + step}px`,
+    );
+}
+/**Returns the current font size in px (or defaults 14 if not found)*/
+export function getCurrentFontSize(): number {
+    const val = getComputedStyle(document.documentElement).getPropertyValue(
+        fontSizeVarName,
+    );
+    let pixels;
+
+    if (val.endsWith("px")) pixels = Number(val.slice(0, -2));
+    else pixels = 14;
+
+    return pixels;
+}
 
 /**
  * Calculates the pixel width of 1ch for a given element.
