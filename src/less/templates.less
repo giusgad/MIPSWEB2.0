@@ -106,8 +106,13 @@
 
 #memory {
   transition: @component-transition;
-  min-width: 11ch;
+  min-width: 8ch;
   max-width: 10%;
+  .title .long {
+    transition: @component-transition;
+    overflow: hidden;
+    max-width: 0;
+  }
   #memorymap-container {
     @mm-width: 10px;
     @padding: 2.5px;
@@ -142,6 +147,9 @@
     max-width: 50%;
     #memory-tables {
       max-width: 70vw;
+    }
+    .title .long {
+      max-width: 100%;
     }
   }
 }
