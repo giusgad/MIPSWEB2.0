@@ -458,14 +458,14 @@ input {
   // this variable can be set from javascript to adapt to the longer label
   --tags-width: 15ch;
   #memorymap-container {
-    opacity: 0.4;
+    opacity: 0.6;
     transition: opacity 0.5s;
     &:has(#memorymap:hover) {
-      opacity: 0.8;
-      transition: opacity 0.5s;
+      opacity: 0.9;
     }
     #memorymap {
       background-color: var(--rgb-gray-7);
+      filter: saturate(250%);
     }
   }
   .component {
@@ -479,7 +479,7 @@ input {
     .tables {
       overflow-y: scroll;
       height: 100%;
-      padding-right: 45px;
+      padding-right: @mem-padding-right;
 
       .table {
         margin-bottom: 12px;
@@ -496,7 +496,7 @@ input {
           &::after {
             .after-whiteout();
             left: var(--tags-width);
-            width: calc(90% - var(--tags-width));
+            width: calc(100% - var(--tags-width));
           }
           &.highlighted::after {
             opacity: 1;

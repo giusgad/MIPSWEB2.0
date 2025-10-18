@@ -88,3 +88,12 @@ export function scrollToEnd(scrollableElementId: string, direction: "x" | "y") {
         }
     }
 }
+
+/**Only run the argument function after this function isn't called for `delay` milliseconds.*/
+export function debounce(fn: Function, delay: number) {
+    let timeoutId: number;
+    return function (...args: any[]) {
+        clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => fn.apply(args), delay);
+    };
+}

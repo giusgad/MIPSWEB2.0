@@ -6,6 +6,7 @@ import {
 } from "./intervals.js";
 import { Colors } from "./lib/Colors.js";
 import { highlightElementAnimation } from "./style.js";
+import { debounce } from "./utils.js";
 import { memoryShown } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
@@ -40,7 +41,7 @@ export function watchMemoryScroll() {
 export function drawMemoryMapConnections() {
     if (!memoryShown) return;
     const canvas = document.getElementById(
-        "memorymap-canvas",
+        "memorymap-connections",
     ) as HTMLCanvasElement;
     // scale up canvas resolution
     const resScaling = 3;
@@ -50,9 +51,6 @@ export function drawMemoryMapConnections() {
     const ctx = canvas.getContext("2d")!;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // each interval is drawn with different colors for easier distinction
-    const colors = ["mint", "orange", "teal", "yellow", "purple"];
-    let color_index = 0;
 
     for (const interval of canvasIntervals) {
         // find the memory table that corresponds to the current interval and its corner coordinates
@@ -66,10 +64,29 @@ export function drawMemoryMapConnections() {
         // get Y coordinates relative to canvas
         const topCornerY = targetRect.top - canvasRect.top;
         const bottomCornerY = targetRect.bottom - canvasRect.top;
-        const color = Colors.get(colors[color_index++ % colors.length])!;
+        const color = getIntervalColor(interval.intervalId);
         drawLine(ctx, interval.startY, topCornerY, resScaling, color);
         drawLine(ctx, interval.endY, bottomCornerY, resScaling, color);
     }
+}
+
+let color_index = 0;
+const colorNames = [
+    "blue",
+    "purple",
+    "brown",
+    "indigo",
+    "cyan",
+    "green",
+    "pink",
+];
+const intervalColors = new Map<number, string>();
+function getIntervalColor(id: number): string {
+    if (intervalColors.has(id)) return intervalColors.get(id)!;
+    const name = colorNames[color_index++ % colorNames.length];
+    const color = Colors.get(name) ?? "#00ff00";
+    intervalColors.set(id, color);
+    return color;
 }
 
 /**Draws a cubic bezier curve between point (canvas_width,y1) and (0, y2) on the given canvas context*/
@@ -87,7 +104,7 @@ function drawLine(
 
     ctx.beginPath();
     ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2); // Draw straight line instead of bezier curve
+    ctx.lineTo(x2, y2);
     ctx.strokeStyle = color;
     ctx.lineWidth = resScaling;
     ctx.setLineDash([16, 8]);
@@ -139,19 +156,26 @@ function findClosetInterval(
 
 export function drawMemoryMap() {
     let canvasElem = document.getElementById("memorymap");
-    if (!canvasElem) return;
+    let glowupCanvasElem = document.getElementById("memorymap-glowup");
+    if (!canvasElem || !glowupCanvasElem) return;
     const canvas = canvasElem as HTMLCanvasElement;
+    const glowupCanvas = glowupCanvasElem as HTMLCanvasElement;
 
     canvas.height = canvas.clientHeight;
     canvas.width = canvas.clientWidth;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+
+    glowupCanvas.height = glowupCanvas.clientHeight;
+    glowupCanvas.width = glowupCanvas.clientWidth;
+    const glowupCtx = glowupCanvas.getContext("2d");
+    if (!ctx || !glowupCtx) return;
 
     const mem = getMemoryIntervals();
     const memLength = maxAddress - minAddress;
     const pixelsPerByte = (canvas.height - 1) / memLength;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    glowupCtx.clearRect(0, 0, glowupCanvas.width, glowupCanvas.height);
     canvasIntervals = [];
 
     for (const interval of mem) {
@@ -160,10 +184,15 @@ export function drawMemoryMap() {
         let { start, end } = extremes;
         start = start - minAddress;
         end = end - minAddress;
+        // draw the line in the memorymap column
         const yStart = Math.floor(start * pixelsPerByte);
         const height = Math.max(Math.ceil((end - start) * pixelsPerByte), 1);
-        ctx.fillStyle = Colors.get("green") ?? "#ff0000";
+        ctx.fillStyle = getIntervalColor(interval.id);
         ctx.fillRect(0, yStart, canvas.width, height);
+        // draw the corresponding glow-up container
+        glowupCtx.fillStyle = getIntervalColor(interval.id);
+        glowupCtx.fillRect(0, yStart + 3, glowupCanvas.width, height + 4);
+
         canvasIntervals.push({
             intervalId: interval.id,
             startY: yStart,
@@ -184,8 +213,8 @@ export function drawMemoryMap() {
         }
     });
     window.addEventListener("resize", () => {
-        drawMemoryMap();
-        drawMemoryMapConnections();
+        debounce(drawMemoryMap, 100);
+        debounce(drawMemoryMapConnections, 100);
     });
 }
 

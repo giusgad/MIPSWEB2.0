@@ -119,8 +119,8 @@
     position: absolute;
     padding: @padding;
     padding-left: 0;
-    width: calc(10% + 7px);
-    z-index: 2;
+    width: @mem-padding-right;
+    z-index: 12;
     height: calc(100% - @toolbar-h);
     top: @toolbar-h;
     right: 0;
@@ -129,11 +129,21 @@
       height: 100%;
       float: right;
     }
-    #memorymap-canvas {
+    #memorymap-glowup {
+      z-index: 15;
+      opacity: 0.3 !important;
+      pointer-events: none;
+      position: absolute;
+      width: calc(@mm-width + 4px);
+      height: calc(100% + @padding * 2);
+      top: calc(-1 * @padding);
+      right: 0.5px;
+    }
+    #memorymap-connections {
       position: absolute;
       top: @padding;
       right: calc(@padding + @mm-width);
-      width: calc(100% - @mm-width);
+      width: calc(100% - @mm-width - @padding);
       height: 100%;
     }
   }

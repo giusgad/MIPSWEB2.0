@@ -61,7 +61,7 @@ const keyboardShortcuts: Shortcut[] = [
         key: "+",
         action: async () => {
             changeFontSize(1);
-            await renderApp();
+            await renderApp(undefined, undefined, false);
         },
     },
     {
@@ -69,7 +69,7 @@ const keyboardShortcuts: Shortcut[] = [
         key: "-",
         action: async () => {
             changeFontSize(-1);
-            await renderApp();
+            await renderApp(undefined, undefined, false);
         },
     },
 ];
