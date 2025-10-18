@@ -127,7 +127,7 @@ export abstract class Instruction {
             }
         }
 
-        return `${this.symbol.toLowerCase()} ${paramValues.join(", ")}`;
+        return `${this.symbol.toLowerCase()} ${paramValues.join(" ")}`;
     }
 
     /**returns a list of the register names that were read*/

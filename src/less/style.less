@@ -7,7 +7,6 @@
 
 @border-gray-10: solid 1px var(--rgb-gray-10);
 @border-gray-11: solid 1px var(--rgb-gray-11);
-@tags-width: 20%;
 
 .after-whiteout() {
   content: "";
@@ -171,15 +170,19 @@ input {
   overflow-y: scroll;
   overflow-x: hidden;
 
+  font-family: monospace;
   .cols-names {
     display: flex;
     & > .col {
       border: none !important;
+      & > * {
+        font-family: "Prompt", sans-serif;
+      }
     }
 
     .col {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: 0.2em;
 
       .col-name {
@@ -201,8 +204,6 @@ input {
   }
 
   .rows {
-    font-family: monospace;
-
     .row {
       display: flex;
 
@@ -454,6 +455,8 @@ input {
 }
 
 #memory {
+  // this variable can be set from javascript to adapt to the longer label
+  --tags-width: 15ch;
   #memorymap-container {
     opacity: 0.4;
     transition: opacity 0.5s;
@@ -476,10 +479,11 @@ input {
     .tables {
       overflow-y: scroll;
       height: 100%;
+      padding-right: 45px;
 
       .table {
         margin-bottom: 12px;
-        padding: 0 12px;
+        padding: 0;
 
         .cols-names {
           .col {
@@ -491,8 +495,8 @@ input {
           position: relative;
           &::after {
             .after-whiteout();
-            left: @tags-width;
-            width: calc(90% - @tags-width);
+            left: var(--tags-width);
+            width: calc(90% - var(--tags-width));
           }
           &.highlighted::after {
             opacity: 1;
@@ -501,8 +505,8 @@ input {
             position: relative;
             &::after {
               .after-whiteout();
-              left: @tags-width;
-              width: calc(100% - @tags-width);
+              left: var(--tags-width);
+              width: calc(100% - var(--tags-width));
             }
             &.highlighted::after {
               opacity: 1;
@@ -552,16 +556,21 @@ input {
               &.tags {
                 display: flex;
                 flex-wrap: wrap;
+                overflow: hidden;
+
                 .static-tags {
                   flex: 1;
                   display: flex;
                   justify-content: flex-start;
                   align-items: center;
                   flex-wrap: wrap;
+                  min-width: 0;
+                  overflow: hidden;
                 }
 
                 .dynamic-tags {
-                  flex: 1;
+                  overflow: scroll;
+                  max-width: 100%;
                   display: flex;
                   justify-content: flex-end;
                   align-items: center;
@@ -573,6 +582,9 @@ input {
                   border-radius: 4px;
                   padding: 2px;
                   margin: 2px;
+                  max-width: 100%;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
 
                   &.register {
                     padding: 2px 4px;
@@ -606,18 +618,17 @@ input {
             .last-read-mixin();
           }
           &.tags {
-            width: @tags-width;
+            width: var(--tags-width);
           }
 
           &.address {
-            width: 25%;
-            min-width: 11ch;
+            width: 11ch;
             border: none;
             background-color: transparent;
           }
 
           &.value {
-            width: 45%;
+            width: 22ch;
             background-color: var(--rgb-gray-10);
           }
 
@@ -646,7 +657,8 @@ input {
   overflow-y: hidden;
   background-color: var(--rgb-gray-10);
   border-bottom: 1px solid var(--rgb-gray-9);
-  padding-right: 60%;
+  // this padding allows to scroll further
+  padding-right: 70%;
 
   .new-file {
     position: relative;

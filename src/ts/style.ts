@@ -1,3 +1,5 @@
+import { VirtualMachine } from "./virtual-machine/VirtualMachine";
+
 const fontSizeVarName = "--font-size-dyn";
 export function changeFontSize(step: number) {
     document.documentElement.style.setProperty(
@@ -16,6 +18,19 @@ export function getCurrentFontSize(): number {
     else pixels = 14;
 
     return pixels;
+}
+
+export function updateTagsWidth(vm: VirtualMachine) {
+    const memoryElem = document.getElementById("memory");
+    if (!memoryElem) return;
+    const longestLabel = Array.from(vm.assembler.allLabels.keys()).reduce(
+        (max, label) => Math.max(max, label.length),
+        0,
+    );
+    const minWidth = 12;
+    const maxWidth = 20;
+    const newWidth = Math.min(Math.max(longestLabel + 4, minWidth), maxWidth);
+    memoryElem.style.setProperty("--tags-width", `${newWidth}ch`);
 }
 
 /**
