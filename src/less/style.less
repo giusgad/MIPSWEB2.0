@@ -218,12 +218,12 @@ input {
         position: relative;
 
         &.binary {
-          font-family: Lekton;
-          font-size: @font-size-small;
           display: flex;
           flex-wrap: nowrap;
           gap: 2px;
           span {
+            font-family: Lekton;
+            font-size: @font-size-small;
             transform-origin: left;
           }
         }
@@ -403,8 +403,17 @@ input {
     border-left: @border-gray-10;
 
     .table {
+      @reg-name-width: 7ch;
       padding: 0 12px;
       padding-bottom: 12px;
+      .cols-names {
+        .col.name {
+          justify-content: center;
+        }
+        .col.value {
+          width: calc(100% - @reg-name-width);
+        }
+      }
 
       .col-format {
         padding-left: 0;
@@ -416,14 +425,16 @@ input {
 
       .col {
         &.name {
-          width: calc(1% * 25);
-          min-width: 6ch;
+          width: @reg-name-width;
           background-color: var(--rgb-gray-11);
           border: 0.5px solid var(--rgb-gray-10);
         }
 
         &.value {
-          width: calc(1% * 75);
+          width: 12ch;
+          &.binary {
+            width: 18ch;
+          }
         }
       }
     }
@@ -628,14 +639,16 @@ input {
             background-color: transparent;
           }
 
+          @mem-value-width: 22ch;
+
           &.value {
-            width: 22ch;
+            width: @mem-value-width;
             background-color: var(--rgb-gray-10);
           }
 
           &.granular {
             display: flex;
-            width: 45%;
+            width: @mem-value-width;
             padding: 0;
             border: none;
 

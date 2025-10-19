@@ -43,9 +43,8 @@ import {
     updateMemoryAddrFormat,
     updateOpts,
 } from "./settings.js";
-import { highlightInterval } from "./memorymap.js";
 import { render } from "./rendering.js";
-import { adjustBinaryWidth, highlightElementAnimation } from "./style.js";
+import { highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
 import { renderApp } from "./app.js";
 
@@ -61,13 +60,6 @@ import { renderApp } from "./app.js";
     const val = values[next];
     btn.innerText = getStateBtnText(val);
     await onchange(btn, val);
-};
-
-(window as any).setMemoryAddrFormat = async function (
-    _btn: any,
-    value: string,
-) {
-    await updateMemoryAddrFormat(value);
 };
 
 const getStateBtnText = function (val: string, long: boolean = false): string {
@@ -102,7 +94,12 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     value: string | undefined,
 ) {
     await colFormatSelect(element, value || element?.value);
-    adjustBinaryWidth();
+};
+(window as any).setMemoryAddrFormat = async function (
+    _btn: any,
+    value: string,
+) {
+    await updateMemoryAddrFormat(value);
 };
 
 (window as any).stepOnClick = async function () {

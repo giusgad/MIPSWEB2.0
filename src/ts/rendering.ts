@@ -19,7 +19,7 @@ import {
     watchMemoryScroll,
 } from "./memorymap.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
-import { updateTagsWidth } from "./style.js";
+import { adjustBinaryWidth, updateTagsWidth } from "./style.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -64,7 +64,10 @@ export async function render(
     element.innerHTML = await renderTemplate(templatePath, ctx);
 
     if (showLoaders) removeLoader(`render: ${id}`);
-
+    // Post rendering logic and redraws
+    if (id === "memory" || id === "registers") {
+        adjustBinaryWidth();
+    }
     if (id === "memory" || id === "app") {
         if (memoryShown) {
             // restore scroll

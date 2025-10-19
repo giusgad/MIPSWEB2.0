@@ -13,6 +13,7 @@ import "./intervals.js";
 import "./execution-speed.js";
 import "./keyboard-shortcuts.js";
 import {
+    debounce,
     getFromStorage,
     scrollSelectedIntoView,
     setIntoStorage,
@@ -69,7 +70,6 @@ window.addEventListener("offline", () => {
 
 window.addEventListener("resize", () => {
     hideFilePopover();
-    adjustBinaryWidth();
 });
 
 // clicking editor while executing goes back to edit state
@@ -109,6 +109,7 @@ export async function renderApp(
     initSortables();
     hideFilePopover();
     scrollSelectedIntoView("files-tabs");
+    adjustBinaryWidth();
     endDrag();
     if (showLoaders) removeLoader("renderApp");
 }
