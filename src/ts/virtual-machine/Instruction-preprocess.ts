@@ -35,6 +35,7 @@ export class InstructionPreprocessor {
         instr: Instruction | undefined,
         tokens: string[],
         labels: Map<string, Binary | undefined>,
+        withLabels: boolean = true,
     ): string[][] {
         if (!instr || !getOptions()["allow-literals"]) return [tokens];
 
@@ -42,7 +43,7 @@ export class InstructionPreprocessor {
         const mapped = this.mapParams(tokens, params);
 
         if (params === "rt, offset(base)") {
-            if (!tokens[2]) return [tokens];
+            if (!tokens[2] || tokens.length !== 3) return [tokens];
             const offsetBaseMatch = tokens[2].match(/(-?\d+)\((\$\w+)\)/);
             // supported possibilities:
             // - register without offset: lw $t0 $t1 | lw $t0 ($t1)
@@ -73,7 +74,9 @@ export class InstructionPreprocessor {
                         .map((part) => part.trim());
                     const labelAddr = labels.get(split[0]);
                     if (!labelAddr) {
-                        throw new Error(`Undefined label: "${split[0]}"`);
+                        if (withLabels)
+                            throw new Error(`Undefined label: "${split[0]}"`);
+                        else return [tokens];
                     }
                     return [
                         ...loadImmediate(labelAddr.getValue(), "$at"),
@@ -91,6 +94,8 @@ export class InstructionPreprocessor {
                         ...loadImmediate(labelAddr.getValue(), "$at"),
                         [instr.symbol, mapped["rt"], "0($at)"],
                     ];
+                } else if (withLabels) {
+                    throw new Error(`Undefined label: "${tokens[2]}"`);
                 }
             }
         }

@@ -113,6 +113,7 @@ export class asmDirective extends Directive {
             instruction,
             tokens,
             labels,
+            true,
         );
         for (const tokens of preprocessed) {
             assembler.addressEditorsPositions.set(
@@ -143,6 +144,7 @@ export class asmDirective extends Directive {
                 instruction,
                 tokens,
                 new Map(),
+                false,
             );
             return preprocessed.length * 4;
         };
