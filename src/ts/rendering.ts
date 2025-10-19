@@ -52,15 +52,31 @@ export async function render(
 ) {
     if (showLoaders) addLoader(`render: ${id}`);
     if (!ctx) ctx = getContext();
+
     const element = document.getElementById(id);
     if (!element) throw new Error(`No element found by Id: ${id}`);
+
+    // in memory save the scroll of the tables and restore it
+    let scrollTop;
+    if (id === "memory" && memoryShown)
+        scrollTop = document.getElementById("memory-tables")?.scrollTop;
+
     element.innerHTML = await renderTemplate(templatePath, ctx);
+
     if (showLoaders) removeLoader(`render: ${id}`);
+
     if (id === "memory" || id === "app") {
+        if (memoryShown) {
+            // restore scroll
+            const tables = document.getElementById("memory-tables");
+            if (scrollTop && tables && memoryShown)
+                tables.scrollTop = scrollTop;
+
+            drawMemoryMapConnections();
+            updateTagsWidth(ctx.vm);
+        }
         drawMemoryMap();
-        if (memoryShown) drawMemoryMapConnections();
         watchMemoryScroll();
-        updateTagsWidth(ctx.vm);
     } else if (id === "console" && vm.console.state === "waitingInput") {
         const consoleInput = document.getElementById("console-input");
         if (consoleInput) {

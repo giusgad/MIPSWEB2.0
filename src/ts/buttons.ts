@@ -102,9 +102,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     value: string | undefined,
 ) {
     await colFormatSelect(element, value || element?.value);
-    const id = element.id.split("_")[1];
     adjustBinaryWidth();
-    highlightInterval(id, { behavior: "instant", block: "end" });
 };
 
 (window as any).stepOnClick = async function () {
