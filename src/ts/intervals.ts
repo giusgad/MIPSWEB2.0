@@ -18,7 +18,6 @@ interface interval {
     id: number;
     cells: cell[];
     formats: {
-        address: string;
         value: string;
         valueGranularity: string;
     };
@@ -192,7 +191,6 @@ function extendInterval(cells: cell[]): interval {
         id: id,
         cells: cells,
         formats: {
-            address: settings.colsFormats["memory-address-format"],
             value: settings.colsFormats["memory-value-format"],
             valueGranularity: settings.colsFormats["memory-value-granularity"],
         },
@@ -202,10 +200,6 @@ function extendInterval(cells: cell[]): interval {
         interval.cells[interval.cells.length - 1].address < 268500992
     ) {
         interval.formats.value = "asm";
-    }
-    if (settings.colsFormats[`memory-address-format_${id}`]) {
-        interval.formats.address =
-            settings.colsFormats[`memory-address-format_${id}`];
     }
     if (settings.colsFormats[`memory-value-format_${id}`]) {
         interval.formats.value =
@@ -217,72 +211,3 @@ function extendInterval(cells: cell[]): interval {
     }
     return interval;
 }
-
-function hexStringToInt(str: string): number {
-    if (str.startsWith("0x")) str = str.substring(2);
-    if (/^[a|b|c|d|e|f|\d]+$/.test(str)) {
-        return parseInt(str, 16);
-    }
-    return NaN;
-}
-
-function isIntervalValid(
-    start: number,
-    end: number,
-): { valid: boolean; msg: string } {
-    const hex = (n: number) => new Binary(n).getHex();
-    if (isNaN(start) || isNaN(end)) {
-        return {
-            valid: false,
-            msg: `${isNaN(start) ? "starting address" : "ending address"} is not a valid hex string`,
-        };
-    } else if (start < minAddress || end < minAddress) {
-        return { valid: false, msg: `Minimum address is 0x${hex(minAddress)}` };
-    } else if (start > maxAddress || end > maxAddress) {
-        return { valid: false, msg: `Maximum address is 0x${hex(maxAddress)}` };
-    } else if (end < start) {
-        return { valid: false, msg: "Start must be less than end" };
-    } else if (start % 4 != 0 || end % 4 != 0) {
-        return { valid: false, msg: "Both addresses must be divisible by 4" };
-    } else if (end - start >= 160) {
-        return {
-            valid: false,
-            msg: "You may not set address intervals bigger than 160 bytes.",
-        };
-    }
-    return { valid: true, msg: "" };
-}
-
-(window as any).createMemoryInterval = async function (event: SubmitEvent) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const start = hexStringToInt(formData.get("start")?.toString() ?? "");
-    const end = hexStringToInt(formData.get("end")?.toString() ?? "");
-    const { valid, msg } = isIntervalValid(start, end);
-    if (!valid) {
-        window.alert(msg);
-        return;
-    }
-    let intervals = getFromStorage("local", "userIntervals") ?? [];
-    intervals.push({ start: start, end: end });
-    setIntoStorage("local", "userIntervals", intervals);
-    await hideForm();
-    await renderApp();
-};
-(window as any).getUserIntervals = getUserIntervals;
-(window as any).setUserIntervals = (intervals: userInterval[]) =>
-    setIntoStorage("local", "userIntervals", intervals);
-(window as any).numToHex = (x: number) => {
-    return new Binary(x).getHex();
-};
-(window as any).hexStringToInt = hexStringToInt;
-(window as any).backupUserIntervals = () => {
-    setIntoStorage("local", "userIntervalsBak", getUserIntervals());
-};
-(window as any).restoreUserIntervals = () => {
-    setIntoStorage(
-        "local",
-        "userIntervals",
-        getFromStorage("local", "userIntervalsBak"),
-    );
-};

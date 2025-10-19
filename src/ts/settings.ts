@@ -260,7 +260,6 @@ export function clearMemorySelectedFormats() {
     if (settings) {
         for (const key in settings.colsFormats) {
             if (
-                key.startsWith("memory-address-format_") ||
                 key.startsWith("memory-value-format_") ||
                 key.startsWith("memory-value-granularity_")
             ) {
@@ -296,6 +295,18 @@ export async function colFormatSelect(
         await render("memory", "/app/memory.ejs", undefined, false);
     if (element.id.startsWith("register"))
         await render("registers", "/app/registers.ejs", undefined, false);
+}
+
+export async function updateMemoryAddrFormat(value: string) {
+    let settings = getFromStorage("local", "settings");
+    if (!settings) {
+        settings = default_settings;
+    } else if (!settings.colsFormats) {
+        settings.colsFormats = default_settings.colsFormats;
+    }
+    settings.colsFormats["memory-address-format"] = value;
+    setIntoStorage("local", "settings", settings);
+    await render("memory", "/app/memory.ejs", undefined, false);
 }
 
 export function getOptionsFromForm(formData: FormData): OptionsObject {

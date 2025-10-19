@@ -40,6 +40,7 @@ import {
     getOptions,
     getOptionsFromForm,
     optsFromFlags,
+    updateMemoryAddrFormat,
     updateOpts,
 } from "./settings.js";
 import { highlightInterval } from "./memorymap.js";
@@ -47,7 +48,6 @@ import { render } from "./rendering.js";
 import { adjustBinaryWidth, highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
 import { renderApp } from "./app.js";
-import { removeClass } from "./utils.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -62,6 +62,14 @@ import { removeClass } from "./utils.js";
     btn.innerText = getStateBtnText(val);
     await onchange(btn, val);
 };
+
+(window as any).setMemoryAddrFormat = async function (
+    _btn: any,
+    value: string,
+) {
+    await updateMemoryAddrFormat(value);
+};
+
 const getStateBtnText = function (val: string, long: boolean = false): string {
     switch (val) {
         case "decimal":

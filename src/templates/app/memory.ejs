@@ -9,27 +9,27 @@
       Mem<span class="long">ory</span>
   </div>
   <div class="tables" id="memory-tables">
-    <%ctx.memoryIntervals.forEach((interval) => {%>
+    <%ctx.memoryIntervals.forEach((interval, intervalIndex) => {%>
       <div class="table">
         <div class="cols-names">
           <div class="col tags"><div class="col-name"></div></div>
           <div class="col address">
-            <div class="col-name">Addr</div>
-            <div class="col-format">
-                <%
-                const addrValues = ["hexadecimal", "decimal"]
-                let addressFormat = (interval.formats && interval.formats.address) || "hexadecimal";
-                let currAddrValue = addrValues.indexOf(addressFormat) || 0;
-                %>
-                <button
-                  type="button"
-                  class="state-btn"
-                  id="memory-address-format_<%=interval.id%>" 
-                  onclick="cycleStateBtn(this, colFormatSelectOnChange)"
-                  data-values="<%=addrValues%>"
-                  data-current="<%=currAddrValue%>"
-                ><%=getStateBtnText(addressFormat)%></button>
-            </div>
+            <%
+            const addrValues = ["hexadecimal", "decimal"]
+            let addressFormat = (ctx.settings.colsFormats["memory-address-format"]) || "hexadecimal";
+            let currAddrValue = addrValues.indexOf(addressFormat) || 0;
+            if (intervalIndex===0) {%>
+              <div class="col-name">Addr</div>
+              <div class="col-format">
+                  <button
+                    type="button"
+                    class="state-btn"
+                    onclick="cycleStateBtn(this, setMemoryAddrFormat)"
+                    data-values="<%=addrValues%>"
+                    data-current="<%=currAddrValue%>"
+                  ><%=getStateBtnText(addressFormat)%></button>
+              </div>
+            <%}%>
           </div>
           <div class="col value">
             <div class="col-name">Value</div>
