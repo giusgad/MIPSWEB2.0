@@ -4,6 +4,7 @@
 @component-transition:
   max-width 0.2s ease-out,
   width 0.2s ease-out,
+  opacity 0.2s ease-out,
   transform 0.2s ease-out,
   height 0.2s ease-out;
 
@@ -150,6 +151,12 @@
   #memory-tables {
     max-width: 0;
     transition: @component-transition;
+  }
+  &:not(.memory-shown) {
+    .cols-names {
+      opacity: 0;
+      visibility: hidden;
+    }
   }
   position: relative;
   &.memory-shown {

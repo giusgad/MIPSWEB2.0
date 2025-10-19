@@ -43,6 +43,10 @@ export class Icons {
                 path: "m 176,48 h 96 v 96 h -96 z m 0,160 h 96 v 96 h -96 z m 96,160 v 96 h -96 v -96 z",
                 viewBox: "0 0 448 512",
             },
+            verticalSpacedDots: {
+                path: "m 176,88 h 96 v 96 h -96 z m 0,247 h 96 v 96 h -96 z m 96,247 v 96 h -96 v -96 z",
+                viewBox: "0 0 448 768",
+            },
             step: {
                 path: "M256 96l0-32 64 0 0 32 0 320 0 32-64 0 0-32 0-160L0 448 0 64 256 256l0-160z",
                 viewBox: "0 0 320 512",

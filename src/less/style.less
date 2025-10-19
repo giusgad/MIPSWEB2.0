@@ -70,6 +70,7 @@ input {
 .value.hexadecimal {
   &::before {
     content: "0𝗑";
+    font-size: calc(@font-size-small - 2px);
     user-select: none;
     opacity: 0.3;
   }
@@ -167,7 +168,6 @@ input {
 
 .table {
   font-size: @font-size-small;
-  overflow-y: scroll;
   overflow-x: hidden;
 
   font-family: monospace;
@@ -494,16 +494,28 @@ input {
 
       .table {
         margin-bottom: 12px;
+        overflow: visible;
         padding: 0;
 
         .cols-names {
           .col {
             background-color: transparent !important;
           }
+          .dots.icon {
+            opacity: 0.3;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            transform: translateY(-6px) scale(1.2);
+            svg {
+              fill: var(--rgb-gray-4);
+            }
+          }
         }
 
         .rows {
           position: relative;
+          overflow: hidden;
           &::after {
             .after-whiteout();
             left: var(--tags-width);
@@ -635,7 +647,6 @@ input {
 
           &.address {
             width: 11ch;
-            border: none;
             background-color: transparent;
           }
 

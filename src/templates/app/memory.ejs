@@ -29,11 +29,16 @@
                     data-current="<%=currAddrValue%>"
                   ><%=getStateBtnText(addressFormat)%></button>
               </div>
+            <%} else {%>
+              <div class="col address icon dots"><%-Icons.render('verticalSpacedDots')%></div>
             <%}%>
           </div>
           <div class="col value">
-            <div class="col-name">Value</div>
-            <%
+            <%if (intervalIndex===0) {%>
+              <div class="col-name">Value</div>
+            <%} else {%>
+              <div class="col address icon dots"><%-Icons.render('verticalSpacedDots')%></div>
+            <%}
               const valueFormatOptions = ["int", "uint", "hexadecimal", "ascii", "binary", "asm"];
               let valueFormat = (interval.formats && interval.formats.value) || "int";
             %>
