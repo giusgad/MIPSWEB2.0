@@ -1,6 +1,4 @@
-import { renderApp } from "./app.js";
-import { hideForm } from "./forms.js";
-import { getFromStorage, setIntoStorage } from "./utils.js";
+import { getFromStorage } from "./utils.js";
 import { vm } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
@@ -210,4 +208,21 @@ function extendInterval(cells: cell[]): interval {
             settings.colsFormats[`memory-value-granularity_${id}`];
     }
     return interval;
+}
+
+export function setGranularTooltips() {
+    for (const granularElem of document.getElementsByClassName("granular")) {
+        const addrElem =
+            granularElem.parentElement?.getElementsByClassName("address")[0]!;
+        const initialAddr = addrElem.classList.contains("hexadecimal")
+            ? parseInt(addrElem.innerHTML.trim(), 16)
+            : parseInt(addrElem.innerHTML.trim(), 10);
+        const parts = granularElem.getElementsByClassName("value");
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts.item(i) as HTMLElement;
+            const addr =
+                parts.length === 2 ? initialAddr + i * 2 : initialAddr + i;
+            part.title = `Address: 0x${new Binary(addr).getHex()}`;
+        }
+    }
 }

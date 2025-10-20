@@ -13,7 +13,6 @@ import "./intervals.js";
 import "./execution-speed.js";
 import "./keyboard-shortcuts.js";
 import {
-    debounce,
     getFromStorage,
     scrollSelectedIntoView,
     setIntoStorage,
@@ -24,6 +23,7 @@ import { endDrag } from "./drag.js";
 import { stop } from "./virtual-machine.js";
 import { adjustBinaryWidth } from "./style.js";
 import { watchMemoryScroll } from "./memorymap.js";
+import { setGranularTooltips } from "./intervals.js";
 
 let online = false;
 initLoaders();
@@ -110,6 +110,7 @@ export async function renderApp(
     hideFilePopover();
     scrollSelectedIntoView("files-tabs");
     adjustBinaryWidth();
+    setGranularTooltips();
     endDrag();
     if (showLoaders) removeLoader("renderApp");
 }

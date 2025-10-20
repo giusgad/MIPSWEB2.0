@@ -11,7 +11,7 @@ import {
 } from "./virtual-machine.js";
 import { getFromStorage } from "./utils.js";
 import { getSelectedInstructionAddresses } from "./editors.js";
-import { getMemoryIntervals } from "./intervals.js";
+import { getMemoryIntervals, setGranularTooltips } from "./intervals.js";
 import { possibleOptions } from "./settings.js";
 import {
     drawMemoryMap,
@@ -80,6 +80,7 @@ export async function render(
         }
         drawMemoryMap();
         watchMemoryScroll();
+        setGranularTooltips();
     } else if (id === "console" && vm.console.state === "waitingInput") {
         const consoleInput = document.getElementById("console-input");
         if (consoleInput) {
