@@ -57,6 +57,7 @@ export function renderEditors() {
                 readOnly: false,
                 highlightActiveLine: true,
                 scrollPastEnd: 0.5,
+                printMarginColumn: -1,
             });
 
             for (let i = 0; i < cursors.length; i++) {
@@ -75,6 +76,7 @@ export function renderEditors() {
                 readOnly: true,
                 highlightActiveLine: true,
                 scrollPastEnd: 0.5,
+                printMarginColumn: -1,
             });
 
             for (let i = 0; i < cursors.length; i++) {
