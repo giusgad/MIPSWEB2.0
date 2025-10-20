@@ -9,7 +9,7 @@ import {
 import { Colors } from "./lib/Colors.js";
 import { addClass, removeClass } from "./utils.js";
 import { editorState, interfaceState, renderApp } from "./app.js";
-import { consoleShown, memoryShown, vm } from "./virtual-machine.js";
+import { vm } from "./virtual-machine.js";
 import { getCurrentFontSize } from "./style.js";
 
 export type editor = {
@@ -201,6 +201,7 @@ export function addEditor(file: file) {
     }
 
     const aceEditor = ace.edit(editorHTMLDivElement);
+    aceEditor.commands.removeCommand("find", false);
     if (Colors.isDarkMode()) {
         aceEditor.setTheme(aceEditorDarkTheme);
     } else {
