@@ -5,6 +5,7 @@
 @import "ace-editor.less";
 @import "buttons.less";
 
+@border-gray-9: solid 1px var(--rgb-gray-9);
 @border-gray-10: solid 1px var(--rgb-gray-10);
 @border-gray-11: solid 1px var(--rgb-gray-11);
 
@@ -207,8 +208,25 @@ input {
     .row {
       display: flex;
 
+      &:first-of-type {
+        .col {
+          &.name,
+          &.address {
+            border-top: @border-gray-10;
+          }
+          &.value {
+            border-top: @border-gray-9;
+          }
+        }
+      }
       .col {
-        border: 0.5px solid var(--rgb-gray-11);
+        &.name,
+        &.address {
+          border-bottom: @border-gray-10;
+        }
+        &.value {
+          border-bottom: @border-gray-9;
+        }
         display: flex;
         align-items: center;
         padding: 2px 4px;
@@ -424,10 +442,10 @@ input {
       }
 
       .col {
+        min-height: 20px;
         &.name {
           width: @reg-name-width;
           background-color: var(--rgb-gray-11);
-          border: 0.5px solid var(--rgb-gray-10);
         }
 
         &.value {
@@ -489,8 +507,10 @@ input {
 
     .tables {
       overflow-y: scroll;
+      overscroll-behavior: contain;
       height: 100%;
       padding-right: @mem-padding-right;
+      padding-bottom: 15vh;
 
       .table {
         margin-bottom: 12px;
@@ -542,9 +562,11 @@ input {
             }
             &.selected-instruction {
               .col {
-                &.address,
+                &.address {
+                  background-color: var(--rgb-gray-9);
+                }
                 &.value {
-                  background-color: var(--rgb-gray-9) !important;
+                  background-color: var(--rgb-gray-8);
                 }
               }
             }
@@ -565,7 +587,7 @@ input {
 
             .col {
               line-height: @font-size-small;
-              min-height: 28px;
+              min-height: 20px;
 
               &.hexadecimal,
               &.binary,
@@ -664,6 +686,10 @@ input {
             border: none;
 
             .value {
+              border-right: @border-gray-9;
+              &:last-of-type {
+                border-right: none;
+              }
               height: 100%;
               width: 100%;
             }
