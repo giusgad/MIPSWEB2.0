@@ -2911,6 +2911,56 @@ export class Instructions {
                 }
             })(),
         );
+
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("SEQ", "rd, rs, rt");
+                }
+
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [
+                        ["xor", params["rd"], params["rs"], params["rt"]],
+                        ["sltiu", params["rd"], params["rd"], "1"],
+                    ];
+                }
+                size(): number {
+                    return 2;
+                }
+            })(),
+        );
+
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("SUBI", "rd, rs, imm");
+                }
+
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [
+                        ...loadImmediate(params["imm"], "$at"),
+                        ["sub", params["rd"], params["rs"], "$at"],
+                    ];
+                }
+                size(): null {
+                    return null;
+                }
+            })(),
+        );
     }
 }
 

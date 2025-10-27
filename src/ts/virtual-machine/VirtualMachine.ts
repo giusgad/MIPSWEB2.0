@@ -6,7 +6,7 @@ import { Binary } from "./Utils.js";
 import { renderApp } from "../app.js";
 import { getExecutionSpeedTimeOut } from "../execution-speed.js";
 import { getAceEditor } from "../editors.js";
-import { INFINITE_LOOP_TRESHOLD } from "../settings.js";
+import { getOptions, INFINITE_LOOP_TRESHOLD } from "../settings.js";
 import { updateUiAfterStep } from "../virtual-machine.js";
 
 export class VirtualMachine {
@@ -126,11 +126,13 @@ export class VirtualMachine {
                     this.stepOutStack.pop();
                 const pcCounter = this.pcCounter.get(currPC);
                 if (pcCounter && pcCounter >= INFINITE_LOOP_TRESHOLD) {
-                    alert(
-                        `Infinite loop detected after ${INFINITE_LOOP_TRESHOLD} iterations. The simulation has been paused, but it's possible to continue with the RUN button or disable infinite loop detection in settings.`,
-                    );
-                    this.pcCounter.clear();
-                    this.pause();
+                    if (getOptions()["detect-infinite-loops"]) {
+                        alert(
+                            `Infinite loop detected after ${INFINITE_LOOP_TRESHOLD} iterations. The simulation has been paused, but it's possible to continue with the RUN button or disable infinite loop detection in settings.`,
+                        );
+                        this.pcCounter.clear();
+                        this.pause();
+                    }
                 } else {
                     this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
                 }

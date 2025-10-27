@@ -221,7 +221,9 @@ export function setGranularTooltips() {
         for (let i = 0; i < parts.length; i++) {
             const part = parts.item(i) as HTMLElement;
             const addr =
-                parts.length === 2 ? initialAddr + i * 2 : initialAddr + i;
+                parts.length === 2
+                    ? initialAddr + 4 - (i + 1) * 2
+                    : initialAddr + 4 - (i + 1);
             part.title = `Address: 0x${new Binary(addr).getHex()}`;
         }
     }
