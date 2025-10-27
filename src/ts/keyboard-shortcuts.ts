@@ -14,7 +14,7 @@ const isStepPossible = function (): boolean {
         vm.nextInstructionEditorPosition !== undefined &&
         editorState === "execute" &&
         interfaceState === "execute" &&
-        !vm.cpu.isHalted()
+        (!vm.cpu.isHalted() || vm.console.state === "waitingInput")
     );
 };
 

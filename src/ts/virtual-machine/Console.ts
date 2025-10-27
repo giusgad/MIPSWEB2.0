@@ -1,4 +1,5 @@
 import { renderApp } from "../app.js";
+import { blinkConsole } from "../console.js";
 import { EditorPosition } from "../editors.js";
 import { render } from "../rendering.js";
 import { consoleShown, setConsoleShown, vm } from "../virtual-machine.js";
@@ -22,14 +23,14 @@ export class Console {
     state: "ready" | "waitingInput" = "ready";
     input: string = "";
 
-    addLine(text: string, type: LineSeverity) {
+    addLine(text: string, type: LineSeverity, showConsole: boolean = true) {
         this.lines.push({
             text: text + "\n",
             type,
             waitingInput: false,
             isPrintString: false,
         });
-        setConsoleShown(true);
+        if (showConsole) setConsoleShown(true);
     }
 
     /**Add an error line with a position to which it relates.
@@ -88,13 +89,18 @@ export class Console {
 
     async getInput(): Promise<string> {
         if (this.lines.length === 0) {
-            this.addLine("", "success");
+            this.addLine("", "success", false);
         }
         this.lines[this.lines.length - 1].waitingInput = true;
         this.state = "waitingInput";
-        if (consoleShown)
+        if (consoleShown) {
             await render("console", "/app/console.ejs", undefined, false);
-        else await setConsoleShown(true);
+            blinkConsole();
+        } else {
+            setConsoleShown(true);
+            setTimeout(blinkConsole, 250);
+        }
+        await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);
         return new Promise((resolve) => {
             const interval = setInterval(() => {
                 if (this.state === "ready") {

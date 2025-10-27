@@ -3,7 +3,7 @@
         <div class="icon gray-4"><%-Icons.render('angleUp')%></div>
         Console
     </div>
-    <div class="console <% if (ctx.vm.console.state === "waiting Input") {%> waiting-input <% } %>">
+    <div class="console <% if (ctx.vm.console.state === "waitingInput") {%> waiting-input <% } %>">
         <%ctx.vm.console.lines.forEach((line) => {%>
         <div class="line <%=line.type%>">
             <% if (line.editorPos) {%>

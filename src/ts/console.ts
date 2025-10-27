@@ -1,6 +1,6 @@
 import { renderApp } from "./app.js";
 import { render } from "./rendering.js";
-import { vm } from "./virtual-machine.js";
+import { consoleShown, setConsoleShown, vm } from "./virtual-machine.js";
 
 document.addEventListener("input", (event) => {
     const target = event.target as HTMLTextAreaElement;
@@ -39,5 +39,28 @@ export function scrollConsoleToBottom() {
     const consoleElement = document.querySelector(".console");
     if (consoleElement) {
         consoleElement.scrollTop = consoleElement.scrollHeight;
+    }
+}
+
+export function blinkConsole() {
+    const blink = () => {
+        const consoleElement = document.querySelector(".console");
+        if (!consoleElement) return;
+        const addBlink = () => {
+            consoleElement.classList.add("blinking");
+        };
+        const removeBlink = () => {
+            consoleElement.classList.remove("blinking");
+        };
+        addBlink();
+        setTimeout(removeBlink, 200);
+        setTimeout(addBlink, 400);
+        setTimeout(removeBlink, 600);
+        document.getElementById("console-input")?.focus();
+    };
+    if (!consoleShown) {
+        setConsoleShown(true);
+    } else {
+        blink();
     }
 }

@@ -1,6 +1,7 @@
 <div class="buttons">
     <% if (ctx.interfaceState === "execute") { %>
-        <%if ((ctx.vm.nextInstructionEditorPosition !== undefined) && (ctx.editorState === "execute") && (!ctx.vm.cpu.isHalted())) {%>
+        <%if ((ctx.vm.nextInstructionEditorPosition !== undefined) && (ctx.editorState === "execute") &&
+              (!ctx.vm.cpu.isHalted() || ctx.vm.console.state === "waitingInput")) {%>
             <div class="button-group">
               <div class="button default" onclick="stepOnClick();" title="F5/F11">
                   <div class="icon gray-4"><%-Icons.render('step')%></div>

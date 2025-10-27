@@ -47,6 +47,7 @@ import { render } from "./rendering.js";
 import { highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
 import { renderApp } from "./app.js";
+import { blinkConsole } from "./console.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -103,20 +104,36 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).stepOnClick = async function () {
+    if (vm.console.state === "waitingInput") {
+        blinkConsole();
+        return;
+    }
     await vm.step();
     await updateUiAfterStep();
 };
 
 (window as any).stepOverOnClick = async function () {
+    if (vm.console.state === "waitingInput") {
+        blinkConsole();
+        return;
+    }
     await vm.stepOver();
     await updateUiAfterStep(true);
 };
 (window as any).stepOutOnClick = async function () {
+    if (vm.console.state === "waitingInput") {
+        blinkConsole();
+        return;
+    }
     await vm.stepOut();
     await updateUiAfterStep(true);
 };
 
 (window as any).runOnClick = async function () {
+    if (vm.console.state === "waitingInput") {
+        blinkConsole();
+        return;
+    }
     if (vm.running) {
         pause();
     } else {
