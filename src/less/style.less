@@ -443,7 +443,7 @@ input {
       }
 
       .col {
-        min-height: 20px;
+        min-height: @mem-cell-height;
         &.name {
           width: @reg-name-width;
           background-color: var(--rgb-gray-11);
@@ -584,7 +584,7 @@ input {
 
             .col {
               line-height: @font-size-small;
-              min-height: 20px;
+              height: @mem-cell-height;
 
               &.hexadecimal,
               &.binary,
@@ -624,7 +624,7 @@ input {
                   font-size: @font-size-small;
                   border-radius: 4px;
                   padding: 2px;
-                  margin: 2px;
+                  margin: 0 2px;
                   max-width: 100%;
                   overflow: hidden;
                   text-overflow: ellipsis;

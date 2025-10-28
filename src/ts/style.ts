@@ -27,9 +27,9 @@ export function updateTagsWidth(vm: VirtualMachine) {
         (max, label) => Math.max(max, label.length),
         0,
     );
-    const minWidth = 12;
-    const maxWidth = 20;
-    const newWidth = Math.min(Math.max(longestLabel + 4, minWidth), maxWidth);
+    const minWidth = 15;
+    const maxWidth = 25;
+    const newWidth = Math.min(Math.max(longestLabel + 8, minWidth), maxWidth);
     memoryElem.style.setProperty("--tags-width", `${newWidth}ch`);
 }
 
