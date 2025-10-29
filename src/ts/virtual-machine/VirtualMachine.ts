@@ -135,7 +135,7 @@ export class VirtualMachine {
             }
         } catch (error) {
             this.console.addErrorWithPos(
-                `Runtime Error : ${(error as Error).message}`,
+                `Runtime Error: ${(error as Error).message}`,
                 this.cpu.pc.getValue(),
             );
             console.warn(error);

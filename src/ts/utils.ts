@@ -14,6 +14,8 @@ export function parseInlineLiteral(str: string): number {
     if (str.startsWith("-")) {
         negative = true;
         str = str.slice(1);
+    } else if (str.startsWith("+")) {
+        str = str.slice(1);
     }
     let num = Number(str);
     if (str === "" || isNaN(num)) {

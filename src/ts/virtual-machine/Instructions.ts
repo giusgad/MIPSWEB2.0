@@ -2748,13 +2748,22 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    )
+                        return [
+                            ...loadImmediate(params["rt"]),
+                            ["slt", "$at", params["rs"], "$at"],
+                            ["bne", "$at", "$zero", params["label"]],
+                        ];
                     return [
                         ["slt", "$at", params["rs"], params["rt"]],
                         ["bne", "$at", "$zero", params["label"]],
                     ];
                 }
-                size(): number {
-                    return 2;
+                size(): null {
+                    return null;
                 }
             })(),
         );
@@ -2772,13 +2781,22 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    )
+                        return [
+                            ...loadImmediate(params["rt"]),
+                            ["slt", "$at", "$at", params["rs"]],
+                            ["beq", "$at", "$zero", params["label"]],
+                        ];
                     return [
                         ["slt", "$at", params["rt"], params["rs"]],
                         ["beq", "$at", "$zero", params["label"]],
                     ];
                 }
-                size(): number {
-                    return 2;
+                size(): null {
+                    return null;
                 }
             })(),
         );
@@ -2796,13 +2814,22 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    )
+                        return [
+                            ...loadImmediate(params["rt"]),
+                            ["slt", "$at", "$at", params["rs"]],
+                            ["bne", "$at", "$zero", params["label"]],
+                        ];
                     return [
                         ["slt", "$at", params["rt"], params["rs"]],
                         ["bne", "$at", "$zero", params["label"]],
                     ];
                 }
-                size(): number {
-                    return 2;
+                size(): null {
+                    return null;
                 }
             })(),
         );
@@ -2820,13 +2847,22 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    )
+                        return [
+                            ...loadImmediate(params["rt"]),
+                            ["slt", "$at", params["rs"], "$at"],
+                            ["beq", "$at", "$zero", params["label"]],
+                        ];
                     return [
                         ["slt", "$at", params["rs"], params["rt"]],
                         ["beq", "$at", "$zero", params["label"]],
                     ];
                 }
-                size(): number {
-                    return 2;
+                size(): null {
+                    return null;
                 }
             })(),
         );
@@ -2847,23 +2883,16 @@ export class Instructions {
                     if (
                         !params["rt"].startsWith("$") &&
                         getOptions()["allow-literals"]
-                    ) {
+                    )
                         return [
-                            [
-                                "addi",
-                                "$at",
-                                "$zero",
-                                `${intFromStr(params["rt"])}`,
-                            ],
+                            ...loadImmediate(params["rt"]),
                             ["mult", params["rs"], "$at"],
                             ["mflo", params["rd"]],
                         ];
-                    } else {
-                        return [
-                            ["mult", params["rs"], params["rt"]],
-                            ["mflo", params["rd"]],
-                        ];
-                    }
+                    return [
+                        ["mult", params["rs"], params["rt"]],
+                        ["mflo", params["rd"]],
+                    ];
                 }
                 size(): null {
                     return null;
@@ -2888,27 +2917,20 @@ export class Instructions {
                     if (
                         !params["rt"].startsWith("$") &&
                         getOptions()["allow-literals"]
-                    ) {
+                    )
                         return [
-                            [
-                                "addi",
-                                "$at",
-                                "$zero",
-                                `${intFromStr(params["rt"])}`,
-                            ],
+                            ...loadImmediate(params["rt"]),
                             ["bne", "$at", "$zero", "1"],
                             ["break"],
                             ["div", params["rs"], "$at"],
                             ["mflo", params["rd"]],
                         ];
-                    } else {
-                        return [
-                            ["bne", params["rt"], "$zero", "1"],
-                            ["break"],
-                            ["div", params["rs"], params["rt"]],
-                            ["mflo", params["rd"]],
-                        ];
-                    }
+                    return [
+                        ["bne", params["rt"], "$zero", "1"],
+                        ["break"],
+                        ["div", params["rs"], params["rt"]],
+                        ["mflo", params["rd"]],
+                    ];
                 }
                 size(): null {
                     return null;
@@ -2930,13 +2952,22 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    )
+                        return [
+                            ...loadImmediate(params["rt"]),
+                            ["xor", params["rd"], params["rs"], "$at"],
+                            ["sltiu", params["rd"], params["rd"], "1"],
+                        ];
                     return [
                         ["xor", params["rd"], params["rs"], params["rt"]],
                         ["sltiu", params["rd"], params["rd"], "1"],
                     ];
                 }
-                size(): number {
-                    return 2;
+                size(): null {
+                    return null;
                 }
             })(),
         );
@@ -2979,6 +3010,15 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
+                    if (
+                        !params["rt"].startsWith("$") &&
+                        getOptions()["allow-literals"]
+                    )
+                        return [
+                            ...loadImmediate(params["rt"]),
+                            ["MULTU", params["rs"], "$at"],
+                            ["MFLO", params["rd"]],
+                        ];
                     return [
                         ["MULTU", params["rs"], params["rt"]],
                         ["MFLO", params["rd"]],
