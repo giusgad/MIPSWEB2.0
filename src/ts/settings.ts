@@ -8,7 +8,7 @@ import { importPublicZip } from "./files.js";
 import { confirmClearProject } from "./buttons.js";
 
 /**How many iterations are to be considered an infinite loop*/
-export const INFINITE_LOOP_TRESHOLD = 1000;
+export const INFINITE_LOOP_TRESHOLD = 10_000;
 
 window
     .matchMedia("(prefers-color-scheme: dark)")

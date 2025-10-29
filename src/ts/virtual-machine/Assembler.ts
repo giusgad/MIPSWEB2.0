@@ -14,7 +14,7 @@ import {
     wordDirective,
 } from "./Directives.js";
 import { getOptions } from "../settings.js";
-import { EditorPosition } from "../editors.js";
+import { EditorPosition, getAceEditor } from "../editors.js";
 import { InstructionPreprocessor } from "./Instruction-preprocess.js";
 
 export class Assembler {
@@ -36,6 +36,7 @@ export class Assembler {
     dataSegmentEnd: Binary = new Binary(this.dataSegmentStart.getValue());
     textSegmentStart: Binary = new Binary(0x00400000);
     textSegmentEnd: Binary = new Binary(this.textSegmentStart.getValue());
+    breakpointPCs: Set<number> = new Set();
 
     addressEditorsPositions: Map<number, EditorPosition> = new Map<
         number,
@@ -111,6 +112,7 @@ export class Assembler {
         let directive: Directive = this.directives.get(".asm")!;
         let address: Binary = new Binary(this.textSegmentEnd.getValue());
 
+        const editorBreakPoints = getAceEditor(file)?.session?.getBreakpoints();
         const lines = file.content.split("\n");
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
@@ -123,6 +125,9 @@ export class Assembler {
                 fileId: file.id,
                 lineNumber: lineNumber,
             };
+            if (withLabels && editorBreakPoints![lineNumber - 1] != null) {
+                this.breakpointPCs.add(address.getValue());
+            }
 
             if (tokens[0] === ".data") {
                 section = ".data";
@@ -292,5 +297,6 @@ export class Assembler {
         this.addressEditorsPositions = new Map<number, EditorPosition>();
         this.allLabels = new Map<string, Binary | undefined>();
         this.currentEditorPosition = undefined;
+        this.breakpointPCs.clear();
     }
 }

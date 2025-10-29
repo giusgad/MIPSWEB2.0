@@ -82,15 +82,6 @@ export class VirtualMachine {
         this.stepOutStack = [];
     }
 
-    nextInstructionHasBreakPoint(): boolean {
-        const pos = this.nextInstructionEditorPosition;
-        if (!pos) return false;
-        const bps = getAceEditor(
-            getFile(pos.fileId),
-        )?.session?.getBreakpoints();
-        return bps![pos.lineNumber - 1] != null;
-    }
-
     async stepOver() {
         // if step over is not possible execute a normal step
         if (!this.isNextInstructionFunction()) {
@@ -137,7 +128,8 @@ export class VirtualMachine {
                     this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
                 }
                 this.updateEditorPosition();
-                if (this.nextInstructionHasBreakPoint()) this.pause();
+                if (this.assembler.breakpointPCs.has(this.cpu.pc.getValue()))
+                    this.pause();
             } else {
                 this.pause();
             }
