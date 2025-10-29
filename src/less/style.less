@@ -502,10 +502,10 @@ input {
   .component {
     background-color: var(--rgb-gray-11);
     border-left: 2px solid var(--rgb-gray-10);
+    overflow-y: scroll;
 
     .tables {
       height: 100%;
-      overflow-y: scroll;
       overscroll-behavior: contain;
       padding-right: @mem-padding-right;
       padding-bottom: 15vh;
@@ -519,6 +519,15 @@ input {
         .cols-names {
           .col {
             background-color: transparent !important;
+            &.tags {
+              padding: 0 2ch;
+              .col-name.section {
+                font-size: @font-size-small;
+                font-family: monospace;
+                font-weight: bold;
+                color: var(--rgb-ace-section);
+              }
+            }
           }
           .dots.icon {
             opacity: 0.3;
@@ -586,7 +595,7 @@ input {
 
             .col {
               line-height: @font-size-small;
-              height: @mem-cell-height;
+              min-height: @mem-cell-height;
 
               &.hexadecimal,
               &.binary,
@@ -600,22 +609,21 @@ input {
               &.tags {
                 display: flex;
                 flex-wrap: wrap;
-                flex-direction: column;
                 overflow: hidden;
+                justify-content: flex-end;
 
                 .static-tags {
-                  flex: 1;
+                  flex: 1 1 auto;
                   display: flex;
-                  justify-content: flex-start;
+                  justify-content: flex-end;
                   align-items: center;
                   flex-wrap: wrap;
-                  min-width: 0;
                   overflow: hidden;
                 }
 
                 .dynamic-tags {
+                  flex: 0 1 auto;
                   overflow: scroll;
-                  width: 100%;
                   display: flex;
                   justify-content: flex-end;
                   align-items: center;
@@ -643,11 +651,6 @@ input {
                     font-weight: bold;
                     color: var(--rgb-blue);
                     border: 1px solid var(--rgb-blue);
-                  }
-
-                  &.section {
-                    font-weight: bold;
-                    color: var(--rgb-ace-section);
                   }
                 }
               }

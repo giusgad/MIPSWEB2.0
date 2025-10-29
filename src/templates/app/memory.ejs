@@ -12,7 +12,10 @@
     <%ctx.memoryIntervals.forEach((interval, intervalIndex) => {%>
       <div class="table">
         <div class="cols-names">
-          <div class="col tags"><div class="col-name"></div></div>
+          <div class="col tags"><div class="col-name section">
+            <%=interval.cells[0].address === ctx.vm.assembler.textSegmentStart.getValue() ? ".text" : ""%>
+            <%=interval.cells[0].address === ctx.vm.assembler.dataSegmentStart.getValue() ? ".data" : ""%>
+          </div></div>
           <div class="col address">
             <%
             const addrValues = ["hexadecimal", "decimal"]

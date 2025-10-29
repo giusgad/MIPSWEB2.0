@@ -28,7 +28,7 @@ function memoryMapOnClick(ev: MouseEvent) {
 }
 
 export function watchMemoryScroll() {
-    const elem = document.getElementById("memory-tables");
+    const elem = document.getElementById("memory")?.querySelector(".component");
     if (!elem) return;
     elem.addEventListener("scroll", () => {
         if (!memoryShown) return;

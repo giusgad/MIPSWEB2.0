@@ -135,12 +135,6 @@ function mergeIntervals(
 
 function addCellTags(interval: interval) {
     for (const cell of interval.cells) {
-        if (cell.address === vm.assembler.textSegmentStart.getValue()) {
-            cell.tags.push({ name: ".text", type: "section" });
-        }
-        if (cell.address === vm.assembler.dataSegmentStart.getValue()) {
-            cell.tags.push({ name: ".data", type: "section" });
-        }
         vm.assembler.allLabels.forEach((address, label) => {
             if (address) {
                 const addressValue = address.getValue();
