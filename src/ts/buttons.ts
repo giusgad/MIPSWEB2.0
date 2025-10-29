@@ -139,6 +139,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     } else {
         run();
     }
+    updateUiAfterStep();
     await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);
 };
 

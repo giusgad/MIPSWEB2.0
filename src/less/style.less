@@ -348,6 +348,7 @@ input {
       border-bottom: 1px solid transparent;
     }
     .console {
+      font-family: monospace;
       &::after {
         .after-whiteout();
       }
@@ -503,11 +504,12 @@ input {
     border-left: 2px solid var(--rgb-gray-10);
 
     .tables {
+      height: 100%;
       overflow-y: scroll;
       overscroll-behavior: contain;
-      height: 100%;
       padding-right: @mem-padding-right;
       padding-bottom: 15vh;
+      padding-top: 0;
 
       .table {
         margin-bottom: 12px;

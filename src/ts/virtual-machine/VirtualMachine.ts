@@ -178,6 +178,7 @@ export class VirtualMachine {
             if (timeout > 0) {
                 // update ui if steps are not instant
                 updateUiAfterStep();
+                this.pcCounter.clear();
                 await new Promise((resolve) => setTimeout(resolve, timeout));
             }
         }

@@ -113,6 +113,7 @@ export class asmDirective extends Directive {
             instruction,
             tokens,
             labels,
+            globals,
             true,
         );
         for (const tokens of preprocessed) {
@@ -143,6 +144,7 @@ export class asmDirective extends Directive {
             const preprocessed = assembler.preprocessor.preprocess(
                 instruction,
                 tokens,
+                new Map(),
                 new Map(),
                 false,
             );

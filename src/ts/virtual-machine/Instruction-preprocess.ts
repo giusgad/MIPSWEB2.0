@@ -1,5 +1,11 @@
 import { getOptions } from "../settings.js";
-import { Instruction, loadImmediate, ParamsFormat } from "./Instructions.js";
+import { parseInlineLiteral } from "../utils.js";
+import {
+    getLabelAddress,
+    Instruction,
+    loadImmediate,
+    ParamsFormat,
+} from "./Instructions.js";
 import { Binary } from "./Utils.js";
 
 /**Expands the instruction to:
@@ -35,6 +41,7 @@ export class InstructionPreprocessor {
         instr: Instruction | undefined,
         tokens: string[],
         labels: Map<string, Binary | undefined>,
+        globals: Map<string, Binary | undefined>,
         withLabels: boolean = true,
     ): string[][] {
         if (!instr || !getOptions()["allow-literals"]) return [tokens];
@@ -72,14 +79,18 @@ export class InstructionPreprocessor {
                     const split = tokens[2]
                         .split(hasPlus ? "+" : "-")
                         .map((part) => part.trim());
-                    const labelAddr = labels.get(split[0]);
-                    if (!labelAddr) {
+                    const labelAddr = getLabelAddress(
+                        split[0],
+                        labels,
+                        globals,
+                    );
+                    if (labelAddr === undefined) {
                         if (withLabels)
                             throw new Error(`Undefined label: "${split[0]}"`);
                         else return [tokens];
                     }
                     return [
-                        ...loadImmediate(labelAddr.getValue(), "$at"),
+                        ...loadImmediate(labelAddr, "$at"),
                         [
                             instr.symbol,
                             mapped["rt"],
@@ -88,10 +99,10 @@ export class InstructionPreprocessor {
                     ];
                 }
                 // label
-                const labelAddr = labels.get(tokens[2]);
-                if (labelAddr) {
+                const labelAddr = getLabelAddress(tokens[2], labels, globals);
+                if (labelAddr !== undefined) {
                     return [
-                        ...loadImmediate(labelAddr.getValue(), "$at"),
+                        ...loadImmediate(labelAddr, "$at"),
                         [instr.symbol, mapped["rt"], "0($at)"],
                     ];
                 } else if (withLabels) {
@@ -105,13 +116,8 @@ export class InstructionPreprocessor {
             if (mapped["rt"].startsWith("$")) return [tokens]; // it's a register so no preprocessing needed
             // check if the instruction has an immediate correspondent and the imm firts in 16 bits
             const immCorrespondent = instr.getImmediateCorrespondent();
-            const num = Number(mapped["rt"]);
-            if (
-                immCorrespondent &&
-                !isNaN(num) &&
-                num >= -32768 &&
-                num <= 32767
-            ) {
+            const num = parseInlineLiteral(mapped["rt"]);
+            if (immCorrespondent && num && num >= -32768 && num <= 32767) {
                 return [[immCorrespondent, ...tokens.slice(1)]];
             }
             return [

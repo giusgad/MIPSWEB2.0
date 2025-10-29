@@ -7,6 +7,58 @@ export function intFromStr(str: string): number {
     return num;
 }
 
+/** Parses string as a literal usable in instructions, either a number or a character in single quotes
+ * @throws if the literal is invalid.*/
+export function parseInlineLiteral(str: string): number {
+    let negative = false;
+    if (str.startsWith("-")) {
+        negative = true;
+        str = str.slice(1);
+    }
+    let num = Number(str);
+    if (str === "" || isNaN(num)) {
+        let char = getCharCode(str);
+        if (char) return char;
+        throw new Error(`Invalid literal: "${str}" is not a literal.`);
+    }
+    if (negative) num = -1 * num;
+    return num;
+}
+
+function getCharCode(str: string): number | null {
+    // Validate format: single-quoted character literal
+    const match = str.match(
+        /^'(?:\\[nrtbfv0'"\\]|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|[^'\\])'$/,
+    );
+    if (!match) return null;
+
+    // Extract inner content (remove quotes)
+    const inner = str.slice(1, -1);
+
+    // Interpret escape sequences manually
+    const escapeMap = {
+        n: "\n",
+        r: "\r",
+        t: "\t",
+        b: "\b",
+        f: "\f",
+        v: "\v",
+        "0": "\0",
+        "'": "'",
+        '"': '"',
+        "\\": "\\",
+    };
+
+    let char: string;
+    if (inner.startsWith("\\")) {
+        char = escapeMap[inner[1] as keyof typeof escapeMap];
+    } else {
+        char = inner;
+    }
+
+    return char ? char.charCodeAt(0) : null;
+}
+
 export function getFromStorage(storage: "local" | "session", key: string): any {
     let item = undefined;
     if (storage === "local") {

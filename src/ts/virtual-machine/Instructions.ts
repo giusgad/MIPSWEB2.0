@@ -3,7 +3,7 @@ import { Binary, Utils } from "./Utils.js";
 import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { VirtualMachine } from "./VirtualMachine.js";
-import { getFromStorage, intFromStr } from "../utils.js";
+import { getFromStorage, intFromStr, parseInlineLiteral } from "../utils.js";
 import { register, Registers } from "./Registers.js";
 import { getOptions } from "../settings.js";
 
@@ -2670,7 +2670,11 @@ export class Instructions {
                 ): string[][] {
                     const params = this.mapParams(tokens);
                     const label = params["label"];
-                    const labelAddress = labels.get(label)?.getValue();
+                    const labelAddress = getLabelAddress(
+                        label,
+                        labels,
+                        globals,
+                    );
                     if (labelAddress === undefined) {
                         throw new Error(`Label "${label}" not found.`);
                     }
@@ -2961,6 +2965,30 @@ export class Instructions {
                 }
             })(),
         );
+        this.pseudoInstructions.push(
+            new (class extends PseudoInstruction {
+                constructor() {
+                    super("MULU", "rd, rs, rt");
+                }
+
+                expand(
+                    assembler: Assembler,
+                    tokens: string[],
+                    globals: Map<string, Binary | undefined>,
+                    labels: Map<string, Binary | undefined>,
+                    address: Binary,
+                ): string[][] {
+                    const params = this.mapParams(tokens);
+                    return [
+                        ["MULTU", params["rs"], params["rt"]],
+                        ["MFLO", params["rd"]],
+                    ];
+                }
+                size(): number {
+                    return 2;
+                }
+            })(),
+        );
     }
 }
 
@@ -2971,7 +2999,9 @@ export function loadImmediate(
     destRegister?: string,
 ): string[][] {
     const imm =
-        typeof immediate === "string" ? intFromStr(immediate) : immediate;
+        typeof immediate === "string"
+            ? parseInlineLiteral(immediate)
+            : immediate;
     if (!destRegister) destRegister = "$at";
     if (imm < -32768 || imm > 32767) {
         const upper = Utils.fromSigned((imm >>> 16) & 0xffff, 16);
@@ -2984,4 +3014,16 @@ export function loadImmediate(
     } else {
         return [["addiu", destRegister, "$zero", `${immediate}`]];
     }
+}
+
+export function getLabelAddress(
+    label: string,
+    labels: Map<string, Binary | undefined>,
+    globals: Map<string, Binary | undefined>,
+): number | undefined {
+    let labelAddress = labels.get(label)?.getValue();
+    if (labelAddress === undefined) {
+        labelAddress = globals.get(label)?.getValue();
+    }
+    return labelAddress;
 }

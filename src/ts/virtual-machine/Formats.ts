@@ -3,7 +3,7 @@ import { Instruction } from "./Instructions.js";
 import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { register } from "./Registers.js";
-import { intFromStr } from "../utils.js";
+import { intFromStr, parseInlineLiteral } from "../utils.js";
 import { getOptions } from "../settings.js";
 
 export interface Format {
@@ -177,22 +177,22 @@ export class I_Format implements Format {
                     ].includes(instruction.symbol)
                 ) {
                     // immediate signed
-                    immediate.set(intFromStr(tokens[3]));
+                    immediate.set(parseInlineLiteral(tokens[3]));
                 } else if (
                     ["ANDI", "ORI", "XORI"].includes(instruction.symbol)
                 ) {
                     // immediate unsigned
-                    immediate.set(intFromStr(tokens[3]), false);
+                    immediate.set(parseInlineLiteral(tokens[3]), false);
                 } else
                     console.error(
                         `Unhandled I-format instruction: ${instruction.symbol} ${param}`,
                     );
             } else if (param === "rt, immediate") {
                 rt = cpu.registers.get(tokens[1]);
-                immediate.set(intFromStr(tokens[2]));
+                immediate.set(parseInlineLiteral(tokens[2]));
             } else if (param === "rs, immediate") {
                 rs = cpu.registers.get(tokens[1]);
-                immediate.set(intFromStr(tokens[2]));
+                immediate.set(parseInlineLiteral(tokens[2]));
             } else if (param === "cop_fun") {
                 throw new Error(
                     `TO-DO: Assemble I ${instruction.symbol} ${param}`,
