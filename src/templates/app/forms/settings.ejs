@@ -1,4 +1,4 @@
-<form class="form settings" method="POST" id="settings-form" onsubmit="return saveSettings(event)">
+<form class="form settings" method="POST" id="settings-form" onsubmit="return saveSettings(event)" onchange="getOptionFlagsOnClick();">
     <div class="title">Settings</div>
     <div>
       <%ctx.possibleOptions.forEach(section => {%>
@@ -33,15 +33,9 @@
       <fieldset class="section">
         <legend class="title">Flags</legend>
         <div class="line">
-          <button type="button" class="button default" onclick="getOptionFlagsOnClick();">
-            Get flags from current options
-          </button>
-        </div>
-        <div class="line">
-          <input type="text" id="option-tags" name="option-tags"></input>
-          <button type="button" class="button default" onclick="setOptionsByFlagsOnClick();">
-            Set options
-          </button>
+          <input type="text" id="option-tags" name="option-tags" onpaste="setOptionsByFlagsOnClick(event, this);"></input>
+          <button type="button" class="button default" onclick="copyOptionsFlagsOnClick(false)">Copy</button>
+          <button type="button" class="button default" onclick="copyOptionsFlagsOnClick(true)">Copy URL</button>
         </div>
       </fieldset>
     </div>
@@ -52,7 +46,7 @@
         </button>
         <button class="button default" type="submit">
             <div class="icon gray-4"><%-Icons.render('save')%></div>
-            <div class="label">Save settings</div>
+            <div class="label">Ok</div>
         </button>
     </div>
 </form>

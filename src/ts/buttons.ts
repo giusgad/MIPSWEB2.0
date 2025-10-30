@@ -68,9 +68,9 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
         case "decimal":
             return long ? "Decimal" : "Dec";
         case "uint":
-            return long ? "Unsigned Decimal" : "UDec";
+            return long ? "Unsigned Decimal" : "Dec";
         case "int":
-            return long ? "Signed Decimal" : "Dec";
+            return long ? "Signed Decimal" : "±Dec";
         case "hexadecimal":
         case "hex":
             return long ? "Hexadecimal" : "Hex";
@@ -217,18 +217,36 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     if (!input) return;
     (input as HTMLInputElement).value = flags;
 };
-(window as any).setOptionsByFlagsOnClick = async function () {
-    const input = document.getElementById("option-tags");
-    if (!input) return;
-    const newOpts = optsFromFlags((input as HTMLInputElement).value);
+(window as any).setOptionsByFlagsOnClick = async function (
+    ev: ClipboardEvent,
+    elem: HTMLInputElement,
+) {
+    ev.preventDefault();
+    const flags = ev.clipboardData?.getData("text") || "";
+    const newOpts = optsFromFlags(flags);
+    elem.value = flags;
     if (!newOpts) {
-        input.classList.add("error");
+        elem.classList.add("error");
         return;
     }
-    input.classList.remove("error");
+    elem.classList.remove("error");
     updateOpts(newOpts);
     await hideForm();
     await showForm("settings", undefined, false);
+    setTimeout((window as any).getOptionFlagsOnClick, 100);
+};
+(window as any).copyOptionsFlagsOnClick = function (fullURL: boolean) {
+    const flags = (document.getElementById("option-tags") as HTMLInputElement)
+        .value;
+    if (!flags) return;
+    if (!fullURL) {
+        navigator.clipboard.writeText(flags);
+    } else {
+        const params = new URLSearchParams();
+        params.set("opts", flags);
+        const url = `${window.location}?${params.toString()}`;
+        navigator.clipboard.writeText(url);
+    }
 };
 
 (window as any).newFileOnClick = async function () {

@@ -3,7 +3,7 @@ import { Binary, Utils } from "./Utils.js";
 import { CPU } from "./CPU.js";
 import { Assembler } from "./Assembler.js";
 import { VirtualMachine } from "./VirtualMachine.js";
-import { getFromStorage, intFromStr, parseInlineLiteral } from "../utils.js";
+import { getFromStorage, parseInlineLiteral } from "../utils.js";
 import { register, Registers } from "./Registers.js";
 import { getOptions } from "../settings.js";
 

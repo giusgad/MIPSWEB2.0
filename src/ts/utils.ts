@@ -28,16 +28,11 @@ export function parseInlineLiteral(str: string): number {
 }
 
 function getCharCode(str: string): number | null {
-    // Validate format: single-quoted character literal
-    const match = str.match(
-        /^'(?:\\[nrtbfv0'"\\]|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|[^'\\])'$/,
-    );
+    // single-quoted character literal
+    const match = str.match(/^'(?:\\[nrtbfv0'"\\]|[^'\\])'$/);
     if (!match) return null;
 
-    // Extract inner content (remove quotes)
     const inner = str.slice(1, -1);
-
-    // Interpret escape sequences manually
     const escapeMap = {
         n: "\n",
         r: "\r",
