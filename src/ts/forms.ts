@@ -1,7 +1,14 @@
 import { render } from "./rendering.js";
 import { hideFilePopover } from "./popovers.js";
 
-export async function showForm(form: string, data: any, autofocus: boolean) {
+let escHandler: ((ev: KeyboardEvent) => void) | null = null;
+
+export async function showForm(
+    form: string,
+    data: any,
+    autofocus: boolean,
+    onClose?: () => void,
+) {
     hideFilePopover();
     const formsBg = document.getElementById("forms-bg");
     if (formsBg) {
@@ -24,6 +31,13 @@ export async function showForm(form: string, data: any, autofocus: boolean) {
             }
         }
     }
+    escHandler = (ev) => {
+        if (ev.key === "Escape") {
+            if (onClose !== undefined) onClose();
+            hideForm();
+        }
+    };
+    document.addEventListener("keyup", escHandler);
 }
 
 export async function hideForm() {
@@ -32,4 +46,23 @@ export async function hideForm() {
         formsBg.style.display = "none";
         formsBg.innerHTML = "";
     }
+    if (escHandler) {
+        document.removeEventListener("keyup", escHandler);
+        escHandler = null;
+    }
+}
+
+let toastTimeout: NodeJS.Timeout | null = null;
+/**Shows a toast notification for `duration` milliseconds*/
+export function showToast(message: string, duration = 2000) {
+    const toast = document.getElementById("toast")!;
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+    toast.textContent = message;
+    toast.style.opacity = "1";
+    toastTimeout = setTimeout(() => {
+        toast.style.opacity = "0";
+        toastTimeout = null;
+    }, duration);
 }

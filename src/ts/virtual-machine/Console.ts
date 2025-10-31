@@ -116,7 +116,6 @@ export class Console {
         this.lines[this.lines.length - 1].waitingInput = false;
         this.addLine(input, "success");
         this.state = "ready";
-        await renderApp();
     }
 
     reset() {

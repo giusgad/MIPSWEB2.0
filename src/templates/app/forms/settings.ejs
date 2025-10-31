@@ -1,4 +1,4 @@
-<form class="form settings" method="POST" id="settings-form" onsubmit="return saveSettings(event)" onchange="getOptionFlagsOnClick();">
+<form class="form settings" id="settings-form" onsubmit="return saveSettings(event)" onchange="getOptionFlagsOnClick();">
     <div class="title">Settings</div>
     <div>
       <%ctx.possibleOptions.forEach(section => {%>
@@ -34,8 +34,10 @@
         <legend class="title">Flags</legend>
         <div class="line">
           <input type="text" id="option-tags" name="option-tags" onpaste="setOptionsByFlagsOnClick(event, this);"></input>
-          <button type="button" class="button default" onclick="copyOptionsFlagsOnClick(false)">Copy</button>
-          <button type="button" class="button default" onclick="copyOptionsFlagsOnClick(true)">Copy URL</button>
+          <div class="button-group">
+            <button type="button" class="button default" onclick="copyOptionsFlagsOnClick(false)">Copy Flags</button>
+            <button type="button" class="button default" onclick="copyOptionsFlagsOnClick(true)">URL</button>
+          </div>
         </div>
       </fieldset>
     </div>

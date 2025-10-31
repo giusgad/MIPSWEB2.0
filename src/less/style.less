@@ -776,6 +776,20 @@ input {
   z-index: 2001;
 }
 
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--rgba-gray-8-70);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
 #forms-bg {
   background-color: var(--rgba-gray-11-60);
   display: none;

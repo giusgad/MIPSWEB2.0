@@ -1,4 +1,4 @@
-import { hideForm, showForm } from "./forms.js";
+import { hideForm, showForm, showToast } from "./forms.js";
 import {
     changeFile,
     closeFile,
@@ -186,11 +186,13 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     form: string,
     dataString: string,
     autofocus: boolean = true,
+    onClose?: () => {},
 ) {
     await showForm(
         form,
         dataString ? JSON.parse(dataString) : undefined,
         autofocus,
+        onClose,
     );
 };
 
@@ -234,7 +236,9 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     await hideForm();
     await showForm("settings", undefined, false);
     setTimeout((window as any).getOptionFlagsOnClick, 100);
+    showToast("Options set by pasted flags");
 };
+
 (window as any).copyOptionsFlagsOnClick = function (fullURL: boolean) {
     const flags = (document.getElementById("option-tags") as HTMLInputElement)
         .value;
@@ -247,6 +251,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
         const url = `${window.location}?${params.toString()}`;
         navigator.clipboard.writeText(url);
     }
+    showToast(`Copied ${fullURL ? "URL" : "flags"} to clipboard`);
 };
 
 (window as any).newFileOnClick = async function () {
