@@ -1,5 +1,5 @@
 import { CPU } from "./CPU.js";
-import { file } from "../files.js";
+import { file, getSelectedFileId } from "../files.js";
 import { Binary } from "./Utils.js";
 import {
     alignDirective,
@@ -85,6 +85,18 @@ export class Assembler {
         const opts = getOptions();
         if (opts["entry-point"] === "main" && globals.has("main")) {
             this.cpu.pc.set(globals.get("main")!.getValue());
+        } else if (opts["entry-point"] === "currFile") {
+            const currFileId = getSelectedFileId();
+            const fileAddrs: number[] = [];
+            for (const [addr, pos] of this.addressEditorsPositions.entries()) {
+                if (pos.fileId === currFileId) fileAddrs.push(addr);
+            }
+            fileAddrs.sort();
+            if (fileAddrs[0] <= this.textSegmentEnd.getValue()) {
+                this.cpu.pc.set(fileAddrs[0]);
+            } else {
+                this.cpu.pc.set(this.textSegmentStart.getValue());
+            }
         } else {
             // entry-point == text segment start
             this.cpu.pc.set(this.textSegmentStart.getValue());

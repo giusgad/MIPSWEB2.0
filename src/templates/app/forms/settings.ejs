@@ -1,4 +1,4 @@
-<form class="form settings" id="settings-form" onsubmit="return saveSettings(event)" onchange="getOptionFlagsOnClick();">
+<form class="form settings" method="POST" id="settings-form" onsubmit="return saveSettings(event)" onchange="getOptionFlagsOnClick();">
     <div class="title">Settings</div>
     <div>
       <%ctx.possibleOptions.forEach(section => {%>

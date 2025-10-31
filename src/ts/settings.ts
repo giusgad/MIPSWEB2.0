@@ -221,6 +221,7 @@ export const possibleOptions = [
                 dropdownOptions: [
                     { value: "main", desc: "Global main" },
                     { value: "text", desc: "Text segment start" },
+                    { value: "currFile", desc: "Current file" },
                 ],
             },
         ],
