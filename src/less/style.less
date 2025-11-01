@@ -508,11 +508,13 @@ input {
       height: 100%;
       overscroll-behavior: contain;
       padding-right: @mem-padding-right;
-      padding-bottom: 15vh;
       padding-top: 0;
 
       .table {
         margin-bottom: 12px;
+        &:last-of-type {
+          padding-bottom: 20vh;
+        }
         overflow: visible;
         padding: 0;
 

@@ -59,7 +59,9 @@ export async function render(
     // in memory save the scroll of the tables and restore it
     let scrollTop;
     if (id === "memory" && memoryShown)
-        scrollTop = document.getElementById("memory-tables")?.scrollTop;
+        scrollTop = document
+            .getElementById("memory")
+            ?.querySelector(".component")?.scrollTop;
 
     element.innerHTML = await renderTemplate(templatePath, ctx);
 
@@ -71,7 +73,9 @@ export async function render(
     if (id === "memory" || id === "app") {
         if (memoryShown) {
             // restore scroll
-            const tables = document.getElementById("memory-tables");
+            const tables = document
+                .getElementById("memory")
+                ?.querySelector(".component");
             if (scrollTop && tables && memoryShown)
                 tables.scrollTop = scrollTop;
 
