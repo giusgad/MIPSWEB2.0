@@ -8,6 +8,7 @@ import { getExecutionSpeedTimeOut } from "../execution-speed.js";
 import { getAceEditor } from "../editors.js";
 import { getOptions, INFINITE_LOOP_TRESHOLD } from "../settings.js";
 import { updateUiAfterStep } from "../virtual-machine.js";
+import { showForm } from "../forms.js";
 
 export class VirtualMachine {
     cpu: CPU;
@@ -118,8 +119,10 @@ export class VirtualMachine {
                 const pcCounter = this.pcCounter.get(currPC);
                 if (pcCounter && pcCounter >= INFINITE_LOOP_TRESHOLD) {
                     if (getOptions()["detect-infinite-loops"]) {
-                        alert(
-                            `Infinite loop detected after ${INFINITE_LOOP_TRESHOLD} iterations. The simulation has been paused, but it's possible to continue with the RUN button or disable infinite loop detection in settings.`,
+                        showForm(
+                            "infinite-loop-popup",
+                            { treshold: INFINITE_LOOP_TRESHOLD },
+                            false,
                         );
                         this.pcCounter.clear();
                         this.pause();

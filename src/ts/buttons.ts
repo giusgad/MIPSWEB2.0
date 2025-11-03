@@ -48,6 +48,7 @@ import { highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
 import { renderApp } from "./app.js";
 import { blinkConsole } from "./console.js";
+import { getFromStorage, setIntoStorage } from "./utils.js";
 
 (window as any).cycleStateBtn = async function (
     btn: HTMLButtonElement,
@@ -101,6 +102,12 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     value: string,
 ) {
     await updateMemoryAddrFormat(value);
+};
+
+(window as any).disableLoopDetectionOnClick = function () {
+    const settings = getFromStorage("local", "settings");
+    settings.options["detect-infinite-loops"] = false;
+    setIntoStorage("local", "settings", settings);
 };
 
 (window as any).stepOnClick = async function () {
