@@ -257,6 +257,54 @@ input {
   }
 }
 
+.help {
+  width: 75%;
+  height: 60%;
+  overflow-y: scroll;
+  padding: 1em;
+  .table {
+    .cols-names {
+      font-weight: bold;
+      & > * {
+        justify-content: flex-start !important;
+        align-items: normal !important;
+      }
+    }
+    .row {
+      min-height: 20px;
+    }
+    .col {
+      padding: 2px 5px;
+      border: 0.5px solid var(--rgb-gray-9) !important;
+      &.name {
+        width: 30%;
+        display: flex;
+        gap: 2ch;
+        .symbol {
+          font-weight: bold;
+          &::after {
+            content: ":";
+          }
+        }
+        .longName {
+          flex: 1;
+        }
+      }
+      &.params {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 18ch;
+      }
+      &.desc {
+        justify-content: flex-start;
+        width: 60%;
+      }
+    }
+  }
+}
+
 .component {
   height: 100%;
   overflow-y: scroll;
@@ -494,7 +542,7 @@ input {
 }
 
 #memory {
-  // this variable can be set from javascript to adapt to the longer label
+  // this variable can be set from JavaScript to adapt to the longer label
   --tags-width: 15ch;
   #memorymap-container {
     opacity: 0.6;

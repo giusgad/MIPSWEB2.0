@@ -58,6 +58,8 @@ export abstract class Instruction {
         vm: VirtualMachine | undefined,
     ): void;
 
+    abstract getHelp(): { longName: string; desc: string } | null;
+
     /** returns the possible params acceptable for the instruction given the number of params found in the user's code*/
     getPossibleParams(n_found_params: number): ParamsFormat[] {
         if (n_found_params === 0)
@@ -313,6 +315,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Shift word Left Logical",
+                        desc: "set rd to (rt << sa)",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -341,6 +349,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Shift word Right Logical",
+                        desc: "set rd to (rt >> sa)",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -368,6 +382,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Shift word Right Arithmetic",
+                        desc: "set rd to (rt >> sa) extending the sign bit in the emptied bits",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -394,6 +414,12 @@ export class Instructions {
                     rd.set(rt.getValue() << sa);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Shift word Left Logical Variable",
+                        desc: "set rd to (rt << rs)",
+                    };
                 }
             })(),
         );
@@ -423,6 +449,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Shift word Right Logical Variable",
+                        desc: "set rd to (rt >> rs)",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -450,6 +482,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Shift word Right Arithmetic Variable",
+                        desc: "set rd to (rt >> rs) extending the sign bit in the emptied bits",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -473,6 +511,12 @@ export class Instructions {
                         registers[params.rs.getValue()].binary.getValue();
 
                     cpu.pc.set(rs);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Jump Register",
+                        desc: "execute a branch to the address in rs",
+                    };
                 }
             })(),
         );
@@ -498,6 +542,12 @@ export class Instructions {
 
                     rd.set(cpu.pc.getValue() + 4);
                     cpu.pc.set(rs.getValue());
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Jump And Link Register",
+                        desc: "execute a procedure call to the address in rs; return address is saved in rd, which if not specified is 31 ($ra)",
+                    };
                 }
             })(),
         );
@@ -526,6 +576,12 @@ export class Instructions {
                     }
 
                     await syscall.execute(cpu, {}, vm);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "SYStem CALL",
+                        desc: "cause a system call exception",
+                    };
                 }
             })(),
         );
@@ -560,6 +616,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Breakpoint",
+                        desc: "cause a breakpoint exception; the 20 central bits in the instruction code can be retrieved by the exception handler for information",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -583,6 +645,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Move From HI register",
+                        desc: "set rd to the contents of the HI register",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -605,6 +673,12 @@ export class Instructions {
                     cpu.hi.set(rs.getValue());
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Move To HI register",
+                        desc: "set the HI register to the contents of rs",
+                    };
                 }
             })(),
         );
@@ -631,6 +705,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Move From LO register",
+                        desc: "set rd to the contents of the LO register",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -653,6 +733,12 @@ export class Instructions {
                     cpu.lo.set(rs.getValue());
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Move To LO register",
+                        desc: "set the LO register to the contents of rs",
+                    };
                 }
             })(),
         );
@@ -686,6 +772,12 @@ export class Instructions {
                     );
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "MULTiply word",
+                        desc: "multiply rs by rt as 32-bit signed integers, producing a 64bit result; set LO to the low-order 32 bits and HI to the high-order 32 bits.",
+                    };
                 }
             })(),
         );
@@ -723,6 +815,12 @@ export class Instructions {
                     cpu.hi.set(hiValue, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "MULTiply Unsigned word",
+                        desc: "multiply rs by rt as 32-bit unsigned integers, producing a 64bit result; set LO to the low-order 32 bits and HI to the high-order 32 bits.",
+                    };
                 }
             })(),
         );
@@ -763,6 +861,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "DIVide word",
+                        desc: "divide rs by rt, treating operands as signed values; set LO to the quotient and set HI to the remainder",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -801,6 +905,12 @@ export class Instructions {
                     cpu.hi.set(remainder, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "DIVide Unsigned word",
+                        desc: "divide rs by rt, treating operands as unsigned values; set LO to the quotient and set HI to the remainder",
+                    };
                 }
             })(),
         );
@@ -841,6 +951,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "ADD word",
+                        desc: "Set rd to rs + rt; if the addition results in 2's complement arithmetic overflow then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -867,6 +983,12 @@ export class Instructions {
                     rd.set(rs.getSignedValue() + rt.getSignedValue());
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "ADD Unsigned word",
+                        desc: "Set rd to rs + rt; doesn't trap on overflow",
+                    };
                 }
             })(),
         );
@@ -907,6 +1029,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "SUBtract word",
+                        desc: "Set rd to rs - rt; if the subtraction results in 2's complement arithmetic overflow then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -942,6 +1070,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "SUBtract Unsigned word",
+                        desc: "Set rd to rs - rt; doesn't trap on overflow",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -970,6 +1104,12 @@ export class Instructions {
                     rd.set(value, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "AND",
+                        desc: "set rd to the result of the bitwise operation rs AND rt",
+                    };
                 }
             })(),
         );
@@ -1000,6 +1140,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "OR",
+                        desc: "set rd to the result of the bitwise operation rs OR rt",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1029,6 +1175,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "XOR",
+                        desc: "set rd to the result of the bitwise operation rs XOR rt (exclusive OR)",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1057,6 +1209,12 @@ export class Instructions {
                     rd.set(value, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "NOR",
+                        desc: "set rd to the result of the bitwise operation rs NOR rt",
+                    };
                 }
             })(),
         );
@@ -1089,6 +1247,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Set on Less Than",
+                        desc: "set rd to 1 if (rs < rt) as signed integers, set rd to 0 otherwise",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1120,6 +1284,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Set on Less Than Unsigned",
+                        desc: "set rd to 1 if (rs < rt) as unsigned integers, set rd to 0 otherwise",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1148,6 +1318,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Greater or Equal",
+                        desc: "if (rs >= rt) as signed integers then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1175,6 +1351,12 @@ export class Instructions {
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Greater or Equal Unsigned",
+                        desc: "if (rs >= rt) as unsigned integers then trap",
+                    };
                 }
             })(),
         );
@@ -1205,6 +1387,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Greater or Equal Immediate",
+                        desc: "if (rs >= immediate) as signed integers then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1234,6 +1422,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Greater or Equal Immediate Unsigned",
+                        desc: "if (rs >= immediate) as unsigned integers then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1261,6 +1455,12 @@ export class Instructions {
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Less Than",
+                        desc: "if (rs < rt) as signed integers then trap",
+                    };
                 }
             })(),
         );
@@ -1291,6 +1491,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Less Than Immediate",
+                        desc: "if (rs < immediate) as signed integers then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1320,6 +1526,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Less Than Immediate Unsigned",
+                        desc: "if (rs < immediate) as unsigned integers then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1348,6 +1560,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Less Than Unsigned",
+                        desc: "if (rs < rt) as unsigned integers then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1375,6 +1593,12 @@ export class Instructions {
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if EQual",
+                        desc: "if (rs == rt) then trap",
+                    };
                 }
             })(),
         );
@@ -1405,6 +1629,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if EQual Immediate",
+                        desc: "if (rs == immediate) then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1432,6 +1662,12 @@ export class Instructions {
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Not Equal",
+                        desc: "if (rs != rt) then trap",
+                    };
                 }
             })(),
         );
@@ -1462,6 +1698,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Trap if Not Equal Immediate",
+                        desc: "if (rs != immediate) then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1486,6 +1728,12 @@ export class Instructions {
                     const newPC =
                         (cpu.pc.getValue() & 0xf0000000) | (target << 2);
                     cpu.pc.set(newPC);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Jump",
+                        desc: "jump to the target address",
+                    };
                 }
             })(),
         );
@@ -1514,6 +1762,12 @@ export class Instructions {
                         (cpu.pc.getValue() & 0xf0000000) | (target << 2);
                     cpu.pc.set(newPC);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Jump And Link",
+                        desc: "execute a procedure call to the target address and set $ra to the return address",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1539,6 +1793,12 @@ export class Instructions {
 
                     registers[31].binary.set(cpu.pc.getValue() + 4);
                     cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch And Link",
+                        desc: "do an unconditional PC-relative procedure call to offset",
+                    };
                 }
             })(),
         );
@@ -1570,6 +1830,12 @@ export class Instructions {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on EQual",
+                        desc: "if (rs == rt) then do a PC-relative branch to offset",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1592,6 +1858,12 @@ export class Instructions {
                         Utils.fromSigned(params.immediate!.getValue(), 16) << 2;
 
                     cpu.pc.set(cpu.pc.getValue() + 4 + offset);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch",
+                        desc: "do an unconditional branch to offset",
+                    };
                 }
             })(),
         );
@@ -1622,6 +1894,12 @@ export class Instructions {
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Greater than or Equal to Zero",
+                        desc: "if (rs >= 0) then do a PC-relative branch to offset",
+                    };
                 }
             })(),
         );
@@ -1654,6 +1932,13 @@ export class Instructions {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName:
+                            "Branch on Greater than or Equal to Zero And Link",
+                        desc: "if (rs >= 0) then do a PC-relative branch to offset and set $ra to the return address",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1683,6 +1968,12 @@ export class Instructions {
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Greater Than Zero",
+                        desc: "if (rs > 0) then do a PC-relative branch to offset",
+                    };
                 }
             })(),
         );
@@ -1714,6 +2005,12 @@ export class Instructions {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Not Equal",
+                        desc: "if (rs != rt) then do a PC-relative branch to offset",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1742,6 +2039,12 @@ export class Instructions {
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Less than or Equal to Zero",
+                        desc: "if (rs <= 0) then do a PC-relative branch to offset",
+                    };
                 }
             })(),
         );
@@ -1773,6 +2076,12 @@ export class Instructions {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Less Than Zero",
+                        desc: "if (rs < 0) then do a PC-relative branch to offset",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1803,6 +2112,12 @@ export class Instructions {
                     } else {
                         cpu.pc.set(cpu.pc.getValue() + 4);
                     }
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Less Than Zero And Link",
+                        desc: "if (rs < 0) then do a PC-relative branch to offset and set $ra to the return address",
+                    };
                 }
             })(),
         );
@@ -1843,6 +2158,12 @@ export class Instructions {
                     rt.set(result, true);
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "ADD Immediate word",
+                        desc: "Set rd to rs + immediate; if the addition results in 2's complement arithmetic overflow then trap",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1869,6 +2190,12 @@ export class Instructions {
                     rt.set(rs.getValue() + immediate);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "ADD Immediate Unsigned word",
+                        desc: "Set rd to rs + immediate; doesn't trap on overflow",
+                    };
                 }
             })(),
         );
@@ -1901,6 +2228,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Set on Less Than Immediate",
+                        desc: "set rd to 1 if (rs < immediate) as signed integers, set rd to 0 otherwise",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1932,6 +2265,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Set on Less Than Immediate Unsigned",
+                        desc: "set rd to 1 if (rs < immediate) as unsigned integers, set rd to 0 otherwise",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -1960,6 +2299,12 @@ export class Instructions {
                     rt.set(value, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "AND Immediate",
+                        desc: "set rt to the result of the bitwise operation rs AND immediate",
+                    };
                 }
             })(),
         );
@@ -1990,6 +2335,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "OR Immediate",
+                        desc: "set rt to the result of the bitwise operation rs OR immediate",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2019,6 +2370,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "XOR Immediate",
+                        desc: "set rt to the result of the bitwise operation rs AND immediate",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2045,6 +2402,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Upper Immediate",
+                        desc: "load the 16-bit immediate in the upper part of rt concatenated with 16 bits of low-order zeros.",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2064,6 +2427,9 @@ export class Instructions {
                     vm: VirtualMachine,
                 ): Promise<void> {
                     throw new Error(`${this.symbol} not implemented yet`);
+                }
+                getHelp(): null {
+                    return null;
                 }
             })(),
         );
@@ -2085,6 +2451,9 @@ export class Instructions {
                 ): Promise<void> {
                     throw new Error(`${this.symbol} not implemented yet`);
                 }
+                getHelp(): null {
+                    return null;
+                }
             })(),
         );
         this.instructions.push(
@@ -2104,6 +2473,9 @@ export class Instructions {
                     vm: VirtualMachine,
                 ): Promise<void> {
                     throw new Error(`${this.symbol} not implemented yet`);
+                }
+                getHelp(): null {
+                    return null;
                 }
             })(),
         );
@@ -2134,6 +2506,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Byte",
+                        desc: "load a byte from the effective address into rt and extend its sign",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2162,6 +2540,12 @@ export class Instructions {
                     rt.set(value.getValue(), true);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Halfword",
+                        desc: "load a half word from the effective address into rt and extend its sign",
+                    };
                 }
             })(),
         );
@@ -2198,6 +2582,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Word Left",
+                        desc: "load the most-significant part of a word from an unaligned memory address into rt preserving its other half",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2230,6 +2620,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Word",
+                        desc: "load a word from the effective address",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2259,6 +2655,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Byte Unsigned",
+                        desc: "load a byte from the effective address into rt and zero extend the value",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2287,6 +2689,12 @@ export class Instructions {
                     rt.set(value.getUnsignedValue(), false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Halfword Unsigned",
+                        desc: "load a halfword from the effective address into rt and zero extend the value",
+                    };
                 }
             })(),
         );
@@ -2323,6 +2731,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Word Right",
+                        desc: "load the least-significant part of a word from an unaligned memory address into rt preserving its other half",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2351,6 +2765,12 @@ export class Instructions {
                     cpu.memory.storeByte(new Binary(address), value);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Store Byte",
+                        desc: "Store the least significant byte of rt to the effective address",
+                    };
                 }
             })(),
         );
@@ -2383,13 +2803,19 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Store Halfword",
+                        desc: "Store the least significant halfword of rt to the effective address",
+                    };
+                }
             })(),
         );
         this.instructions.push(
             new (class extends Instruction {
                 constructor() {
                     super(
-                        "SWL",
+                        "SW",
                         ["rt, offset(base)"],
                         "I",
                         new Binary(0b101010, 6),
@@ -2418,6 +2844,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Store Word Left",
+                        desc: "store the most-significant part of rt to an unaligned memory address",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2445,6 +2877,12 @@ export class Instructions {
                     cpu.memory.storeWord(new Binary(address), rt.copy());
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Store Word",
+                        desc: "store the contents of rt to the effective address",
+                    };
                 }
             })(),
         );
@@ -2481,6 +2919,12 @@ export class Instructions {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Store Word Right",
+                        desc: "store the least-significant part of rt to an unaligned memory address",
+                    };
+                }
             })(),
         );
         this.instructions.push(
@@ -2500,6 +2944,9 @@ export class Instructions {
                     vm: VirtualMachine,
                 ): Promise<void> {
                     throw new Error(`${this.symbol} not implemented yet`);
+                }
+                getHelp(): null {
+                    return null;
                 }
             })(),
         );
