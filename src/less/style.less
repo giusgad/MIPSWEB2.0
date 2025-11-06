@@ -290,6 +290,9 @@ input {
       .col {
         padding: 2px 5px;
         border: 0.5px solid var(--rgb-gray-8) !important;
+        &.code {
+          width: 5ch;
+        }
         &.name {
           width: 30%;
           display: flex;
@@ -328,6 +331,14 @@ input {
               font-family: monospace;
             }
           }
+        }
+      }
+      &.syscalls {
+        .col.name {
+          width: 23ch;
+        }
+        .col.desc {
+          flex: 1;
         }
       }
     }

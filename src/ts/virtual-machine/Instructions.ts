@@ -58,6 +58,8 @@ export abstract class Instruction {
         vm: VirtualMachine | undefined,
     ): void;
 
+    /**Returns an object with extra info about the instruction
+     * should return null if the instruction is not implemented, causing it not to be shown in the help screen*/
     abstract getHelp(): { longName: string; desc: string } | null;
 
     /** returns the possible params acceptable for the instruction given the number of params found in the user's code*/

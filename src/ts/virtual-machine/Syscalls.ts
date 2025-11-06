@@ -17,6 +17,11 @@ export abstract class Syscall {
         params: { [key: string]: Binary },
         vm: VirtualMachine,
     ): Promise<void>;
+
+    /**Returns a string that descibes what the syscall does if it's implemented, null otherwise*/
+    getHelp(): string | null {
+        return null;
+    }
 }
 
 export class Syscalls {
@@ -48,6 +53,9 @@ export class Syscalls {
                     }
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): string {
+                    return "Print the integer in $a0";
                 }
             })(),
         );
@@ -100,6 +108,9 @@ export class Syscalls {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): string {
+                    return "Print the null-terminated string at the address in $a0";
+                }
             })(),
         );
 
@@ -127,6 +138,9 @@ export class Syscalls {
                     const v0 = vm.cpu.getRegisters()[2].binary;
                     v0.set(value);
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): string {
+                    return "Read an integer from the console and load it in $v0";
                 }
             })(),
         );
@@ -206,6 +220,9 @@ export class Syscalls {
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
+                getHelp(): string {
+                    return "Read a string to the address in $a0, with a maximum length in bytes set in $a1";
+                }
             })(),
         );
 
@@ -224,6 +241,9 @@ export class Syscalls {
                     cpu.registers.get("$v0")!.binary.set(allocatedAddr, false);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
+                }
+                getHelp(): string {
+                    return "Allocate $a0 bytes on the heap and return the address of the requested memory in $v0";
                 }
             })(),
         );

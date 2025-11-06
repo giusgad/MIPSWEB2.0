@@ -1,9 +1,14 @@
 import { vm } from "./virtual-machine.js";
 
-type instructionHelp = {
+type InstructionHelp = {
     symbol: string;
     longName: string;
     params: string[];
+    description: string;
+};
+type SyscallHelp = {
+    code: number;
+    name: string;
     description: string;
 };
 
@@ -40,8 +45,8 @@ function mapDesc(desc: string): string {
     return res;
 }
 
-(window as any).getInstructionsHelp = function (): instructionHelp[] {
-    const res: instructionHelp[] = [];
+(window as any).getInstructionsHelp = function (): InstructionHelp[] {
+    const res: InstructionHelp[] = [];
     vm.cpu.instructionsSet.instructions.forEach((instr) => {
         const help = instr.getHelp();
         if (help)
@@ -56,8 +61,8 @@ function mapDesc(desc: string): string {
     return res;
 };
 
-(window as any).getPseudoInstructionsHelp = function (): instructionHelp[] {
-    const res: instructionHelp[] = [];
+(window as any).getPseudoInstructionsHelp = function (): InstructionHelp[] {
+    const res: InstructionHelp[] = [];
     vm.cpu.instructionsSet.pseudoInstructions.forEach((instr) => {
         const help = instr.getHelp();
         if (help)
@@ -69,5 +74,18 @@ function mapDesc(desc: string): string {
             });
     });
     res.sort((a, b) => a.symbol.localeCompare(b.symbol));
+    return res;
+};
+
+(window as any).getSyscallHelp = function (): SyscallHelp[] {
+    const res: SyscallHelp[] = [];
+    for (const syscall of vm.cpu.syscallsSet.syscalls) {
+        res.push({
+            code: syscall.code,
+            name: syscall.name,
+            description: syscall.getHelp() ?? "Not implemented",
+        });
+    }
+    res.sort((a, b) => a.code - b.code);
     return res;
 };

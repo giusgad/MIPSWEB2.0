@@ -1,36 +1,55 @@
-<div class="form help"><div class="content">
-  <%const helps = [["Instructions", getInstructionsHelp()], ["Pseudoinstructions", getPseudoInstructionsHelp()]];
-  for (const [title, instructions] of helps) {%>
-    <div class="section-title"><%=title%></div>
-    <div class="table">
+<div class="form help">
+  <div class="content">
+    <%const helps = [["Instructions", getInstructionsHelp()], ["Pseudoinstructions", getPseudoInstructionsHelp()]];
+    for (const [title, instructions] of helps) {%>
+      <div class="section-title"><%=title%></div>
+      <div class="table">
+        <div class="cols-names">
+          <div class="col name">Name</div>
+          <div class="col params">Params</div>
+          <div class="col desc">Description</div>
+        </div>
+        <div class="rows">
+          <%instructions.forEach((help, i) => {%>
+            <div class="row <%=i%2==0 ? "even" : ""%>">
+              <div class="col name">
+                <span class="symbol"><%=help.symbol%></span><span class="longName"><%=help.longName%></span>
+              </div>
+              <div class="col params">
+                <%help.params.forEach(param => {%>
+                  <div><%=param%></div>
+                <%});%>
+              </div>
+              <div class="col desc">
+                <p><%-help.description%></p>
+              </div>
+            </div>
+          <%});%>
+        </div>
+      </div>
+    <%}%>
+    <div class="section-title">Syscalls</div>
+    <div class="table syscalls">
       <div class="cols-names">
+        <div class="col code">Code</div>
         <div class="col name">Name</div>
-        <div class="col params">Params</div>
         <div class="col desc">Description</div>
       </div>
       <div class="rows">
-        <%instructions.forEach((help, i) => {%>
+        <%getSyscallHelp().forEach((help, i) => {%>
           <div class="row <%=i%2==0 ? "even" : ""%>">
-            <div class="col name">
-              <span class="symbol"><%=help.symbol%></span><span class="longName"><%=help.longName%></span>
-            </div>
-            <div class="col params">
-              <%help.params.forEach(param => {%>
-                <div><%=param%></div>
-              <%});%>
-            </div>
-            <div class="col desc">
-              <p><%-help.description%></p>
-            </div>
+            <div class="col code"><%=help.code%></div>
+            <div class="col name"><%=help.name%></div>
+            <div class="col desc"><%=help.description%></div>
           </div>
         <%});%>
       </div>
     </div>
-  <%}%>
+  </div>
   <div class="buttons">
       <button class="button default" onclick="hideFormOnClick();">
           <div class="icon gray-4"><%-Icons.render('x')%></div>
           <div class="label">Close</div>
       </button>
   </div>
-</div></div>
+</div>
