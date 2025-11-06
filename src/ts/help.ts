@@ -1,4 +1,6 @@
+import { getOptions } from "./settings.js";
 import { vm } from "./virtual-machine.js";
+import { ParamsFormat } from "./virtual-machine/Instructions.js";
 
 type InstructionHelp = {
     symbol: string;
@@ -21,14 +23,35 @@ const paramMap: Map<string, string> = new Map([
     ["offset", "label"],
     ["immediate", "1000"],
     ["imm", "1000"],
-    ["offset(base)", "4($s3)"],
+    ["offset(base)", "4($s2)"],
     ["SYSCALL", ""],
 ]);
-function mapParams(params: string): string {
-    return params
-        .split(", ")
-        .map((p) => paramMap.get(p))
-        .join(", ");
+function mapParams(params: string[]): string[] {
+    const preprocessor = vm.assembler.preprocessor;
+    // preprocessor params that need to be added here to be shown in the help
+    const extra: string[] = [];
+    if (preprocessor.allowNumberRt.has(params[0] as ParamsFormat)) {
+        extra.push(
+            params[0]
+                .split(", ")
+                .map((p) => (p === "rt" ? "imm" : p))
+                .join(", "),
+        );
+    } else if (params.includes("rt, offset(base)")) {
+        extra.push(
+            "rt, rs",
+            "rt, imm",
+            "rt, label-4",
+            "rt, label+4",
+            "rt, label",
+        );
+    }
+    return [...params, ...extra].map((param) =>
+        param
+            .split(", ")
+            .map((p) => paramMap.get(p) ?? p)
+            .join(", "),
+    );
 }
 function mapDesc(desc: string): string {
     let res = `${desc}`;
@@ -53,7 +76,7 @@ function mapDesc(desc: string): string {
             res.push({
                 symbol: instr.symbol.toLowerCase(),
                 longName: help.longName,
-                params: instr.params.map((p) => mapParams(p)),
+                params: mapParams(instr.params),
                 description: mapDesc(help.desc),
             });
     });
@@ -69,7 +92,7 @@ function mapDesc(desc: string): string {
             res.push({
                 symbol: instr.symbol.toLowerCase(),
                 longName: help.longName,
-                params: [mapParams(instr.params.join(", "))],
+                params: mapParams([instr.params.join(", ")]),
                 description: mapDesc(help.desc),
             });
     });
