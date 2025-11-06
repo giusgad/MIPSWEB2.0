@@ -345,3 +345,13 @@ function generateUniqueName(name: string, ignore?: string): string {
     }
     return newName;
 }
+
+export function scrollOpenedFiles() {
+    const elem = document.getElementById("files-tabs") as HTMLDivElement;
+    if (!elem) return;
+    // turn scrolls into horizontal scrolls
+    elem.addEventListener("wheel", (ev) => {
+        ev.preventDefault();
+        elem.scrollLeft += ev.deltaY;
+    });
+}

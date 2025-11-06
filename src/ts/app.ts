@@ -25,6 +25,7 @@ import { stop } from "./virtual-machine.js";
 import { adjustBinaryWidth } from "./style.js";
 import { watchMemoryScroll } from "./memorymap.js";
 import { setGranularTooltips } from "./intervals.js";
+import { scrollOpenedFiles } from "./files.js";
 
 let online = false;
 initLoaders();
@@ -113,5 +114,6 @@ export async function renderApp(
     adjustBinaryWidth();
     setGranularTooltips();
     endDrag();
+    scrollOpenedFiles();
     if (showLoaders) removeLoader("renderApp");
 }
