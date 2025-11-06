@@ -262,6 +262,8 @@ export abstract class PseudoInstruction {
     /**Returns the number of instructions this pseudo maps to if it's always the same number.
      * Otherwise the size needs to be found by expanding the pseudo*/
     abstract size(): number | null;
+
+    abstract getHelp(): { longName: string; desc: string } | null;
 }
 
 export class Instructions {
@@ -2161,7 +2163,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ADD Immediate word",
-                        desc: "Set rd to rs + immediate; if the addition results in 2's complement arithmetic overflow then trap",
+                        desc: "Set rt to rs + immediate; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
             })(),
@@ -2194,7 +2196,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ADD Immediate Unsigned word",
-                        desc: "Set rd to rs + immediate; doesn't trap on overflow",
+                        desc: "Set rt to rs + immediate; doesn't trap on overflow",
                     };
                 }
             })(),
@@ -2405,7 +2407,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "Load Upper Immediate",
-                        desc: "load the 16-bit immediate in the upper part of rt concatenated with 16 bits of low-order zeros.",
+                        desc: "load the 16-bit immediate in the upper half of rt concatenated with 16 bits of low-order zeros.",
                     };
                 }
             })(),
@@ -2970,6 +2972,12 @@ export class Instructions {
                 size(): number {
                     return 1;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "No OPeration",
+                        desc: "execute a filler operation that doesn't affect the status of the CPU",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -2989,6 +2997,12 @@ export class Instructions {
                 }
                 size(): number {
                     return 1;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Move register",
+                        desc: "copy the content of rs in rd",
+                    };
                 }
             })(),
         );
@@ -3010,6 +3024,12 @@ export class Instructions {
                 size(): number {
                     return 1;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "NOT",
+                        desc: "set rd to the bitwise negation of rs",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3030,6 +3050,12 @@ export class Instructions {
                 size(): number {
                     return 1;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "NEGate word",
+                        desc: "set rd to the negation of rs ( $zero - rs ); if the subtraction results in 2's complement arithmetic overflow then trap",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3049,6 +3075,12 @@ export class Instructions {
                 }
                 size(): number {
                     return 1;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "NEGate Unsigned word",
+                        desc: "set rd to the negation of rs ( $zero - rs ); doesn't trap on overflow",
+                    };
                 }
             })(),
         );
@@ -3080,6 +3112,12 @@ export class Instructions {
                 size(): number {
                     return 3;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "ABSolute value of word",
+                        desc: "set rd to the absolute value of rs (|rs|)",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3100,6 +3138,12 @@ export class Instructions {
                 }
                 size(): null {
                     return null;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Immediate",
+                        desc: "load a constant (immediate) in rd",
+                    };
                 }
             })(),
         );
@@ -3140,6 +3184,12 @@ export class Instructions {
                 size(): number {
                     return 2;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Load Address",
+                        desc: "load the effective address of label in rd",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3160,6 +3210,12 @@ export class Instructions {
                 size(): number {
                     return 1;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on EQual to Zero",
+                        desc: "if (rs == 0) then do a PC-relative branch to label",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3179,6 +3235,12 @@ export class Instructions {
                 }
                 size(): number {
                     return 1;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Not Equal to Zero",
+                        desc: "if (rs != 0) then do a PC-relative branch to label",
+                    };
                 }
             })(),
         );
@@ -3211,6 +3273,12 @@ export class Instructions {
                 }
                 size(): null {
                     return null;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Less Than",
+                        desc: "if (rs < rt) then do a PC-relative branch to label",
+                    };
                 }
             })(),
         );
@@ -3245,6 +3313,12 @@ export class Instructions {
                 size(): null {
                     return null;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Less than or Equal",
+                        desc: "if (rs <= rt) then do a PC-relative branch to label",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3277,6 +3351,12 @@ export class Instructions {
                 }
                 size(): null {
                     return null;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Greater Than",
+                        desc: "if (rs > rt) then do a PC-relative branch to label",
+                    };
                 }
             })(),
         );
@@ -3311,6 +3391,12 @@ export class Instructions {
                 size(): null {
                     return null;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Branch on Greater than or Equal",
+                        desc: "if (rs >= rt) then do a PC-relative branch to label",
+                    };
+                }
             })(),
         );
         this.pseudoInstructions.push(
@@ -3343,6 +3429,12 @@ export class Instructions {
                 }
                 size(): null {
                     return null;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "MULtiply word to register",
+                        desc: "set rd to the low-order word of the result of rs x rt as signed integers",
+                    };
                 }
             })(),
         );
@@ -3382,6 +3474,12 @@ export class Instructions {
                 size(): null {
                     return null;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "DIVide word to register",
+                        desc: "set rd to the quotient of the division rs / rt",
+                    };
+                }
             })(),
         );
 
@@ -3416,6 +3514,12 @@ export class Instructions {
                 size(): null {
                     return null;
                 }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "Set on EQual",
+                        desc: "set rd to 1 if (rs == rt) as signed integers, set rd to 0 otherwise",
+                    };
+                }
             })(),
         );
 
@@ -3440,6 +3544,12 @@ export class Instructions {
                 }
                 size(): null {
                     return null;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "SUBtract Immediate word",
+                        desc: "Set rd to rs - immediate; if the addition results in 2's complement arithmetic overflow then trap",
+                    };
                 }
             })(),
         );
@@ -3473,6 +3583,12 @@ export class Instructions {
                 }
                 size(): number {
                     return 2;
+                }
+                getHelp(): { longName: string; desc: string } {
+                    return {
+                        longName: "MULtiply Unsigned word",
+                        desc: "set rd to the low-order word of the result of rs x rt as unsigned integers",
+                    };
                 }
             })(),
         );
