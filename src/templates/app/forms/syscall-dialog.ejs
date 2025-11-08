@@ -1,0 +1,33 @@
+<div class="form syscall">
+  <%if (ctx.variant === "input_confirm") {%>
+    <span class="msg"><%=ctx.msg%></span>
+    <div class="buttons">
+        <button id="cancBtn" class="button default" type="button">
+            <div class="label">Cancel</div>
+        </button>
+        <button id="yesBtn" class="button default" type="button">
+            <div class="label">Yes</div>
+        </button>
+        <button id="noBtn" class="button default" type="button">
+            <div class="label">No</div>
+        </button>
+    </div>
+  <%} else if (["input_int", "input_string"].includes(ctx.variant)) {%>
+    <span class="msg"><%=ctx.msg%></span>
+    <input type="text" id="dialogIntInput" placeholder="<%=ctx.variant==='input_int' ? '123' : 'Your string' %>" autocomplete="off"></input>
+    <div class="buttons">
+        <button id="confirmBtn" class="button default" type="button">
+            <div class="label">Confirm</div>
+        </button>
+    </div>
+  <%} else if (ctx.variant === "output") {%>
+    <span class="msg"><%=ctx.msg%></span>
+    <span style="margin-top:15px"><%=ctx.payload%></span>
+    <div class="buttons">
+        <button class="button default" onclick="hideFormOnClick();">
+            <div class="icon gray-4"><%-Icons.render('x')%></div>
+            <div class="label">Close</div>
+        </button>
+    </div>
+  <%}%>
+</div>

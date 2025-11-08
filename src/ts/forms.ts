@@ -8,6 +8,7 @@ export async function showForm(
     data: any,
     autofocus: boolean,
     onClose?: () => void,
+    bindEsc: boolean = true,
 ) {
     hideFilePopover();
     const formsBg = document.getElementById("forms-bg");
@@ -31,13 +32,15 @@ export async function showForm(
             }
         }
     }
-    escHandler = (ev) => {
-        if (ev.key === "Escape") {
-            if (onClose !== undefined) onClose();
-            hideForm();
-        }
-    };
-    document.addEventListener("keyup", escHandler);
+    if (bindEsc) {
+        escHandler = (ev) => {
+            if (ev.key === "Escape") {
+                if (onClose !== undefined) onClose();
+                hideForm();
+            }
+        };
+        document.addEventListener("keyup", escHandler);
+    }
 }
 
 export async function hideForm() {

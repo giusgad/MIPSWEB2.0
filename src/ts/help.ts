@@ -103,10 +103,15 @@ function mapDesc(desc: string): string {
 (window as any).getSyscallHelp = function (): SyscallHelp[] {
     const res: SyscallHelp[] = [];
     for (const syscall of vm.cpu.syscallsSet.syscalls) {
+        const help = syscall.getHelp();
+        if (!help) continue;
         res.push({
             code: syscall.code,
             name: syscall.name,
-            description: syscall.getHelp() ?? "Not implemented",
+            description: help.replace(
+                /\$(..)/g,
+                '<span class="code">$$$1</span>',
+            ),
         });
     }
     res.sort((a, b) => a.code - b.code);

@@ -46,11 +46,6 @@ const keyboardShortcuts: Shortcut[] = [
         action: () => (window as any).stepOutOnClick(),
     },
     {
-        key: " ", // space
-        conditions: () => interfaceState === "execute",
-        action: () => (window as any).runOnClick(),
-    },
-    {
         mods: "ctrl/cmd",
         key: "r",
         conditions: () => interfaceState === "execute",

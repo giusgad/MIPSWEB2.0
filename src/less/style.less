@@ -878,10 +878,20 @@ input {
   background-color: var(--rgba-gray-11-60);
   display: none;
   justify-content: center;
+  .form {
+    max-width: 80%;
+  }
   align-items: center;
 }
 
 .form {
+  &.syscall {
+    .msg {
+      color: var(--rgb-gray-4);
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+  }
   background-color: var(--rgb-gray-10);
   padding: 8px;
   border: 1px solid var(--rgb-gray-9);
