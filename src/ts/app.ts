@@ -1,7 +1,7 @@
 import { addLoader, initLoaders, removeLoader } from "./loaders.js";
 import { Colors } from "./lib/Colors.js";
 import { Icons } from "./lib/Icons.js";
-import { initEditors, renderEditors } from "./editors.js";
+import { editors, initEditors, renderEditors } from "./editors.js";
 import { render } from "./rendering.js";
 import { initSortables } from "./sortable.js";
 import { hideFilePopover } from "./popovers.js";
@@ -95,6 +95,7 @@ async function renderErrorPage(errorMessage: string) {
     removeLoader("renderErrorPage");
 }
 
+export let pauseEditorUpdates = false;
 export async function renderApp(
     newInterfaceState: "edit" | "execute" = interfaceState,
     newEditorState: "edit" | "execute" = editorState,
@@ -103,7 +104,12 @@ export async function renderApp(
     if (showLoaders) addLoader("renderApp");
     interfaceState = newInterfaceState;
     editorState = newEditorState;
+
+    // don't allow changes to the text in the editor during the full rerendering.
+    // This is needed because internal async renders of the ace editor detect ghost changes and duplicate the last line
+    pauseEditorUpdates = true;
     await render("app", "app.ejs", undefined, showLoaders);
+    pauseEditorUpdates = false;
     renderEditors();
     scrollConsoleToBottom();
     watchingConsole();

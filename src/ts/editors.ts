@@ -8,7 +8,12 @@ import {
 } from "./files.js";
 import { Colors } from "./lib/Colors.js";
 import { addClass, removeClass } from "./utils.js";
-import { editorState, interfaceState, renderApp } from "./app.js";
+import {
+    editorState,
+    interfaceState,
+    pauseEditorUpdates,
+    renderApp,
+} from "./app.js";
 import { vm } from "./virtual-machine.js";
 import { getCurrentFontSize } from "./style.js";
 
@@ -217,8 +222,20 @@ export function addEditor(file: file) {
         aceEditor: aceEditor,
     });
 
-    aceEditor.session.on("change", async () => {
-        updateFile(file.id, aceEditor.getValue());
+    // This event listener updates the file in localstorage on input
+    // The extra guard for `pauseEditorUpdates` is needed because the event sometimes fires on subsequent rerenders and that causes
+    // the last line duplicating. The `silent` guard is neeeded to prevent infinite onchange recursion since setValue triggers the event itself.
+    let silent = false;
+    aceEditor.session.on("change", () => {
+        if (silent) return;
+        if (!pauseEditorUpdates) {
+            updateFile(file.id, aceEditor.getValue());
+        } else {
+            silent = true;
+            aceEditor.setValue(file.content);
+            aceEditor.clearSelection();
+            silent = false;
+        }
     });
 
     aceEditor.getSession().selection.on("changeCursor", async () => {
