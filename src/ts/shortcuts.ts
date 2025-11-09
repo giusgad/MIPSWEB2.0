@@ -1,4 +1,5 @@
 import { editorState, interfaceState, renderApp } from "./app.js";
+import { handleFileDrop } from "./files.js";
 import { changeFontSize } from "./style.js";
 import { vm } from "./virtual-machine.js";
 
@@ -92,3 +93,10 @@ document.addEventListener("keydown", (ev) => {
         shortcut.action();
     }
 });
+
+// Handle drag and drops of files on the website
+window.addEventListener("dragover", (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+});
+window.addEventListener("drop", handleFileDrop);

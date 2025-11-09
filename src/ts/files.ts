@@ -2,6 +2,7 @@ import { addEditor, removeEditor, showEditor } from "./editors.js";
 import { renderApp } from "./app.js";
 import { getFromStorage, setIntoStorage } from "./utils.js";
 import { setConsoleShown } from "./virtual-machine.js";
+import { confirmClearProject } from "./buttons.js";
 
 declare const JSZip: any;
 const defaultProjectName = "MIPS_project";
@@ -185,6 +186,7 @@ export async function importZip() {
 }
 
 async function loadProject(zip: any, name: string | undefined) {
+    console.log(zip);
     // delete all current files
     getFiles().forEach((f) => deleteFile(f.id, false));
     // load the new files
@@ -350,4 +352,26 @@ export function scrollOpenedFiles() {
         ev.preventDefault();
         elem.scrollLeft += ev.deltaY;
     });
+}
+
+export async function handleFileDrop(ev: DragEvent) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (!ev.dataTransfer) return;
+    const files = Array.from(ev.dataTransfer.files);
+    if (files.length === 1 && files[0].name.endsWith(".zip")) {
+        if (!confirmClearProject()) return;
+        const zip = new JSZip();
+        const zipContent = await zip.loadAsync(files[0]);
+        await loadProject(zipContent, files[0].name.slice(-4));
+    } else if (files.every((f) => f.name.endsWith(".asm"))) {
+        for (const file of files) {
+            await importFile(file);
+        }
+        await renderApp("edit", "edit");
+    } else {
+        alert(
+            "Can only load a single zip file (a project) or import a series of .asm files",
+        );
+    }
 }

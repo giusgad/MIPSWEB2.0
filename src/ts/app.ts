@@ -11,7 +11,7 @@ import "./settings.js";
 import "./memorymap.js";
 import "./intervals.js";
 import "./execution-speed.js";
-import "./keyboard-shortcuts.js";
+import "./shortcuts.js";
 import "./help.js";
 import {
     getFromStorage,
