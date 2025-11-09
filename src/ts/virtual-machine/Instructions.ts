@@ -2819,7 +2819,7 @@ export class Instructions {
             new (class extends Instruction {
                 constructor() {
                     super(
-                        "SW",
+                        "SWL",
                         ["rt, offset(base)"],
                         "I",
                         new Binary(0b101010, 6),

@@ -16,23 +16,19 @@ export type file = {
 export async function changeFile(fileId: number) {
     if (getSelectedFileId() === fileId) return;
     setSelectedFileId(fileId);
-    await renderApp();
     showEditor(fileId);
+    await renderApp();
 }
 
-export async function deleteFile(fileId: number) {
-    await closeFile(fileId);
+export async function deleteFile(fileId: number, rerender: boolean = true) {
     const files = getFiles();
     const index = files.findIndex((file) => file.id === fileId);
     if (index !== -1) {
         files.splice(index, 1);
         setFiles(files);
     }
-    const selected = getSelectedFileId();
-    if (!files.find((f) => f.id === selected)) {
-        localStorage.removeItem("selectedFileId");
-    }
-    await renderApp();
+    await closeFile(fileId, false);
+    if (rerender) await renderApp();
 }
 
 export async function renameFile(fileId: number, newName: string) {
@@ -45,7 +41,7 @@ export async function renameFile(fileId: number, newName: string) {
     await renderApp();
 }
 
-export async function closeFile(fileId: number) {
+export async function closeFile(fileId: number, rerender: boolean = true) {
     const selectedFileId = getSelectedFileId();
     removeEditor(fileId);
     const files = getFiles();
@@ -57,10 +53,10 @@ export async function closeFile(fileId: number) {
         setConsoleShown(false);
         localStorage.removeItem("selectedFileId");
     }
-    await renderApp("edit", "edit");
+    if (rerender) await renderApp("edit", "edit");
 }
 
-async function openFileTab(fileId: number) {
+async function openFileTab(fileId: number, rerender: boolean = true) {
     const file = getFiles().find((f) => f.id === fileId);
     if (!file) {
         console.error(`Can't open file. File with id '${fileId}' not found`);
@@ -68,7 +64,7 @@ async function openFileTab(fileId: number) {
     }
     setSelectedFileId(fileId);
     showEditor(fileId);
-    await renderApp("edit", "edit");
+    if (rerender) await renderApp("edit", "edit");
 }
 
 export function getSelectedFileId(): number | null {
@@ -160,7 +156,7 @@ export async function importPublicZip(zipPath: string) {
     if (!zipPath.endsWith(".zip")) return;
     try {
         while (zipPath.startsWith("/")) zipPath = zipPath.slice(1);
-        const res = await fetch(`projects/${zipPath}`);
+        const res = await fetch(`projects/${zipPath}`); //TODO: change to absolute
         const arrayBuffer = await res.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
         await loadProject(zip, zipPath.split("/").pop());
@@ -190,7 +186,7 @@ export async function importZip() {
 
 async function loadProject(zip: any, name: string | undefined) {
     // delete all current files
-    getFiles().forEach((f) => deleteFile(f.id));
+    getFiles().forEach((f) => deleteFile(f.id, false));
     // load the new files
     for (const file of Object.values(zip.files).filter(
         (f: any) => !f.dir && !f.name.includes("/") && f.name.endsWith(".asm"),
@@ -232,7 +228,7 @@ export async function importFile(file: File): Promise<void> {
                 };
 
                 addFile(fileToAdd);
-                await openFileTab(fileId);
+                await openFileTab(fileId, false);
                 resolve();
             } catch (error) {
                 console.error(`Error importing the file: ${file.name}`, error);

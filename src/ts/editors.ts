@@ -182,9 +182,10 @@ export function updateEditorsTheme() {
 }
 
 export function removeEditor(fileId: number) {
-    const editorHTMLElement = document.getElementById(`editor-${fileId}`);
-    if (editorHTMLElement) {
-        editorHTMLElement.remove();
+    const editor = editors.find((e) => e.fileId === fileId);
+    if (editor) {
+        editor.aceEditor.destroy();
+        editor.aceEditor.container.remove();
     }
     editors = editors.filter((editor) => editor.fileId !== fileId);
 }
@@ -208,7 +209,8 @@ export function addEditor(file: file) {
         aceEditor.setTheme(aceEditorLightTheme);
     }
     aceEditor.session.setMode("ace/mode/mips");
-    aceEditor.setValue(file.content, 1);
+
+    aceEditor.setValue(file.content);
 
     editors.push({
         fileId: file.id,
@@ -307,6 +309,10 @@ export function initEditors() {
     const editorsElement = document.getElementById("editors");
     if (editorsElement) {
         editorsElement.innerHTML = "";
+        for (const { aceEditor } of editors) {
+            aceEditor.destroy();
+            aceEditor.container.remove();
+        }
         editors = [];
         const files = getFiles();
         if (files.length > 0) {

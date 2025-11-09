@@ -357,7 +357,7 @@ Save your current project before proceeding.`,
     if (confirmClearProject()) {
         setProjectName(null);
         for (const file of getFiles()) {
-            await deleteFile(file.id);
+            await deleteFile(file.id, false);
         }
         await renderApp("edit", "edit");
     }

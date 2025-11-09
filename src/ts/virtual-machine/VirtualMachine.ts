@@ -1,11 +1,10 @@
 import { CPU } from "./CPU.js";
-import { file, getFile } from "../files.js";
+import { file } from "../files.js";
 import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
 import { Binary } from "./Utils.js";
 import { renderApp } from "../app.js";
 import { getExecutionSpeedTimeOut } from "../execution-speed.js";
-import { getAceEditor } from "../editors.js";
 import { getOptions, INFINITE_LOOP_TRESHOLD } from "../settings.js";
 import { updateUiAfterStep } from "../virtual-machine.js";
 import { showForm } from "../forms.js";
@@ -181,6 +180,7 @@ export class VirtualMachine {
 
     pause() {
         this.running = false;
+        updateUiAfterStep();
     }
 
     isNextInstructionFunction(): boolean {
