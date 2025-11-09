@@ -104,12 +104,12 @@ export async function renderApp(
     interfaceState = newInterfaceState;
     editorState = newEditorState;
     await render("app", "app.ejs", undefined, showLoaders);
+    renderEditors();
     scrollConsoleToBottom();
     watchingConsole();
     watchMemoryScroll();
     initSortables();
     hideFilePopover();
-    renderEditors();
     scrollSelectedIntoView("files-tabs");
     adjustBinaryWidth();
     setGranularTooltips();

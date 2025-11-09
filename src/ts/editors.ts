@@ -244,6 +244,14 @@ export function addEditor(file: file) {
         }
     });
 
+    aceEditor.on("gutterclick", (ev: any) => {
+        ev.preventDefault();
+        const row = ev.getDocumentPosition().row;
+        const session = getAceEditor()?.getSession()!;
+        if (session.getBreakpoints()[row]) session.clearBreakpoint(row);
+        else session.setBreakpoint(row, "breakpoint-line");
+    });
+
     editorHTMLDivElement.style.opacity = "1";
 }
 
@@ -262,27 +270,6 @@ export function showEditor(fileId: number | null) {
             }
         }
 
-        // add event listeners after rendering the editor
-        requestAnimationFrame(() => {
-            // breakpoint event listeners
-            for (const lineDiv of document.getElementsByClassName(
-                "ace_gutter-cell",
-            )) {
-                (lineDiv as HTMLDivElement).addEventListener("click", (ev) => {
-                    ev.preventDefault();
-                    let row = Number(lineDiv.childNodes[0].textContent);
-                    if (!row) {
-                        console.error("Invalid row number for breakpoint");
-                        return;
-                    }
-                    row = row - 1;
-                    const session = getAceEditor()?.getSession();
-                    if (session?.getBreakpoints()[row])
-                        session?.clearBreakpoint(row);
-                    else session?.setBreakpoint(row, "breakpoint-line");
-                });
-            }
-        });
         // remove error marker when editing
         for (const editorElem of document.getElementsByClassName(
             "ace_content",
