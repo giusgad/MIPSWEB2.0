@@ -7,6 +7,11 @@ import { Syscalls } from "./Syscalls.js";
 import { VirtualMachine } from "./VirtualMachine.js";
 import { getOptions } from "../settings.js";
 
+type DecodingCacheItem = {
+    instruction: Instruction;
+    params: { [key: string]: Binary };
+    basic: string;
+};
 export class CPU {
     instructionsSet: Instructions = new Instructions();
     syscallsSet: Syscalls = new Syscalls();
@@ -57,7 +62,15 @@ export class CPU {
         this.formats.set("J", new J_Format());
     }
 
+    decodingCache: Map<number, DecodingCacheItem> = new Map();
+
     decode(instructionCode: Binary) {
+        const cached = this.decodingCache.get(
+            instructionCode.getUnsignedValue(),
+        );
+        if (cached) {
+            return cached;
+        }
         const opcode = new Binary(
             instructionCode.getBits(31, 26).getValue(),
             6,
@@ -103,6 +116,11 @@ export class CPU {
                 );
 
                 const basic = foundInstruction.basic(params, this.registers);
+                this.decodingCache.set(instructionCode.getUnsignedValue(), {
+                    instruction: foundInstruction,
+                    params,
+                    basic,
+                });
                 return { instruction: foundInstruction, params, basic };
             }
         }
