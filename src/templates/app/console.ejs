@@ -6,7 +6,7 @@
     <div class="console <% if (ctx.vm.console.state === "waitingInput") {%> waiting-input <% } %>">
         <%ctx.vm.console.lines.forEach((line) => {%>
         <div class="line <%=line.type%>">
-            <% if (line.editorPos) {%>
+            <% if (line.editorPos && ctx.files.length > 0) {%>
               <span
                 class="clickable-pos"
                 onclick="goToEditorPosOnClick(this)"
@@ -14,7 +14,7 @@
                 data-fileid="<%=line.editorPos.fileId%>"
               >[<%=ctx.files.find(f => f.id===line.editorPos.fileId).name??""%>.asm:<%=line.editorPos.lineNumber%>]</span>
             <%}
-            if (line.memoryPos) {%>
+            if (line.memoryPos && ctx.files.length > 0) {%>
               <span
                 class="clickable-pos"
                 onclick="goToMemoryPosOnClick(this)"

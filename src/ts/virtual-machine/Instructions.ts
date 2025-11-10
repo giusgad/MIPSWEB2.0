@@ -67,7 +67,10 @@ export abstract class Instruction {
         if (n_found_params === 0)
             return this.params.filter((p) => ["SYSCALL", ""].includes(p));
         return this.params.filter(
-            (p) => p.split(",").length === n_found_params,
+            (p) =>
+                p.split(",").length === n_found_params ||
+                // this case allows space between offset and (base)
+                (p === "rt, offset(base)" && n_found_params === 3),
         );
     }
 

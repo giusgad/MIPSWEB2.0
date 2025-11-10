@@ -186,7 +186,6 @@ export async function importZip() {
 }
 
 async function loadProject(zip: any, name: string | undefined) {
-    console.log(zip);
     // delete all current files
     getFiles().forEach((f) => deleteFile(f.id, false));
     // load the new files

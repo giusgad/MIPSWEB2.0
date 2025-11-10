@@ -199,9 +199,17 @@ export class I_Format implements Format {
                 );
             } else if (param === "rt, offset(base)") {
                 rt = cpu.registers.get(tokens[1]);
-                const offsetBaseMatch = (tokens[2] ?? "").match(
-                    /(-?\d*)\((\$\w+)\)/,
-                );
+                // if (
+                //     !offsetBaseMatch &&
+                //     tokens[2].match(/(-?\d*)/) &&
+                //     tokens[3].match(/\((\$\w+)\)/)
+                // )
+                //     tokens[2] = `${tokens[2].trim()}${tokens[3].trim()}`;
+                console.log(tokens.slice(2).join(""));
+                const offsetBaseMatch = tokens
+                    .slice(2)
+                    .join("")
+                    .match(/(-?\d*)\((\$\w+)\)/);
                 if (offsetBaseMatch != null) {
                     const offset = intFromStr(offsetBaseMatch[1]);
                     immediate.set(offset);
