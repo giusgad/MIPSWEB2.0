@@ -26,6 +26,10 @@ const keyboardShortcuts: Shortcut[] = [
         action: (window as any).assembleOnClick,
     },
     {
+        key: "F1",
+        action: () => (window as any).showFormOnClick("help", undefined, false),
+    },
+    {
         key: "F5",
         conditions: () => isStepPossible(),
         action: () => (window as any).stepOnClick(),

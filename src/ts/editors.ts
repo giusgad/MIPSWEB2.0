@@ -208,6 +208,8 @@ export function addEditor(file: file) {
 
     const aceEditor = ace.edit(editorHTMLDivElement);
     aceEditor.commands.removeCommand("find", false);
+    aceEditor.commands.removeCommand("openCommandPallete", false);
+
     if (Colors.isDarkMode()) {
         aceEditor.setTheme(aceEditorDarkTheme);
     } else {
