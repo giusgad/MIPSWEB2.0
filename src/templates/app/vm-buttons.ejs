@@ -2,28 +2,26 @@
     <% if (ctx.interfaceState === "execute") { %>
         <%if ((ctx.vm.nextInstructionEditorPosition !== undefined) && (ctx.editorState === "execute") &&
               (!ctx.vm.cpu.isHalted() || ctx.vm.console.state === "waitingInput")) {%>
-            <div class="button-group">
-              <div class="button default" onclick="stepOnClick();" title="F5/F11">
-                  <div class="icon gray-4"><%-Icons.render('step')%></div>
+            <div id="step-group" class="button-group">
+              <div class="button default" onclick="stepOnClick();" title="Step-into (F5/F11)">
                   <div class="label">Step</div>
+                  <div class="icon gray-4"><%-Icons.render('step')%></div>
               </div>
               <% if (ctx.vm.stepOutStack.length > 0) {%>
-                <div class="button default" onclick="stepOutOnClick();" title="shift+F11">
-                    <div class="label">Out</div>
+                <div class="button default" onclick="stepOutOnClick();" title="Step-out (shift+F11)">
                     <div class="icon gray-4"><%-Icons.render('stepOut')%></div>
                 </div>
               <%}%>
               <% if (ctx.vm.isNextInstructionFunction()) {%>
-                <div class="button default" onclick="stepOverOnClick();" title="F10">
-                    <div class="label">Over</div>
+                <div class="button default" onclick="stepOverOnClick();" title="Step-over (F10)">
                     <div class="icon gray-4"><%-Icons.render('stepOver')%></div>
                 </div>
               <%}%>
             </div>
             <div class="button-group">
               <div class="button default" onclick="runOnClick();" title="ctrl+R/space">
-                  <div class="icon gray-4"><%-ctx.vm.running ? Icons.render('pause') : Icons.render('run')%></div>
                   <div class="label"><%=ctx.vm.running ? "Pause" : "Run" %></div>
+                  <div class="icon gray-4"><%-ctx.vm.running ? Icons.render('pause') : Icons.render('run')%></div>
               </div>
               <div class="button default" onclick="showFormOnClick('execution-speed')">
                   <div class="icon gray-4"><%-Icons.render('dots')%></div>
@@ -31,12 +29,12 @@
             </div>
         <%}%>
         <div class="button default" onclick="stopOnClick();">
-            <div class="icon gray-4"><%-Icons.render('stop')%></div>
             <div class="label">Stop</div>
+            <div class="icon gray-4"><%-Icons.render('stop')%></div>
         </div>
     <% } %>
-    <div class="button default" onclick="assembleOnClick()" title="ctrl+B">
-        <div class="icon gray-4"><%-ctx.interfaceState==="execute" ? Icons.render('rewind') : Icons.render('assemble')%></div>
+    <div id="btn-assemble" class="button default" onclick="assembleOnClick()" title="ctrl+B">
         <div class="label"><%=ctx.interfaceState==="execute" ? "Reset" : "Assemble"%></div>
+        <div class="icon gray-4"><%-ctx.interfaceState==="execute" ? Icons.render('rewind') : Icons.render('assemble')%></div>
     </div>
 </div>

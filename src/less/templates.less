@@ -7,6 +7,21 @@
   transform 0.2s ease-out,
   height 0.2s ease-out;
 
+#vm-buttons {
+  .buttons {
+    width: 40ch;
+    #btn-assemble {
+      flex: 1;
+    }
+    #step-group {
+      width: 12ch;
+      & > * {
+        flex: 1;
+      }
+    }
+  }
+}
+
 #app {
   position: absolute;
   top: 0;
