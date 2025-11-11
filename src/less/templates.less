@@ -30,14 +30,6 @@
   right: 0;
 }
 
-#opened-files {
-  position: absolute;
-  top: @toolbar-h;
-  left: 0;
-  right: 0;
-  height: @toolbar-h;
-}
-
 #editors {
   position: absolute;
   top: calc(@toolbar-h * 2);
@@ -57,7 +49,7 @@
   pointer-events: none;
   #console-container {
     pointer-events: none;
-    #console {
+    & > * {
       pointer-events: auto;
     }
     flex: 1 1 auto;
@@ -65,7 +57,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
   }
   #memory,
   #registers {

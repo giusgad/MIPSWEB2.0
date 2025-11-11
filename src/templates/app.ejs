@@ -10,13 +10,10 @@
   <%}%>
 </div>
 
-<div id="opened-files">
-  <%- await renderTemplate('/app/opened-files.ejs', ctx) %>
-</div>
-
 <% if (ctx.files.length > 0) { %>
   <div id="components-container">
     <div id="console-container">
+      <div id="opened-files"><%-await renderTemplate('/app/opened-files.ejs', ctx) %></div>
       <div id="console" class="<%=ctx.consoleShown ? "console-shown" : ""%> <%=ctx.memoryShown?"memory-shown":""%>">
         <%-await renderTemplate('/app/console.ejs', ctx)%>
       </div>

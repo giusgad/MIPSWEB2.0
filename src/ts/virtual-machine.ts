@@ -13,6 +13,7 @@ import {
     removeClass,
     scrollSelectedInstructionIntoView,
 } from "./utils.js";
+import { adjustEditorsTop } from "./style.js";
 
 export const vm = new VirtualMachine(new CPU());
 export let memoryShown = false;
@@ -24,6 +25,7 @@ export async function setRegistersShown(val: boolean) {
     registersShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("registers-shown", "registers");
+    setTimeout(async () => adjustEditorsTop(), 200);
 }
 
 export async function setMemoryShown(val: boolean) {
@@ -31,10 +33,11 @@ export async function setMemoryShown(val: boolean) {
     memoryShown = val;
     const classAction = val ? addClass : removeClass;
     classAction("memory-shown", "memory");
-    setTimeout(
-        async () => await render("memory", "/app/memory.ejs", undefined, false),
-        200,
-    );
+    adjustEditorsTop();
+    setTimeout(async () => {
+        await render("memory", "/app/memory.ejs", undefined, false);
+        adjustEditorsTop();
+    }, 200);
 }
 
 export async function setConsoleShown(val: boolean) {

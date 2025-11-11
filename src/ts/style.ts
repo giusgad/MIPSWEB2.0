@@ -1,5 +1,8 @@
 import { VirtualMachine } from "./virtual-machine/VirtualMachine";
 
+// NOTE: this needs to be updated manually if the variable is changed in variables.less
+export const toolbarH = 40;
+
 const fontSizeVarName = "--font-size-dyn";
 export function changeFontSize(step: number) {
     document.documentElement.style.setProperty(
@@ -79,6 +82,17 @@ export function adjustBinaryWidth() {
         }
     }
 }
+
+export function adjustEditorsTop() {
+    const tabsContainer = document.querySelector(
+        ".files-tabs",
+    ) as HTMLDivElement;
+    const editors = document.getElementById("editors") as HTMLDivElement;
+    if (!editors || !tabsContainer) return;
+    const tabsHeight = tabsContainer.offsetHeight;
+    editors.style.top = `${toolbarH + tabsHeight}px`;
+}
+window.addEventListener("resize", adjustEditorsTop);
 
 export function highlightElementAnimation(
     elem: HTMLElement | string,

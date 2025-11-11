@@ -5,7 +5,7 @@ import {
     minAddress,
 } from "./intervals.js";
 import { Colors } from "./lib/Colors.js";
-import { highlightElementAnimation } from "./style.js";
+import { highlightElementAnimation, toolbarH } from "./style.js";
 import { debounce } from "./utils.js";
 import { memoryShown } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
@@ -117,7 +117,6 @@ function isElemVerticallyInView(el: HTMLElement): boolean {
     const windowHeight =
         window.innerHeight || document.documentElement.clientHeight;
 
-    const toolbarH = 40;
     const verticallyInView = rect.top < windowHeight && rect.bottom > toolbarH;
 
     return verticallyInView;

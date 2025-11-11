@@ -22,10 +22,9 @@ import { clearMemorySelectedFormats, default_settings } from "./settings.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 import { endDrag } from "./drag.js";
 import { stop } from "./virtual-machine.js";
-import { adjustBinaryWidth } from "./style.js";
+import { adjustBinaryWidth, adjustEditorsTop } from "./style.js";
 import { watchMemoryScroll } from "./memorymap.js";
 import { setGranularTooltips } from "./intervals.js";
-import { scrollOpenedFiles } from "./files.js";
 
 let online = false;
 initLoaders();
@@ -118,8 +117,8 @@ export async function renderApp(
     hideFilePopover();
     scrollSelectedIntoView("files-tabs");
     adjustBinaryWidth();
+    adjustEditorsTop();
     setGranularTooltips();
     endDrag();
-    scrollOpenedFiles();
     if (showLoaders) removeLoader("renderApp");
 }
