@@ -7,6 +7,7 @@ export enum ExecSpeed {
     TwoIps = 3,
     FourIps = 4,
     Instant = 5,
+    InstantPerformance = 6,
 }
 
 /**Gets the execution speed setting and returns the time to wait between instructions in ms*/
@@ -22,13 +23,14 @@ export function getExecutionSpeedTimeOut(): number {
         case ExecSpeed.FourIps:
             return 250;
         case ExecSpeed.Instant:
+        case ExecSpeed.InstantPerformance:
         default:
             return 0;
     }
 }
 
 (window as any).setExecutionSpeed = (val: number) => {
-    if (val >= 1 && val <= 5) {
+    if (val >= 1 && val <= 6) {
         setIntoStorage("local", "executionSpeed", val);
     }
 };
@@ -36,6 +38,13 @@ export function getExecutionSpeedTimeOut(): number {
 (window as any).getExecutionSpeed = (): number => {
     return getFromStorage("local", "executionSpeed");
 };
+
+export function isPerformanceMode() {
+    return (
+        getFromStorage("local", "executionSpeed") ===
+        `${ExecSpeed.InstantPerformance}`
+    );
+}
 
 (window as any).getExecSpeedLabel = (val: string) => {
     const speed = Number(val);
@@ -50,6 +59,8 @@ export function getExecutionSpeedTimeOut(): number {
             return "4 instructions per second";
         case ExecSpeed.Instant:
             return "Instant execution";
+        case ExecSpeed.InstantPerformance:
+            return "Performance mode, UI updates and breakpoints disabled";
         default:
             return "Invalid execution speed";
     }

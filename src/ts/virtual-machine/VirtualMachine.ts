@@ -4,7 +4,10 @@ import { Assembler } from "./Assembler.js";
 import { Console } from "./Console.js";
 import { Binary } from "./Utils.js";
 import { renderApp } from "../app.js";
-import { getExecutionSpeedTimeOut } from "../execution-speed.js";
+import {
+    getExecutionSpeedTimeOut,
+    isPerformanceMode,
+} from "../execution-speed.js";
 import { getOptions, INFINITE_LOOP_TRESHOLD } from "../settings.js";
 import { updateUiAfterStep } from "../virtual-machine.js";
 import { showForm } from "../forms.js";
@@ -19,6 +22,9 @@ export class VirtualMachine {
     nextInstructionEditorPosition:
         | { fileId: number; lineNumber: number }
         | undefined;
+    /**If this flag is true (can be set by the user with execution speed) then skip all operations about UI updates during execution,
+     * leaving only the barebones. This improves performance for complex programs.*/
+    performanceMode: boolean = false;
 
     /**Register that was changed by the last instruction*/
     lastChangedRegister?: string;
@@ -108,30 +114,37 @@ export class VirtualMachine {
                 !this.cpu.isHalted() &&
                 this.nextInstructionEditorPosition !== undefined
             ) {
-                if (this.isNextInstructionFunction()) {
+                if (!this.performanceMode && this.isNextInstructionFunction()) {
                     this.stepOutStack.push(this.cpu.pc.getValue() + 4);
                 }
                 await this.cpu.execute(this);
-                const currPC = this.cpu.pc.getValue();
-                if (currPC === this.stepOutStack[this.stepOutStack.length - 1])
-                    this.stepOutStack.pop();
-                const pcCounter = this.pcCounter.get(currPC);
-                if (pcCounter && pcCounter >= INFINITE_LOOP_TRESHOLD) {
-                    if (getOptions()["detect-infinite-loops"]) {
-                        showForm(
-                            "infinite-loop-popup",
-                            { treshold: INFINITE_LOOP_TRESHOLD },
-                            false,
-                        );
-                        this.pcCounter.clear();
-                        this.pause();
+                if (!this.performanceMode) {
+                    const currPC = this.cpu.pc.getValue();
+                    if (
+                        currPC ===
+                        this.stepOutStack[this.stepOutStack.length - 1]
+                    )
+                        this.stepOutStack.pop();
+                    const pcCounter = this.pcCounter.get(currPC);
+                    if (pcCounter && pcCounter >= INFINITE_LOOP_TRESHOLD) {
+                        if (getOptions()["detect-infinite-loops"]) {
+                            showForm(
+                                "infinite-loop-popup",
+                                { treshold: INFINITE_LOOP_TRESHOLD },
+                                false,
+                            );
+                            this.pcCounter.clear();
+                            this.pause();
+                        }
+                    } else {
+                        this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
                     }
-                } else {
-                    this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
+                    this.updateEditorPosition();
+                    if (
+                        this.assembler.breakpointPCs.has(this.cpu.pc.getValue())
+                    )
+                        this.pause();
                 }
-                this.updateEditorPosition();
-                if (this.assembler.breakpointPCs.has(this.cpu.pc.getValue()))
-                    this.pause();
             } else {
                 this.pause();
             }
@@ -167,6 +180,8 @@ export class VirtualMachine {
     async run() {
         this.running = true;
         const timeout = getExecutionSpeedTimeOut();
+        this.performanceMode = isPerformanceMode();
+
         while (this.running && !this.cpu.isHalted()) {
             await this.step();
             if (timeout > 0) {

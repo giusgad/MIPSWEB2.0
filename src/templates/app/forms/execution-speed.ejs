@@ -1,5 +1,5 @@
 <form class="form">
-  <div class="text">Edit execution speed</div>
+  <div class="text">Execution speed</div>
   <%
     window.updateLabel = (val) => {
       const text = getExecSpeedLabel(val);
@@ -11,7 +11,7 @@
     <label id="exec-speed-label" for="exec-speed" style="text-align:center; width:30ch">
       <%=getExecSpeedLabel(execSpeed)%>
     </label>
-    <input type="range" min="1" max="5" step="1" value="<%=execSpeed%>" id="exec-speed"
+    <input type="range" min="1" max="6" step="1" value="<%=execSpeed%>" id="exec-speed"
     onchange="setExecutionSpeed(this.value);" oninput="updateLabel(this.value);">
   </div>
   <div class="buttons">

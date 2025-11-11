@@ -134,8 +134,10 @@ export class CPU {
             const decodedInstruction = this.decode(instructionCode);
             if (decodedInstruction) {
                 const instruction = decodedInstruction.instruction;
+                let oldRegisters: Registers | null = null;
                 if (instruction) {
-                    const oldRegisters = this.registers.copy();
+                    if (!vm.performanceMode)
+                        oldRegisters = this.registers.copy();
 
                     await instruction.execute(
                         this,
@@ -143,32 +145,40 @@ export class CPU {
                         vm,
                     );
 
-                    // update vm's values for operation visualization (read/written registers and memory)
-                    let changedRegister: string | undefined = undefined;
-                    for (let i = 0; i < this.registers.registers.length; i++) {
-                        if (
-                            !this.registers.registers[i].binary.equals(
-                                oldRegisters.registers[i].binary,
-                            )
-                        ) {
-                            changedRegister = this.registers.registers[i].name;
-                            break;
-                        }
+                    if (!vm.performanceMode) {
+                        // update vm's values for operation visualization (read/written registers and memory)
+                        let changedRegister: string | undefined = undefined;
+                        if (oldRegisters)
+                            for (
+                                let i = 0;
+                                i < this.registers.registers.length;
+                                i++
+                            ) {
+                                if (
+                                    !this.registers.registers[i].binary.equals(
+                                        oldRegisters.registers[i].binary,
+                                    )
+                                ) {
+                                    changedRegister =
+                                        this.registers.registers[i].name;
+                                    break;
+                                }
+                            }
+                        const registers = this.getRegisters();
+                        vm.lastChangedRegister = changedRegister;
+                        vm.lastReadRegisters = instruction.getReadRegisters(
+                            decodedInstruction.params,
+                            registers,
+                        );
+                        vm.lastReadMem = instruction.getReadMem(
+                            decodedInstruction.params,
+                            registers,
+                        );
+                        vm.lastWrittenMem = instruction.getWrittenMem(
+                            decodedInstruction.params,
+                            registers,
+                        );
                     }
-                    const registers = this.getRegisters();
-                    vm.lastChangedRegister = changedRegister;
-                    vm.lastReadRegisters = instruction.getReadRegisters(
-                        decodedInstruction.params,
-                        registers,
-                    );
-                    vm.lastReadMem = instruction.getReadMem(
-                        decodedInstruction.params,
-                        registers,
-                    );
-                    vm.lastWrittenMem = instruction.getWrittenMem(
-                        decodedInstruction.params,
-                        registers,
-                    );
                 }
             }
         } else {
