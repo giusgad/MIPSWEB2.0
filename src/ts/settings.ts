@@ -2,7 +2,7 @@ import { getFromStorage, setIntoStorage } from "./utils.js";
 import { Colors } from "./lib/Colors.js";
 import { updateEditorsTheme } from "./editors.js";
 import { renderApp } from "./app.js";
-import { hideForm } from "./forms.js";
+import { hideForm, showToast } from "./forms.js";
 import { render } from "./rendering.js";
 import { importPublicZip } from "./files.js";
 import { confirmClearProject } from "./buttons.js";
@@ -31,6 +31,7 @@ window.addEventListener("load", async () => {
             window.location.pathname +
             (params.toString() ? "?" + params.toString() : "");
         history.replaceState(null, "", newUrl);
+        showToast("Options updated from URL", 4000);
     }
     const projectPath = params.get("project");
     if (projectPath) {

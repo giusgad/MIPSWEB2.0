@@ -3,6 +3,7 @@ import { renderApp } from "./app.js";
 import { getFromStorage, setIntoStorage } from "./utils.js";
 import { setConsoleShown } from "./virtual-machine.js";
 import { confirmClearProject } from "./buttons.js";
+import { showToast } from "./forms.js";
 
 declare const JSZip: any;
 const defaultProjectName = "MIPS_project";
@@ -362,15 +363,16 @@ export async function handleFileDrop(ev: DragEvent) {
         if (!confirmClearProject()) return;
         const zip = new JSZip();
         const zipContent = await zip.loadAsync(files[0]);
-        await loadProject(zipContent, files[0].name.slice(-4));
+        await loadProject(zipContent, files[0].name);
     } else if (files.every((f) => f.name.endsWith(".asm"))) {
         for (const file of files) {
             await importFile(file);
         }
         await renderApp("edit", "edit");
     } else {
-        alert(
-            "Can only load a single zip file (a project) or import a series of .asm files",
+        showToast(
+            "Can only load a single zip file (a project) or import one or more `.asm` files",
+            5000,
         );
     }
 }
