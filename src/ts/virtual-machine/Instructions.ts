@@ -3102,7 +3102,7 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    let skipLabel = "L1";
+                    let skipLabel = "@1";
                     while (labels.has(skipLabel)) {
                         let n = Math.floor(Math.random() * 10);
                         skipLabel = `${skipLabel}${n}`;

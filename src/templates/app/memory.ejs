@@ -90,7 +90,8 @@
                   <%if (cell.tags.length > 0) {%>
                   <div class="static-tags">
                     <%cell.tags.forEach((tag) => {%>
-                    <%if (['section', 'label'].includes(tag.type)) {%>
+                    <% // labels that start with @ are not allowed for the user, but are used in pseudoinstruction expansions and have to be hidden
+                    if (['section', 'label'].includes(tag.type) && !(tag.type==="label" && tag.name.startsWith("@"))) {%>
                     <div class="tag <%=tag.type%>"><%=tag.name%></div>
                     <%}%>
                     <%});%>
