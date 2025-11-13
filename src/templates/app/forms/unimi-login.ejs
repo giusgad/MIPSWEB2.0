@@ -1,0 +1,24 @@
+<form class="form unimi-login">
+    <div class="text">Login with your unimi credentials</div>
+    <div class="input">
+        <label for="username">Username</label>
+        <div class="email-input">
+          <input type="text" id="username" name="username" placeholder="nome.cognome"></input>
+          <span class="domain">@studenti.unimi.it</span>
+        </div>
+    </div>
+    <div class="input">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"></input>
+    </div>
+    <div class="buttons">
+        <div id="cancelBtn" class="button default">
+            <div class="icon gray-4"><%-Icons.render('x')%></div>
+            <div class="label">Cancel</div>
+        </div>
+        <div id="loginBtn" class="button default">
+            <div class="icon gray-4"><%-Icons.render('user')%></div>
+            <div class="label">Login</div>
+        </div>
+    </div>
+</form>

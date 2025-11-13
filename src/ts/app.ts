@@ -13,6 +13,7 @@ import "./intervals.js";
 import "./execution-speed.js";
 import "./shortcuts.js";
 import "./help.js";
+import "./unimi.js";
 import {
     getFromStorage,
     scrollSelectedIntoView,
