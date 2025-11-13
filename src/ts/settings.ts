@@ -6,6 +6,7 @@ import { hideForm, showToast } from "./forms.js";
 import { render } from "./rendering.js";
 import { importPublicZip } from "./files.js";
 import { confirmClearProject } from "./buttons.js";
+import { vm } from "./virtual-machine.js";
 
 /**How many iterations are to be considered an infinite loop*/
 export const INFINITE_LOOP_TRESHOLD = 10_000;
@@ -295,8 +296,15 @@ export async function colFormatSelect(
     setIntoStorage("local", "settings", settings);
     if (element.id.startsWith("memory"))
         await render("memory", "/app/memory.ejs", undefined, false);
-    if (element.id.startsWith("register"))
+    if (element.id.startsWith("register")) {
+        if (element.id === "registers-name-format") {
+            // need to update the assembly format in the deassembled memory
+            // since it's cached, the cache needs to be cleared (minor performance loss on play if it was mid execution)
+            vm.cpu.decodingCache.clear();
+            await render("memory", "/app/memory.ejs", undefined, false);
+        }
         await render("registers", "/app/registers.ejs", undefined, false);
+    }
 }
 
 export async function updateMemoryAddrFormat(value: string) {

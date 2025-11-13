@@ -83,7 +83,7 @@
                 <%=ctx.selectedInstructionAddresses.includes(cell.address) &&
                    (ctx.editorState === "execute") && (ctx.interfaceState === 'execute')
                    ? "selected-instruction" : "" %>
-                <%=cell.userDefined ? "userDefined" : ""%>"
+                   <%=cell.tags.find(t => t.type==="pc") ? "curr-pc" : ""%>"
                 id="<%=cell.address%>"
               >
                 <div class="col tags">

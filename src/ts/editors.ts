@@ -51,6 +51,15 @@ export function getSelectedInstructionAddresses() {
     return selectedInstructionAddresses;
 }
 
+function clearNextInstructionMarkers(editor: AceAjax.Editor) {
+    let markers = editor.session.getMarkers(false);
+    for (let i in markers) {
+        if (markers[i].clazz === "next-instruction") {
+            editor.session.removeMarker(markers[i].id);
+        }
+    }
+}
+
 export function renderEditors() {
     resizeEditors();
     const aceEditor = getAceEditor();
@@ -69,12 +78,7 @@ export function renderEditors() {
                 (cursors[i] as HTMLElement).style.display = "block";
             }
 
-            let markers = aceEditor.session.getMarkers(false);
-            for (let i in markers) {
-                if (markers[i].clazz === "next-instruction") {
-                    aceEditor.session.removeMarker(markers[i].id);
-                }
-            }
+            clearNextInstructionMarkers(aceEditor);
             aceEditor.focus();
         } else if (editorState === "execute") {
             aceEditor.setOptions({
@@ -115,6 +119,7 @@ export function selectNextInstruction() {
                             nextInstructionLine - 1,
                             Infinity,
                         );
+                    clearNextInstructionMarkers(aceEditor);
                     aceEditor.session.addMarker(
                         range,
                         "next-instruction",

@@ -56,8 +56,8 @@ export async function assemble(files: file[]) {
         vm.assemble(files);
         if (vm.nextInstructionEditorPosition) {
             await changeFile(vm.nextInstructionEditorPosition.fileId);
-            selectNextInstruction();
             moveCursorToNextInstruction();
+            selectNextInstruction();
         }
         await renderApp("execute", "execute");
     } catch (error) {
@@ -77,8 +77,8 @@ export async function updateUiAfterStep(updateButtons: boolean = false) {
     }
     if (vm.nextInstructionEditorPosition) {
         await changeFile(vm.nextInstructionEditorPosition.fileId);
-        selectNextInstruction();
         moveCursorToNextInstruction();
+        selectNextInstruction();
     }
     if (memoryShown)
         await render("memory", "/app/memory.ejs", undefined, false);
@@ -94,6 +94,7 @@ export async function run() {
     await vm.run();
     await renderApp();
     moveCursorToNextInstruction();
+    selectNextInstruction();
     scrollSelectedInstructionIntoView();
 }
 

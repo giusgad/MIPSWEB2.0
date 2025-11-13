@@ -299,7 +299,6 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
     const elem = document.getElementById(addr);
     if (!elem) return;
     highlightElementAnimation(`${addr}`, true);
-    elem.classList.add("error");
 };
 
 (window as any).closeFileOnClick = async function (

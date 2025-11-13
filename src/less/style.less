@@ -724,12 +724,7 @@ input {
             &.highlighted::after {
               opacity: 1;
             }
-            &.error::before {
-              .after-whiteout();
-              z-index: 10;
-              opacity: 1;
-              background-color: var(--rgba-red-20) !important;
-            }
+            // cell is part of the current instruction (used for pseudos)
             &.selected-instruction {
               .col {
                 &.address {
@@ -737,6 +732,17 @@ input {
                 }
                 &.value {
                   background-color: var(--rgb-gray-8);
+                }
+              }
+            }
+            // current pc is on the line
+            &.curr-pc {
+              .col {
+                &.address {
+                  background-color: var(--rgba-blue-20) !important;
+                }
+                &.value {
+                  background-color: var(--rgba-blue-30) !important;
                 }
               }
             }

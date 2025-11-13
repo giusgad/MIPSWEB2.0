@@ -191,6 +191,7 @@ export class VirtualMachine {
                 await new Promise((resolve) => setTimeout(resolve, timeout));
             }
         }
+        updateUiAfterStep();
     }
 
     pause() {

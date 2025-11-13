@@ -198,6 +198,7 @@ export class CPU {
         this.lo.set(0);
         this.hi.set(0);
         this.halted = false;
+        this.decodingCache.clear();
     }
 
     resume(): void {

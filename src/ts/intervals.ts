@@ -9,7 +9,6 @@ interface cell {
     address: number;
     binary: Binary;
     tags: { name: string; type: string }[];
-    userDefined?: boolean;
 }
 
 interface interval {
@@ -77,7 +76,6 @@ function mergeIntervals(
             address: addr,
             binary: memory.loadWord(new Binary(addr)),
             tags: [],
-            userDefined: true,
         };
     };
 
