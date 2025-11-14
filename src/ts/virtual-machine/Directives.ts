@@ -1,6 +1,6 @@
 import { Binary } from "./Utils.js";
 import { Assembler } from "./Assembler";
-import { intFromStr } from "../utils.js";
+import { intFromStr, parseInlineLiteral } from "../utils.js";
 import { getOptions } from "../settings.js";
 
 export abstract class Directive {
@@ -191,17 +191,8 @@ export class wordDirective extends Directive {
     ) {
         tokens.forEach((token) => {
             let value: Binary = new Binary(0, 32);
-            if (!isNaN(Number(token))) {
-                const num = Number(token);
-                value.set(num, num <= 2147483647);
-            } else if (
-                (token.startsWith('"') && token.endsWith('"')) ||
-                (token.startsWith("'") && token.endsWith("'"))
-            ) {
-                value.set(token.slice(1, -1).charCodeAt(0));
-            } else {
-                throw new Error(`Invalid token for .word directive: ${token}`);
-            }
+            const num = parseInlineLiteral(token);
+            value.set(num, num <= 2147483647);
             if (address.getValue() % 4 !== 0) {
                 address.set(
                     address.getValue() + (4 - (address.getValue() % 4)),
@@ -345,19 +336,8 @@ export class byteDirective extends Directive {
     ) {
         tokens.forEach((token) => {
             let value: Binary = new Binary(0, 8);
-            if (!isNaN(Number(token))) {
-                const num = Number(token);
-                value.set(num, num < 128);
-            } else if (
-                (token.startsWith('"') && token.endsWith('"')) ||
-                (token.startsWith("'") && token.endsWith("'"))
-            ) {
-                value.set(token.slice(1, -1).charCodeAt(0));
-            } else {
-                console.error(
-                    `Token non valido nella direttiva .byte: ${token}`,
-                );
-            }
+            const val = parseInlineLiteral(token);
+            value.set(val);
             assembler.cpu.storeByte(address, value);
             address.set(address.getValue() + 1);
         });
@@ -398,22 +378,8 @@ export class halfDirective extends Directive {
     ) {
         tokens.forEach((token) => {
             let value: Binary = new Binary(0, 16);
-            if (!isNaN(Number(token))) {
-                const num = Number(token);
-                value.set(num, num < 2 ** 15);
-            } else if (
-                (token.startsWith('"') && token.endsWith('"')) ||
-                (token.startsWith("'") && token.endsWith("'"))
-            ) {
-                const first = token.slice(1, -1).charCodeAt(0) || 0;
-                const second = token.slice(1, -1).charCodeAt(1) || 0;
-                value.setBits(new Binary(first, 8), 7, 0);
-                value.setBits(new Binary(second, 8), 15, 8);
-            } else {
-                console.error(
-                    `Token non valido nella direttiva .byte: ${token}`,
-                );
-            }
+            const num = parseInlineLiteral(token);
+            value.set(num, num < 2 ** 15);
             assembler.cpu.memory.storeHalf(address, value);
             address.set(address.getValue() + 2);
         });

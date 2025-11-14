@@ -1,3 +1,5 @@
+import { asciiTable } from "../utils.js";
+
 export class Utils {
     static toHex(value: number, bits: number = 32): string {
         const hex = (value >>> 0)
@@ -32,15 +34,10 @@ export class Utils {
 
         for (let i = bits - 8; i >= 0; i -= 8) {
             const byte = (value >> i) & 0xff;
-            let char;
-            if (byte === 0) {
-                //TODO: caratteri speciali
-                char = "\\0";
+            if (byte < 128) {
+                ascii.push(asciiTable[byte]);
             } else {
-                char = String.fromCharCode(byte);
-            }
-            if (char) {
-                ascii.push(char);
+                ascii.push("�");
             }
         }
 

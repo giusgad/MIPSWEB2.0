@@ -1,5 +1,4 @@
 import { hideForm, showForm } from "./forms.js";
-import { getOptions } from "./settings.js";
 import { getFromStorage, setIntoStorage } from "./utils.js";
 import { vm } from "./virtual-machine.js";
 import { ParamsFormat } from "./virtual-machine/Instructions.js";

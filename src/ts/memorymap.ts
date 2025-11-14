@@ -7,7 +7,7 @@ import {
 import { Colors } from "./lib/Colors.js";
 import { highlightElementAnimation, toolbarH } from "./style.js";
 import { debounce } from "./utils.js";
-import { memoryShown } from "./virtual-machine.js";
+import { memoryShown, vm } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
 
 type CanvasInterval = { intervalId: number; startY: number; endY: number };
@@ -206,7 +206,8 @@ export function drawMemoryMap() {
         let addr = interval
             ? interval.intervalId
             : Math.round(ev.offsetY / pixelsPerByte) + minAddress;
-        const newTitle = `0x${new Binary(addr).getHex()}`;
+        const addrBin = new Binary(addr);
+        const newTitle = `Address: 0x${addrBin.getHex()}\nValue 0x${vm.cpu.memory.loadWord(addrBin).getHex()}`;
         if (newTitle !== canvasElem.title) {
             canvasElem.title = newTitle;
         }

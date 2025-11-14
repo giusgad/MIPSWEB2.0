@@ -16,11 +16,12 @@ export function parseInlineLiteral(str: string): number {
         str = str.slice(1);
     } else if (str.startsWith("+")) {
         str = str.slice(1);
+    } else if (str.startsWith("'")) {
+        let char = getCharCode(str);
+        if (char) return char;
     }
     let num = Number(str);
     if (str === "" || isNaN(num)) {
-        let char = getCharCode(str);
-        if (char) return char;
         throw new Error(`Invalid literal: "${str}" is not a literal.`);
     }
     if (negative) num = -1 * num;
@@ -29,31 +30,29 @@ export function parseInlineLiteral(str: string): number {
 
 function getCharCode(str: string): number | null {
     // single-quoted character literal
-    const match = str.match(/^'(?:\\[nrtbfv0'"\\]|[^'\\])'$/);
+    const match = str.match(/^'(?:\\[nrtbfdv0'"\\]|[^'\\])'$/);
     if (!match) return null;
 
     const inner = str.slice(1, -1);
     const escapeMap = {
-        n: "\n",
-        r: "\r",
-        t: "\t",
-        b: "\b",
-        f: "\f",
-        v: "\v",
-        "0": "\0",
-        "'": "'",
-        '"': '"',
-        "\\": "\\",
+        n: 10,
+        r: 13,
+        t: 9,
+        b: 8,
+        f: 12,
+        v: 11,
+        d: 127,
+        "0": 0,
+        "'": 39,
+        '"': 34,
+        "\\": 92,
     };
 
-    let char: string;
     if (inner.startsWith("\\")) {
-        char = escapeMap[inner[1] as keyof typeof escapeMap];
+        return escapeMap[inner[1] as keyof typeof escapeMap];
     } else {
-        char = inner;
+        return inner.charCodeAt(0);
     }
-
-    return char ? char.charCodeAt(0) : null;
 }
 
 export function getFromStorage(storage: "local" | "session", key: string): any {
@@ -146,3 +145,28 @@ export function debounce(fn: Function, delay: number) {
         timeoutId = window.setTimeout(() => fn.apply(args), delay);
     };
 }
+
+export const asciiTable: string[] = [];
+const special: any = {
+    0: "\\0",
+    8: "\\b",
+    9: "\\t",
+    10: "\\n",
+    11: "\\v",
+    12: "\\f",
+    13: "\\r",
+    127: "\\d",
+};
+for (let i = 0; i < 128; i++) {
+    if (special[i]) {
+        asciiTable[i] = special[i];
+    } else {
+        const ch = String.fromCharCode(i);
+        if (i >= 32 && i <= 126) {
+            asciiTable[i] = ch;
+        } else {
+            asciiTable[i] = `\\${i}`;
+        }
+    }
+}
+(window as any).asciiTable = asciiTable;
