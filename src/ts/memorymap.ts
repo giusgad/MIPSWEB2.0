@@ -206,6 +206,7 @@ export function drawMemoryMap() {
         let addr = interval
             ? interval.intervalId
             : Math.round(ev.offsetY / pixelsPerByte) + minAddress;
+        if (addr % 4 !== 0) addr = addr + 4 - (addr % 4);
         const addrBin = new Binary(addr);
         const newTitle = `Address: 0x${addrBin.getHex()}\nValue 0x${vm.cpu.memory.loadWord(addrBin).getHex()}`;
         if (newTitle !== canvasElem.title) {
@@ -213,8 +214,8 @@ export function drawMemoryMap() {
         }
     });
     window.addEventListener("resize", () => {
-        debounce(drawMemoryMap, 100);
-        debounce(drawMemoryMapConnections, 100);
+        debounce(drawMemoryMap, 200)();
+        debounce(drawMemoryMapConnections, 200)();
     });
 }
 
