@@ -208,9 +208,9 @@ export const possibleOptions = [
             },
             {
                 name: "detect-infinite-loops",
-                desc: "Infinite loop detection",
+                desc: "Pause long executions",
                 flag: "L",
-                help: `Disable this if you know your program will run very long loops that aren't infinite, otherwise loops with more than ${INFINITE_LOOP_TRESHOLD} iterations are automatically stopped.`,
+                help: `If active execution will pause after encountering the same Program Counter ${INFINITE_LOOP_TRESHOLD} times. Disable if your program runs very long loops, otherwise leave enabled as the browser tries to kill the website if it runs for too long`,
                 defaultValue: true,
                 inputType: "checkbox",
             },

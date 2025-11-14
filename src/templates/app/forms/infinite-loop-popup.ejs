@@ -1,5 +1,5 @@
 <div class="form">
-    <div class="text">Infinite loop detected after <%=ctx.treshold%> iterations.</div>
+    <div class="text">The program passed by the same Program Counter <%=ctx.treshold%> times.</div>
     <div class="buttons">
         <div class="button default" onclick="hideFormOnClick();">
             <div class="icon gray-4"><%-Icons.render('pause')%></div>
@@ -7,7 +7,7 @@
         </div>
         <div class="button default" onclick="hideFormOnClick();runOnClick();">
             <div class="icon gray-4"><%-Icons.render('step')%></div>
-            <div class="label">Run for <%=ctx.treshold%> more iterations</div>
+            <div class="label">Run for <%=ctx.treshold%> more times</div>
         </div>
         <div class="button default" onclick="hideFormOnClick();disableLoopDetectionOnClick();runOnClick();">
             <div class="icon gray-4"><%-Icons.render('run')%></div>
