@@ -34,6 +34,7 @@ export class Utils {
             const byte = (value >> i) & 0xff;
             let char;
             if (byte === 0) {
+                //TODO: caratteri speciali
                 char = "\\0";
             } else {
                 char = String.fromCharCode(byte);

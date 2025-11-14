@@ -1,6 +1,22 @@
+import { hideForm, showForm } from "./forms.js";
 import { getOptions } from "./settings.js";
+import { getFromStorage, setIntoStorage } from "./utils.js";
 import { vm } from "./virtual-machine.js";
 import { ParamsFormat } from "./virtual-machine/Instructions.js";
+
+(window as any).getActiveHelpTab = function (): number {
+    const item = getFromStorage("session", "help-tab-index");
+    if (!item) return 0;
+    const num = Number(item);
+    if (!isNaN(num)) return num;
+    sessionStorage.removeItem("help-tab-index");
+    return 0;
+};
+(window as any).sectionTitleOnClick = async function (i: number) {
+    setIntoStorage("session", "help-tab-index", i);
+    await hideForm();
+    await showForm("help", undefined, false);
+};
 
 type InstructionHelp = {
     symbol: string;
@@ -53,6 +69,7 @@ function mapParams(params: string[]): string[] {
             .join(", "),
     );
 }
+
 function mapDesc(desc: string): string {
     let res = `${desc}`;
     for (const [key, replacement] of paramMap) {

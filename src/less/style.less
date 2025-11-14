@@ -325,16 +325,37 @@ input {
   width: 75%;
   height: 60%;
   padding: 1em;
-  .content {
-    .section-title {
-      padding: 50px 10px 10px 10px;
-      &:first-of-type {
-        padding-top: 0;
-      }
+  .title-container {
+    display: flex;
+    gap: 3px;
+    span {
       font-size: calc(@font-size-big + 5px);
-      font-weight: bold;
     }
+    .section-title {
+      transition: opacity 0.3s;
+      opacity: 0.5;
+      &:hover {
+        cursor: pointer;
+        opacity: 1;
+      }
+      &.active {
+        opacity: 1;
+        font-weight: bold;
+      }
+    }
+  }
+  .content {
+    height: 100%;
     overflow-y: scroll;
+    span {
+      &.WIP {
+        font-weight: bold;
+        color: var(--rgba-red-80);
+      }
+      &.name {
+        font-style: italic;
+      }
+    }
     .table {
       .cols-names {
         font-weight: bold;
