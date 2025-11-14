@@ -29,7 +29,7 @@ type SyscallHelp = {
     description: string;
 };
 
-const paramMap: Map<string, string> = new Map([
+export const paramExampleMap: Map<string, string> = new Map([
     ["rd", "$s0"],
     ["rt", "$s1"],
     ["rs", "$s2"],
@@ -41,7 +41,9 @@ const paramMap: Map<string, string> = new Map([
     ["offset(base)", "4($s2)"],
     ["SYSCALL", ""],
 ]);
-function mapParams(params: string[]): string[] {
+
+/**Substitues rt, rs etc. with example registers like $s0 $s1 and things like "imm" with an example number like 1000, consistently with mapHelpToExamples*/
+export function mapParamsToExamples(params: string[]): string[] {
     const preprocessor = vm.assembler.preprocessor;
     // preprocessor params that need to be added here to be shown in the help
     const extra: string[] = [];
@@ -64,14 +66,15 @@ function mapParams(params: string[]): string[] {
     return [...params, ...extra].map((param) =>
         param
             .split(", ")
-            .map((p) => paramMap.get(p) ?? p)
+            .map((p) => paramExampleMap.get(p) ?? p)
             .join(", "),
     );
 }
 
-function mapDesc(desc: string): string {
+/**Substitues rt, rs etc. with example registers like $s0 $s1 and things like "imm" with an example number like 1000, consistently with mapParamsToExamples*/
+export function mapHelpToExamples(desc: string): string {
     let res = `${desc}`;
-    for (const [key, replacement] of paramMap) {
+    for (const [key, replacement] of paramExampleMap) {
         // needed to avoid replacing in words like part (rt) or integers (rs)
         // Match key when only when its preceded/followed by , ; ( ) or whitespace
         const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -92,8 +95,8 @@ function mapDesc(desc: string): string {
             res.push({
                 symbol: instr.symbol.toLowerCase(),
                 longName: help.longName,
-                params: mapParams(instr.params),
-                description: mapDesc(help.desc),
+                params: mapParamsToExamples(instr.params),
+                description: mapHelpToExamples(help.desc),
             });
     });
     res.sort((a, b) => a.symbol.localeCompare(b.symbol));
@@ -108,8 +111,8 @@ function mapDesc(desc: string): string {
             res.push({
                 symbol: instr.symbol.toLowerCase(),
                 longName: help.longName,
-                params: mapParams([instr.params.join(", ")]),
-                description: mapDesc(help.desc),
+                params: mapParamsToExamples([instr.params.join(", ")]),
+                description: mapHelpToExamples(help.desc),
             });
     });
     res.sort((a, b) => a.symbol.localeCompare(b.symbol));

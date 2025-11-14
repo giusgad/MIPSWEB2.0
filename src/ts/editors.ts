@@ -14,8 +14,9 @@ import {
     pauseEditorUpdates,
     renderApp,
 } from "./app.js";
-import { vm } from "./virtual-machine.js";
 import { getCurrentFontSize } from "./style.js";
+import { vm } from "./virtual-machine.js";
+import { MipsCompleter } from "./lib/Autocompletion.js";
 
 export type editor = {
     fileId: number;
@@ -67,11 +68,13 @@ export function renderEditors() {
         const cursors = document.getElementsByClassName("ace_cursor-layer");
         aceEditor.setFontSize(`${getCurrentFontSize()}px`);
         if (editorState === "edit") {
+            ace.require("ace/ext/language_tools");
             aceEditor.setOptions({
                 readOnly: false,
                 highlightActiveLine: true,
                 scrollPastEnd: 0.5,
                 printMarginColumn: -1,
+                enableLiveAutocompletion: [MipsCompleter],
             });
 
             for (let i = 0; i < cursors.length; i++) {
