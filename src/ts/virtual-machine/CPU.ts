@@ -144,6 +144,7 @@ export class CPU {
                         decodedInstruction.params,
                         vm,
                     );
+                    this.registers.registers[0].binary.set(0);
 
                     if (!vm.performanceMode) {
                         // update vm's values for operation visualization (read/written registers and memory)

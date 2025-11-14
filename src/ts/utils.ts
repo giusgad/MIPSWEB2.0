@@ -117,9 +117,7 @@ export function scrollSelectedIntoView(scrollableElementId: string) {
 }
 
 export function scrollSelectedInstructionIntoView() {
-    const elem = document
-        .getElementsByClassName("selected-instruction")
-        .item(0);
+    const elem = document.getElementsByClassName("curr-pc").item(0);
     if (!elem) return;
     elem.scrollIntoView({ behavior: "instant", block: "center" });
 }

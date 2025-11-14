@@ -1,6 +1,11 @@
 import { renderApp } from "./app.js";
 import { render } from "./rendering.js";
-import { consoleShown, setConsoleShown, vm } from "./virtual-machine.js";
+import {
+    consoleShown,
+    setConsoleShown,
+    updateUiAfterStep,
+    vm,
+} from "./virtual-machine.js";
 
 document.addEventListener("input", (event) => {
     const target = event.target as HTMLTextAreaElement;
@@ -28,6 +33,7 @@ export function watchingConsole() {
                 event.preventDefault();
                 const target = event.target as HTMLTextAreaElement;
                 await vm.console.setInput(target.value);
+                await updateUiAfterStep();
                 await renderApp(undefined, undefined, false);
             }
             await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);

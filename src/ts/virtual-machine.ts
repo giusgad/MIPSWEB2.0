@@ -93,8 +93,6 @@ export async function updateUiAfterStep(updateButtons: boolean = false) {
 export async function run() {
     await vm.run();
     await renderApp();
-    moveCursorToNextInstruction();
-    selectNextInstruction();
     scrollSelectedInstructionIntoView();
 }
 
