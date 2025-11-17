@@ -7,6 +7,7 @@ import { render } from "./rendering.js";
 import { importPublicZip } from "./files.js";
 import { confirmClearProject } from "./buttons.js";
 import { vm } from "./virtual-machine.js";
+import { Memory } from "./virtual-machine/Memory.js";
 
 /**How many iterations are to be considered an infinite loop*/
 export const INFINITE_LOOP_TRESHOLD = 10_000;
@@ -154,6 +155,8 @@ export function updateOpts(newOpts: OptionsObject) {
     }
     settings.options = { ...oldOpts, ...newOpts };
     setIntoStorage("local", "settings", settings);
+    // need to call this since endianness is set on memory construction
+    vm.cpu.memory = new Memory();
 }
 
 export const possibleOptions = [
@@ -185,6 +188,17 @@ export const possibleOptions = [
                 dropdownOptions: [
                     { value: "all", desc: "All project files" },
                     { value: "current", desc: "Currently open file" },
+                ],
+            },
+            {
+                name: "endianness",
+                desc: "Endianness",
+                flag: "E",
+                defaultValue: "big",
+                inputType: "dropdown",
+                dropdownOptions: [
+                    { value: "big", desc: "Big endian" },
+                    { value: "little", desc: "Little endian" },
                 ],
             },
         ],
@@ -346,9 +360,8 @@ export function getOptionsFromForm(formData: FormData): OptionsObject {
 (window as any).saveSettings = async function (event: SubmitEvent) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const settings = getFromStorage("local", "settings");
-    settings.options = getOptionsFromForm(formData);
-    setIntoStorage("local", "settings", settings);
+    const newOpts = getOptionsFromForm(formData);
+    updateOpts(newOpts);
     await hideForm();
     await renderApp();
 };

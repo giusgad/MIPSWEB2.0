@@ -1,3 +1,4 @@
+import { getOptions } from "../settings.js";
 import { Binary } from "./Utils.js";
 
 enum Alignment {
@@ -45,8 +46,17 @@ function getNumericAddress(
 }
 
 export class Memory {
+    constructor() {
+        this.bigEndian = getOptions()["endianness"] === "big";
+    }
+
+    private bigEndian: boolean;
     private heapPointer = 0x10040000;
     private memory: Map<number, Binary> = new Map<number, Binary>();
+
+    private byteBitPosition(byteOffset: number): number {
+        return this.bigEndian ? (3 - byteOffset) * 8 : byteOffset * 8;
+    }
 
     /**Inits the heap pointer to 0x10040000 or after the static data end if it exceeds 0x10040000*/
     initHeapPointer(staticDataEnd: number) {
@@ -90,7 +100,7 @@ export class Memory {
         const wordAlignedAddress = new Binary(alignedAddress);
         let word: Binary = this.loadWord(wordAlignedAddress);
 
-        const bitPosition = byteOffset * 8;
+        const bitPosition = this.byteBitPosition(byteOffset);
 
         word.setBits(value, bitPosition + 7, bitPosition);
 
@@ -104,7 +114,7 @@ export class Memory {
         const wordAlignedAddress = new Binary(alignedAddress);
         let word: Binary = this.loadWord(wordAlignedAddress, false);
 
-        const bitPosition = byteOffset * 8;
+        const bitPosition = this.byteBitPosition(byteOffset);
 
         return word.getBits(bitPosition + 7, bitPosition, true);
     }
@@ -117,7 +127,7 @@ export class Memory {
         const wordAlignedAddress = new Binary(alignedAddress);
         let word: Binary = this.loadWord(wordAlignedAddress);
 
-        const bitPosition = byteOffset * 8; // 0 or 16
+        const bitPosition = this.byteBitPosition(byteOffset); // 0 or 16
 
         return word.getBits(bitPosition + 15, bitPosition, true);
     }
@@ -129,7 +139,7 @@ export class Memory {
         const wordAlignedAddress = new Binary(alignedAddress);
         let word: Binary = this.loadWord(wordAlignedAddress);
 
-        const bitPosition = byteOffset * 8; // 0 or 16
+        const bitPosition = this.byteBitPosition(byteOffset); // 0 or 16
 
         word.setBits(value, bitPosition + 15, bitPosition);
 
