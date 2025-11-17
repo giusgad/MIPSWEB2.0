@@ -1,6 +1,6 @@
 <div class="form help">
   <%const helps = [
-    {title: "Editor", content: null, kind: "editorInfo"},
+    {title: "About", content: null, kind: "editorInfo"},
     {title: "Instructions", content: getInstructionsHelp(), kind: "instr"},
     {title: "Pseudoinstructions", content: getPseudoInstructionsHelp(), kind: "instr"},
     {title: "Syscalls", content: getSyscallHelp(), kind: "syscalls"},
@@ -23,9 +23,8 @@
   </div>
   <div class="content <%=help.kind%>">
     <%if (help.kind==="editorInfo") {%>
-      <p>MIPSWEB is a web-based IDE for the development of MIPS32 assembly code. It includes a code editor and a Virtual Machine that simulates the execution of MIPS assembly.<br/>
-      The project is a <span class="WIP">Work In Progress</span>, and is being developed by students from "Università degli Studi di Milano".
-      <span class="name">Mattia Mendicino</span> is the first student to work on the project, followed by <span class="name">Giuseppe Gadola</span>, all under the guidance of Professor <span class="name">Marco Tarini</span>.</p>
+      <p>MIPSWEB is a web-based IDE, assembler, and virtual machine for MIPS-32. <span class="WIP">THIS IS A WORK IN PROGRESS</span>.<br/>
+       The project is developed by <a class="name">Mattia Mendicino</a>, <a class="name">Giuseppe Gadola</a> and <a class="name" href="https://tarini.di.unimi.it/">Marco Tarini</a> from <a class="name" href="https://www.unimi.it/en">University of Milan</a>.</p>
     <%} else if (help.kind==="instr") {%>
       <div class="table">
         <div class="cols-names">

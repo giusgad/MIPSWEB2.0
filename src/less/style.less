@@ -362,13 +362,17 @@ input {
         }
       }
     }
-    span {
-      &.WIP {
-        font-weight: bold;
-        color: var(--rgba-red-80);
+    span.WIP {
+      font-weight: bold;
+      color: var(--rgba-red-80);
+    }
+    a.name {
+      color: var(--rgb-gray-3);
+      &:visited {
+        color: var(--rgb-gray-5);
       }
-      &.name {
-        font-style: italic;
+      &:hover {
+        color: var(--rgb-gray-3);
       }
     }
     .table {
