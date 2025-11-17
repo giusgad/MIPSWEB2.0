@@ -6,7 +6,7 @@ import { hideForm, showToast } from "./forms.js";
 import { render } from "./rendering.js";
 import { importPublicZip } from "./files.js";
 import { confirmClearProject } from "./buttons.js";
-import { vm } from "./virtual-machine.js";
+import { stop, vm } from "./virtual-machine.js";
 import { Memory } from "./virtual-machine/Memory.js";
 
 /**How many iterations are to be considered an infinite loop*/
@@ -79,7 +79,11 @@ export type OptionsObject = {
 };
 
 export function getOptions(): OptionsObject {
-    return getFromStorage("local", "settings").options ?? default_options;
+    const settings = getFromStorage("local", "settings");
+    if (!settings || !settings.options) {
+        return default_options;
+    }
+    return settings.options;
 }
 
 /**Retrives the current value of a setting and returns the corrseponding flag encoding*/
@@ -145,7 +149,7 @@ export function optsFromFlags(queryFlags: string): OptionsObject | null {
  * Note that boolean values are all set to false before merging with the new options, which mean that any option
  * that needs to be true, has to be specified in the opts.*/
 export function updateOpts(newOpts: OptionsObject) {
-    const settings = getFromStorage("local", "settings");
+    const settings = getFromStorage("local", "settings") ?? default_settings;
     // set all the boolean options to false, because only the one in newOpts are set to true
     const oldOpts = settings.options;
     for (const [key, val] of Object.entries(oldOpts)) {
@@ -156,7 +160,10 @@ export function updateOpts(newOpts: OptionsObject) {
     settings.options = { ...oldOpts, ...newOpts };
     setIntoStorage("local", "settings", settings);
     // need to call this since endianness is set on memory construction
-    vm.cpu.memory = new Memory();
+    if (newOpts["endianness"] !== oldOpts["endianness"]) {
+        vm.cpu.memory = new Memory();
+        stop();
+    }
 }
 
 export const possibleOptions = [
@@ -365,8 +372,9 @@ export function getOptionsFromForm(formData: FormData): OptionsObject {
     await hideForm();
     await renderApp();
 };
+
 (window as any).backupOptions = function () {
-    const opts = getFromStorage("local", "settings").options;
+    const opts = getFromStorage("local", "settings")?.options;
     setIntoStorage("session", "opts-backup", opts);
 };
 (window as any).restoreOptions = function () {
