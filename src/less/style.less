@@ -349,16 +349,13 @@ input {
     height: 100%;
     overflow-y: scroll;
     &.ascii {
-      width: 100%;
+      display: flex;
+      gap: 5px;
+      overflow-y: scroll;
       .table {
-        .rows {
-          overflow: hidden;
-          display: block !important;
-          column-width: 10ch;
-          column-gap: 1px;
-          .row {
-            break-inside: avoid;
-          }
+        overflow: visible;
+        .col.desc {
+          width: 18ch !important;
         }
       }
     }

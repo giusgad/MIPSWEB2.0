@@ -136,3 +136,17 @@ export function mapHelpToExamples(desc: string): string {
     res.sort((a, b) => a.code - b.code);
     return res;
 };
+
+(window as any).getAsciiTableHelp = function (): string[] {
+    const help = Array(128).fill("");
+    help[0] = "terminator byte";
+    help[8] = "backspace";
+    help[9] = "horizontal tab";
+    help[10] = "newline";
+    help[11] = "vertical tab";
+    help[12] = "form feed";
+    help[13] = "carriage return";
+    help[32] = "space";
+    help[127] = "delete";
+    return help;
+};

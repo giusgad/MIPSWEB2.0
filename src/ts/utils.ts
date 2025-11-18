@@ -163,7 +163,7 @@ for (let i = 0; i < 128; i++) {
         if (i >= 32 && i <= 126) {
             asciiTable[i] = ch;
         } else {
-            asciiTable[i] = `\\${i}`;
+            asciiTable[i] = "";
         }
     }
 }

@@ -24,7 +24,7 @@
   <div class="content <%=help.kind%>">
     <%if (help.kind==="editorInfo") {%>
       <p>MIPSWEB is a web-based IDE, assembler, and virtual machine for MIPS-32. <span class="WIP">THIS IS A WORK IN PROGRESS</span>.<br/>
-       The project is developed by <a class="name">Mattia Mendicino</a>, <a class="name">Giuseppe Gadola</a> and <a class="name" href="https://tarini.di.unimi.it/">Marco Tarini</a> from <a class="name" href="https://www.unimi.it/en">University of Milan</a>.</p>
+       The project is developed by <a class="name">Giuseppe Gadola</a>, <a class="name">Mattia Mendicino</a> and <a class="name" href="https://tarini.di.unimi.it/">Marco Tarini</a> from <a class="name" href="https://www.unimi.it/en">University of Milan</a>.</p>
     <%} else if (help.kind==="instr") {%>
       <div class="table">
         <div class="cols-names">
@@ -68,21 +68,29 @@
         </div>
       </div>
     <%} else if (help.kind==="ascii") {%>
-      <div class="table ascii-col">
-        <div class="cols-names">
-          <div class="col dec">Dec</div>
-          <div class="col char">Char</div>
+      <%const descriptions = getAsciiTableHelp();
+      for (const col of [1,2,3,4]) {%>
+        <div class="table">
+          <div class="cols-names">
+            <div class="col dec">Dec</div>
+            <div class="col char">Char</div>
+            <%if (col!=3) {%>
+              <div class="col desc">Desc</div>
+            <%}%>
+          </div>
+          <div class="rows">
+            <% for (i = 32*(col-1); i < 32*col; i++) {%>
+              <div class="row <%=i%2==0 ? "even" : ""%>">
+                <div class="col dec"><%=i%></div>
+                <div class="col char"><%=help.content[i]%></div>
+                <%if (col!=3) {%>
+                  <div class="col desc"><%=descriptions[i] ?? ""%></div>
+                <%}%>
+              </div>
+            <%}%>
+          </div>
         </div>
-        <div class="rows">
-          <% for (i = 0; i < 128; i++) {%>
-            <div class="row <%=i%2==0 ? "even" : ""%>">
-              <div class="col dec"><%=i%></div>
-              <div class="col char"><%=help.content[i]%></div>
-            </div>
-          <%}%>
-        </div>
-      </div>
-    <%}%>
+      <%}}%>
   </div>
   <div class="buttons">
       <button class="button default" onclick="hideFormOnClick();">
