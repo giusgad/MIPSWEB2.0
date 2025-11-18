@@ -1,7 +1,7 @@
 import { addLoader, initLoaders, removeLoader } from "./loaders.js";
 import { Colors } from "./lib/Colors.js";
 import { Icons } from "./lib/Icons.js";
-import { editors, initEditors, renderEditors } from "./editors.js";
+import { initEditors, renderEditors } from "./editors.js";
 import { render } from "./rendering.js";
 import { initSortables } from "./sortable.js";
 import { hideFilePopover } from "./popovers.js";
@@ -23,7 +23,11 @@ import { clearMemorySelectedFormats, default_settings } from "./settings.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
 import { endDrag } from "./drag.js";
 import { stop } from "./virtual-machine.js";
-import { adjustBinaryWidth, adjustEditorsTop } from "./style.js";
+import {
+    adjustBinaryWidth,
+    adjustEditorsTop,
+    updateTagsOverflowClasses,
+} from "./style.js";
 import { watchMemoryScroll } from "./memorymap.js";
 import { setGranularTooltips } from "./intervals.js";
 
@@ -118,6 +122,7 @@ export async function renderApp(
     hideFilePopover();
     scrollSelectedIntoView("files-tabs");
     adjustBinaryWidth();
+    updateTagsOverflowClasses();
     adjustEditorsTop();
     setGranularTooltips();
     endDrag();

@@ -3449,6 +3449,7 @@ export class Instructions {
                 constructor() {
                     super("DIV", "rd, rs, rt");
                 }
+                //TODO: tlgiere check zero e metter console.warn
 
                 expand(
                     assembler: Assembler,

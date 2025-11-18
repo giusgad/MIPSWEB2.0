@@ -19,7 +19,11 @@ import {
     watchMemoryScroll,
 } from "./memorymap.js";
 import { scrollConsoleToBottom, watchingConsole } from "./console.js";
-import { adjustBinaryWidth, updateTagsWidth } from "./style.js";
+import {
+    adjustBinaryWidth,
+    updateTagsOverflowClasses,
+    updateTagsWidth,
+} from "./style.js";
 
 declare const ejs: any;
 (window as any).ejs = ejs;
@@ -85,6 +89,7 @@ export async function render(
         drawMemoryMap();
         watchMemoryScroll();
         setGranularTooltips();
+        updateTagsOverflowClasses();
     } else if (id === "console" && vm.console.state === "waitingInput") {
         const consoleInput = document.getElementById("console-input");
         if (consoleInput) {

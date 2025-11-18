@@ -644,7 +644,7 @@ input {
       }
 
       .col {
-        min-height: @mem-cell-height;
+        height: @mem-cell-height;
         &.name {
           width: @reg-name-width;
           background-color: var(--rgb-gray-11);
@@ -755,6 +755,7 @@ input {
             opacity: 1;
           }
           .row {
+            justify-content: flex-end;
             position: relative;
             &::after {
               .after-whiteout();
@@ -789,7 +790,7 @@ input {
 
             .col {
               line-height: @font-size-small;
-              min-height: @mem-cell-height;
+              height: @mem-cell-height;
 
               &.hexadecimal,
               &.binary,
@@ -805,6 +806,19 @@ input {
                 flex-wrap: wrap;
                 overflow: hidden;
                 justify-content: flex-end;
+
+                &.has-overflow {
+                  border-bottom: 1px dashed var(--rgb-gray-8);
+                  &:hover {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: auto;
+                    z-index: 1000;
+                    border-bottom-style: solid;
+                    background-color: var(--rgb-gray-11);
+                  }
+                }
 
                 .static-tags {
                   flex: 1 1 auto;
@@ -868,7 +882,7 @@ input {
             background-color: transparent;
           }
 
-          @mem-value-width: 22ch;
+          @mem-value-width: 25ch;
 
           &.value {
             width: @mem-value-width;

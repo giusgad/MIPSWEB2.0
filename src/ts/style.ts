@@ -109,3 +109,20 @@ export function highlightElementAnimation(
     elem.classList.add("highlighted");
     setTimeout(() => elem.classList.remove("highlighted"), 1500);
 }
+
+export function updateTagsOverflowClasses() {
+    const tables = document
+        .getElementById("memory-tables")
+        ?.querySelectorAll(".table");
+    if (!tables) return;
+    for (const table of tables) {
+        for (const tagsCell of table.querySelectorAll(".col.tags")) {
+            if (
+                tagsCell.scrollHeight > tagsCell.clientHeight ||
+                tagsCell.scrollWidth > tagsCell.clientWidth
+            )
+                tagsCell.classList.add("has-overflow");
+            else tagsCell.classList.remove("has-overflow");
+        }
+    }
+}
