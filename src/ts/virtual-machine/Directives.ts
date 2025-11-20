@@ -21,6 +21,10 @@ export abstract class Directive {
         tokens = tokens.map((token) => token.replace(/,/g, ""));
         return tokens;
     }
+    /**Whether this directive is used to parse data in the data segment (like . byte, .word etc.)*/
+    isDataDirective(): boolean {
+        return false;
+    }
 }
 
 export class asmDirective extends Directive {
@@ -207,6 +211,9 @@ export class wordDirective extends Directive {
         const numValues = tokens.length;
         return 4 * numValues;
     }
+    isDataDirective(): boolean {
+        return true;
+    }
 }
 
 export class globlDirective extends Directive {
@@ -246,12 +253,15 @@ export class asciiDirective extends Directive {
             assembler.cpu.storeByte(address, value);
             address.set(address.getValue() + 1);
         }
-        address.set(address.getValue() + 1);
     }
 
     size(tokens: string[]): number {
         const string = tokens[0].slice(1, -1);
         return string.length + 1;
+    }
+
+    isDataDirective(): boolean {
+        return true;
     }
 }
 
@@ -278,6 +288,9 @@ export class asciizDirective extends Directive {
     size(tokens: string[]): number {
         const string = tokens[0].slice(1, -1);
         return string.length + 1;
+    }
+    isDataDirective(): boolean {
+        return true;
     }
 }
 
@@ -365,6 +378,9 @@ export class byteDirective extends Directive {
         });
         return newTokens;
     }
+    isDataDirective(): boolean {
+        return true;
+    }
 }
 
 export class halfDirective extends Directive {
@@ -406,5 +422,8 @@ export class halfDirective extends Directive {
             }
         });
         return newTokens;
+    }
+    isDataDirective(): boolean {
+        return true;
     }
 }

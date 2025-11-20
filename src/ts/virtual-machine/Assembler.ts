@@ -122,6 +122,14 @@ export class Assembler {
     ) {
         let section: ".text" | ".data" = ".text";
         let directive: Directive = this.directives.get(".asm")!;
+        /**Keep track of the previous directive, needed for example in this case:
+         * x: .byte 50
+         * .globl x
+         * y: 30
+         *
+         * The y would be read as word because .globl is not a data directive and so it would reset the data-reading directive to .word
+         * By keeping track of the previous one it can be restored to keep reading y as bytes.*/
+        let prevDirective: Directive | null = null;
         let address: Binary = new Binary(this.textSegmentEnd.getValue());
 
         const editorBreakPoints = getAceEditor(file)?.session?.getBreakpoints();
@@ -153,6 +161,7 @@ export class Assembler {
                 continue;
             }
 
+            // parse label if present
             if (tokens[0].endsWith(":") || tokens[1] === ":") {
                 // if there are spaces before the : it's counted as a separate token
                 const label =
@@ -164,6 +173,8 @@ export class Assembler {
                         `Invalid label: "${label}". Labels must only contain alphanumeric characters or underscores and must not start with a number.`,
                     );
                 }
+                if (!withLabels && labels.has(label))
+                    throw new Error(`Duplicate label: "${label}"`);
                 labels.set(label, new Binary(address.getValue()));
                 if (!withLabels) {
                     if (globals.has(label)) {
@@ -179,7 +190,25 @@ export class Assembler {
                 if (tokens.length === 0) continue;
             }
 
+            // check if the token is a directive
             if (this.directives.get(tokens[0])) {
+                // some directives can only be used in the data segment
+                if (
+                    section === ".text" &&
+                    [
+                        ".align",
+                        ".byte",
+                        ".half",
+                        ".word",
+                        ".asciiz",
+                        ".ascii",
+                        ".space",
+                    ].includes(tokens[0])
+                )
+                    throw new Error(
+                        `Directive "${tokens[0]}" can't be used in the text segment`,
+                    );
+                prevDirective = directive;
                 directive = this.directives.get(tokens[0])!;
 
                 tokens.shift();
@@ -216,7 +245,12 @@ export class Assembler {
 
             if (section === ".data") {
                 this.dataSegmentEnd.set(address.getValue());
-                directive = this.directives.get(".word")!;
+                // if the directive is a data directive don't reset it:
+                // for example if the directive is .byte, values on next lines will still be read as bytes
+                if (!directive.isDataDirective())
+                    if (prevDirective && prevDirective.isDataDirective())
+                        directive = prevDirective;
+                    else directive = this.directives.get(".word")!;
             } else if (section === ".text") {
                 this.textSegmentEnd.set(address.getValue());
                 directive = this.directives.get(".asm")!;
