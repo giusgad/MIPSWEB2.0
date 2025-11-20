@@ -1,4 +1,8 @@
-import { mapHelpToExamples, mapParamsToExamples } from "../help.js";
+import {
+    getDirectivesHelp,
+    mapHelpToExamples,
+    mapParamsToExamples,
+} from "../help.js";
 import { vm } from "../virtual-machine.js";
 
 type MipsCompletion = {
@@ -31,6 +35,7 @@ const pseudos: MipsCompletion[] = isa.pseudoInstructions
             isPseudo: true,
         };
     });
+const directiveCompletions: any[] = generateDirectiveCompletions();
 
 function generateCompletions(...parts: (MipsCompletion | undefined)[]): any[] {
     const res: any[] = [];
@@ -51,12 +56,13 @@ function generateCompletions(...parts: (MipsCompletion | undefined)[]): any[] {
 
 function generateDirectiveCompletions(): any[] {
     const res: any[] = [];
-    for (const dir of [...vm.assembler.directives.keys(), ".data", ".text"]) {
+    for (const help of getDirectivesHelp()) {
         res.push({
-            name: dir,
-            value: dir,
+            name: help.symbol,
+            value: help.symbol,
             meta: "directive",
-            score: [".data", ".text"].includes(dir) ? 20 : 10,
+            docHTML: `<p>${help.description}</p>`,
+            score: [".data", ".text"].includes(help.symbol) ? 20 : 10,
         });
     }
     return res;

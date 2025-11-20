@@ -173,7 +173,7 @@ function getPseudoInstructionsHelp(): InstructionHelp[] {
     return help;
 };
 
-(window as any).getDirectivesHelp = function (): DirectiveHelp[] {
+export function getDirectivesHelp(): DirectiveHelp[] {
     const helps: DirectiveHelp[] = [];
     for (const [symbol, dir] of vm.assembler.directives.entries()) {
         const help = dir.getHelp();
@@ -196,4 +196,6 @@ function getPseudoInstructionsHelp(): InstructionHelp[] {
         },
         ...helps,
     ];
-};
+}
+
+(window as any).getDirectivesHelp = getDirectivesHelp;
