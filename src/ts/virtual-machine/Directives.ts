@@ -3,6 +3,7 @@ import { Assembler } from "./Assembler";
 import { intFromStr, parseInlineLiteral } from "../utils.js";
 import { getOptions } from "../settings.js";
 
+type DirectiveHelp = { desc: string; example: string };
 export abstract class Directive {
     abstract assemble(
         tokens: string[],
@@ -25,6 +26,7 @@ export abstract class Directive {
     isDataDirective(): boolean {
         return false;
     }
+    abstract getHelp(): DirectiveHelp;
 }
 
 export class asmDirective extends Directive {
@@ -182,6 +184,12 @@ export class asmDirective extends Directive {
         }
         return calcRegular();
     }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "parse the following lines as assembly instructions",
+            example: ".asm\nli $t0 0",
+        };
+    }
 }
 
 export class wordDirective extends Directive {
@@ -214,6 +222,12 @@ export class wordDirective extends Directive {
     isDataDirective(): boolean {
         return true;
     }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "read and store the following data as words",
+            example: ".word 0x11223344",
+        };
+    }
 }
 
 export class globlDirective extends Directive {
@@ -235,6 +249,12 @@ export class globlDirective extends Directive {
 
     size(tokens: string[]): number {
         return 0;
+    }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "declare the label following the directive as global, making it accessible from other files in the project",
+            example: ".globl label",
+        };
     }
 }
 
@@ -262,6 +282,12 @@ export class asciiDirective extends Directive {
 
     isDataDirective(): boolean {
         return true;
+    }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "read and store the following data as strings, without adding null terminator",
+            example: '.ascii "string"',
+        };
     }
 }
 
@@ -292,6 +318,12 @@ export class asciizDirective extends Directive {
     isDataDirective(): boolean {
         return true;
     }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "read and store the following data as strings, adding a null terminator byte after each",
+            example: '.asciiz "string"',
+        };
+    }
 }
 
 export class spaceDirective extends Directive {
@@ -309,6 +341,12 @@ export class spaceDirective extends Directive {
     size(tokens: string[]): number {
         const spaceAmount = intFromStr(tokens[0]);
         return spaceAmount;
+    }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "read the number following the directive as the amount of empty bytes of space to leave",
+            example: ".space 4",
+        };
     }
 }
 
@@ -335,6 +373,12 @@ export class alignDirective extends Directive {
         } else {
             return alignment - filled;
         }
+    }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "align the next used address to the boundary specified by the number following the directive",
+            example: ".align 4",
+        };
     }
 }
 
@@ -381,6 +425,12 @@ export class byteDirective extends Directive {
     isDataDirective(): boolean {
         return true;
     }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "read and store the following data as bytes",
+            example: ".byte 0x11 0x22 0x33 0x44",
+        };
+    }
 }
 
 export class halfDirective extends Directive {
@@ -425,5 +475,11 @@ export class halfDirective extends Directive {
     }
     isDataDirective(): boolean {
         return true;
+    }
+    getHelp(): DirectiveHelp {
+        return {
+            desc: "read and store the following data as half words",
+            example: ".half 0x1122 0x3344",
+        };
     }
 }

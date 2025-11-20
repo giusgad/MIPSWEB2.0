@@ -3,6 +3,7 @@
     {title: "About", kind: "about"},
     {title: "Instructions", kind: "instr"},
     {title: "Syscalls", kind: "syscalls"},
+    {title: "Directives", kind: "directives"},
     {title: "ASCII", kind: "ascii"}
   ];
   let activeSection = getActiveHelpTab() || 0;
@@ -50,6 +51,23 @@
               <div class="col desc">
                 <p><%-instrHelp.description%></p>
               </div>
+            </div>
+          <%});%>
+        </div>
+      </div>
+    <%} else if (help.kind==="directives") {%>
+      <div class="table syscalls">
+        <div class="cols-names">
+          <div class="col symbol">Symbol</div>
+          <div class="col example">Example</div>
+          <div class="col desc">Description</div>
+        </div>
+        <div class="rows">
+          <%getDirectivesHelp().forEach((dirHelp, i) => {%>
+            <div class="row <%=i%2==0 ? "even" : ""%>">
+              <div class="col symbol"><%=dirHelp.symbol%></div>
+              <div class="col example"><p><%-dirHelp.example.replace('\n', '<br/>')%></p></div>
+              <div class="col desc"><p><%=dirHelp.description%></p></div>
             </div>
           <%});%>
         </div>

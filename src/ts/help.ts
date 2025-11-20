@@ -29,6 +29,11 @@ type SyscallHelp = {
     name: string;
     description: string;
 };
+type DirectiveHelp = {
+    symbol: string;
+    example: string;
+    description: string;
+};
 
 export const paramExampleMap: Map<string, string> = new Map([
     ["rd", "$s0"],
@@ -166,4 +171,29 @@ function getPseudoInstructionsHelp(): InstructionHelp[] {
     help[32] = "space";
     help[127] = "delete";
     return help;
+};
+
+(window as any).getDirectivesHelp = function (): DirectiveHelp[] {
+    const helps: DirectiveHelp[] = [];
+    for (const [symbol, dir] of vm.assembler.directives.entries()) {
+        const help = dir.getHelp();
+        helps.push({
+            symbol: symbol,
+            example: help.example,
+            description: help.desc,
+        });
+    }
+    return [
+        {
+            symbol: ".data",
+            example: ".data\n0x11223344",
+            description: "begin data section",
+        },
+        {
+            symbol: ".text",
+            example: ".text\nli $t0 3",
+            description: "begin text section",
+        },
+        ...helps,
+    ];
 };

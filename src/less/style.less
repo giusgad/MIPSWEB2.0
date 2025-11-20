@@ -375,6 +375,28 @@ input {
         }
       }
     }
+    &.directives {
+      .col {
+        &.symbol {
+          width: 9ch;
+        }
+        &.example {
+          justify-content: flex-start;
+          width: 25ch;
+          p {
+            margin: 2px;
+          }
+        }
+        &.desc {
+          justify-content: flex-start;
+          flex: 1;
+          p {
+            margin: 2px;
+            font-family: @font-family;
+          }
+        }
+      }
+    }
     &.instr {
       .col {
         &.name {
@@ -425,6 +447,15 @@ input {
         }
       }
     }
+    &.syscalls {
+      .col.name {
+        width: 23ch;
+      }
+      .col.desc {
+        justify-content: flex-start;
+        flex: 1;
+      }
+    }
     .table {
       .cols-names {
         font-weight: bold;
@@ -451,14 +482,6 @@ input {
         border: 0.5px solid var(--rgb-gray-8) !important;
         &.code {
           width: 5ch;
-        }
-      }
-      &.syscalls {
-        .col.name {
-          width: 23ch;
-        }
-        .col.desc {
-          flex: 1;
         }
       }
     }
