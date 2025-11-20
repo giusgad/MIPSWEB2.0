@@ -19,7 +19,7 @@ export class Colors {
         orange: { light: "rgb(255,149,0)", dark: "rgb(255,159,10)" },
         yellow: { light: "rgb(255,204,0)", dark: "rgb(255,214,10)" },
         green: { light: "rgb(52,199,89)", dark: "rgb(48,209,88)" },
-        darkgreen: { light: "rgb(21,107,43)", dark: "rgb(37,168,70)" },
+        darkgreen: { light: "rgb(30,153,61)", dark: "rgb(37,168,70)" },
         mint: { light: "rgb(0,199,190)", dark: "rgb(102,212,207)" },
         teal: { light: "rgb(48,176,199)", dark: "rgb(64,200,224)" },
         cyan: { light: "rgb(50,173,230)", dark: "rgb(100,210,255)" },

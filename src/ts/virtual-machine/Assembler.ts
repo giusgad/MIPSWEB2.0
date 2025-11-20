@@ -173,7 +173,7 @@ export class Assembler {
                         `Invalid label: "${label}". Labels must only contain alphanumeric characters or underscores and must not start with a number.`,
                     );
                 }
-                if (!withLabels && labels.has(label))
+                if (!withLabels && labels.has(label) && !globals.has(label))
                     throw new Error(`Duplicate label: "${label}"`);
                 labels.set(label, new Binary(address.getValue()));
                 if (!withLabels) {
