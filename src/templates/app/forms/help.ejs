@@ -1,10 +1,9 @@
 <div class="form help">
   <%const helps = [
-    {title: "About", content: null, kind: "editorInfo"},
-    {title: "Instructions", content: getInstructionsHelp(), kind: "instr"},
-    {title: "Pseudoinstructions", content: getPseudoInstructionsHelp(), kind: "instr"},
-    {title: "Syscalls", content: getSyscallHelp(), kind: "syscalls"},
-    {title: "ASCII", content: asciiTable, kind: "ascii"}
+    {title: "About", kind: "about"},
+    {title: "Instructions", kind: "instr"},
+    {title: "Syscalls", kind: "syscalls"},
+    {title: "ASCII", kind: "ascii"}
   ];
   let activeSection = getActiveHelpTab() || 0;
   let help = helps[activeSection];
@@ -22,21 +21,26 @@
     <%});%>
   </div>
   <div class="content <%=help.kind%>">
-    <%if (help.kind==="editorInfo") {%>
+    <%if (help.kind==="about") {%>
       <p>MIPSWEB is a web-based IDE, assembler, and virtual machine for MIPS-32. <span class="WIP">THIS IS A WORK IN PROGRESS</span>.<br/>
        The project is developed by <a class="name">Giuseppe Gadola</a>, <a class="name">Mattia Mendicino</a> and <a class="name" href="https://tarini.di.unimi.it/">Marco Tarini</a> from <a class="name" href="https://www.unimi.it/en">University of Milan</a>.</p>
     <%} else if (help.kind==="instr") {%>
+      <p style="margin:0;opacity:0.7;font-style:italic;">Pseudoinstructions are marked in <span style="color:var(--rgb-blue)">blue</span></p>
       <div class="table">
         <div class="cols-names">
           <div class="col name">Name</div>
+          <div class="col longname">Long name</div>
           <div class="col params">Params</div>
           <div class="col desc">Description</div>
         </div>
         <div class="rows">
-          <%help.content.forEach((instrHelp, i) => {%>
-            <div class="row <%=i%2==0 ? "even" : ""%>">
+          <%getAllInstructionsHelp().forEach((instrHelp, i) => {%>
+            <div class="row <%=i%2==0 ? "even" : ""%> <%=instrHelp.meta%>">
               <div class="col name">
-                <span class="symbol"><%=instrHelp.symbol%></span><span class="longName"><%=instrHelp.longName%></span>
+                <%=instrHelp.symbol%>
+              </div>
+              <div class="col longname">
+                <%-instrHelp.longName%>
               </div>
               <div class="col params">
                 <%instrHelp.params.forEach(param => {%>
@@ -58,7 +62,7 @@
           <div class="col desc">Description</div>
         </div>
         <div class="rows">
-          <%help.content.forEach((syscallHelp, i) => {%>
+          <%getSyscallHelp().forEach((syscallHelp, i) => {%>
             <div class="row <%=i%2==0 ? "even" : ""%>">
               <div class="col code"><%=syscallHelp.code%></div>
               <div class="col name"><%=syscallHelp.name%></div>
@@ -74,18 +78,14 @@
           <div class="cols-names">
             <div class="col dec">Dec</div>
             <div class="col char">Char</div>
-            <%if (col!=3) {%>
-              <div class="col desc">Desc</div>
-            <%}%>
+            <div class="col desc">Desc</div>
           </div>
           <div class="rows">
             <% for (i = 32*(col-1); i < 32*col; i++) {%>
               <div class="row <%=i%2==0 ? "even" : ""%>">
                 <div class="col dec"><%=i%></div>
-                <div class="col char"><%=help.content[i]%></div>
-                <%if (col!=3) {%>
-                  <div class="col desc"><%=descriptions[i] ?? ""%></div>
-                <%}%>
+                <div class="col char"><%=asciiTable[i]%></div>
+                <div class="col desc"><div><%=descriptions[i] ?? ""%></div></div>
               </div>
             <%}%>
           </div>

@@ -242,13 +242,16 @@ input {
   font-size: @font-size-small;
   overflow-x: hidden;
 
+  // font-family is set to monospace to allow the same ch measurment used in the rows for columns width
   font-family: monospace;
   .cols-names {
     display: flex;
     & > .col {
       border: none !important;
       & > * {
+        // font-family is reset to default to show the content independently of the font-family used for ch-width calcluations
         font-family: @font-family;
+        font-size: @font-size;
       }
     }
 
@@ -354,22 +357,72 @@ input {
       overflow-y: scroll;
       .table {
         overflow: visible;
-        .col.desc {
-          width: 18ch !important;
+        .col {
+          &.desc {
+            & > * {
+              text-wrap: nowrap;
+              overflow-x: scroll;
+              font-size: calc(@font-size-small - 4px);
+            }
+            width: 14ch;
+          }
+          &.dec {
+            width: 5ch;
+          }
+          &.char {
+            width: 5ch;
+          }
         }
       }
     }
-    span.WIP {
-      font-weight: bold;
-      color: var(--rgba-red-80);
-    }
-    a.name {
-      color: var(--rgb-gray-3);
-      &:visited {
-        color: var(--rgb-gray-5);
+    &.instr {
+      .col {
+        &.name {
+          width: 7ch;
+          font-weight: bold;
+        }
+        &.longname {
+          display: block;
+          align-content: center;
+          text-align: left;
+          width: 25ch;
+          .mnemonic {
+            display: inline-block;
+            font-weight: bold;
+            text-transform: lowercase;
+            display: inline-block;
+          }
+        }
+        &.params {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 23ch;
+        }
+        &.desc {
+          justify-content: flex-start;
+          width: 60%;
+          p {
+            margin: 2px;
+            font-family: @font-family;
+          }
+        }
       }
-      &:hover {
+    }
+    &.about {
+      span.WIP {
+        font-weight: bold;
+        color: var(--rgba-red-80);
+      }
+      a.name {
         color: var(--rgb-gray-3);
+        &:visited {
+          color: var(--rgb-gray-5);
+        }
+        &:hover {
+          color: var(--rgb-gray-3);
+        }
       }
     }
     .table {
@@ -387,51 +440,17 @@ input {
             background-color: var(--rgb-gray-9);
           }
         }
+        &.pseudo {
+          .col.name {
+            color: var(--rgb-blue);
+          }
+        }
       }
       .col {
         padding: 2px 5px;
         border: 0.5px solid var(--rgb-gray-8) !important;
-        &.dec {
-          width: 5ch;
-        }
-        &.char {
-          width: 5ch;
-        }
         &.code {
           width: 5ch;
-        }
-        &.name {
-          width: 25%;
-          display: flex;
-          gap: 1ch;
-          .symbol {
-            font-family: monospace;
-            font-weight: bold;
-            width: 7ch;
-            text-align: right;
-            &::after {
-              content: ":";
-            }
-          }
-          .longName {
-            font-family: @font-family;
-            flex: 1;
-          }
-        }
-        &.params {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          width: 23ch;
-        }
-        &.desc {
-          justify-content: flex-start;
-          width: 60%;
-          p {
-            margin: 2px;
-            font-family: @font-family;
-          }
         }
       }
       &.syscalls {

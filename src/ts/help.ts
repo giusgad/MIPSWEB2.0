@@ -22,6 +22,7 @@ type InstructionHelp = {
     longName: string;
     params: string[];
     description: string;
+    meta: "instr" | "pseudo";
 };
 type SyscallHelp = {
     code: number;
@@ -87,7 +88,23 @@ export function mapHelpToExamples(desc: string): string {
     return res;
 }
 
-(window as any).getInstructionsHelp = function (): InstructionHelp[] {
+(window as any).getAllInstructionsHelp = function (): InstructionHelp[] {
+    const res = [...getInstructionsHelp(), ...getPseudoInstructionsHelp()];
+    res.sort((a, b) => a.symbol.localeCompare(b.symbol));
+    res.map((i) => {
+        i.longName = i.longName
+            .split(/\s+/)
+            .map((word) => `<span style="white-space: nowrap;">${word}</span>`)
+            .join(" ");
+        i.longName = i.longName.replace(
+            /[A-Z]/g,
+            (match) => `<span class="mnemonic">${match}</span>`,
+        );
+    });
+    return res;
+};
+
+function getInstructionsHelp(): InstructionHelp[] {
     const res: InstructionHelp[] = [];
     vm.cpu.instructionsSet.instructions.forEach((instr) => {
         const help = instr.getHelp();
@@ -97,13 +114,13 @@ export function mapHelpToExamples(desc: string): string {
                 longName: help.longName,
                 params: mapParamsToExamples(instr.params),
                 description: mapHelpToExamples(help.desc),
+                meta: "instr",
             });
     });
-    res.sort((a, b) => a.symbol.localeCompare(b.symbol));
     return res;
-};
+}
 
-(window as any).getPseudoInstructionsHelp = function (): InstructionHelp[] {
+function getPseudoInstructionsHelp(): InstructionHelp[] {
     const res: InstructionHelp[] = [];
     vm.cpu.instructionsSet.pseudoInstructions.forEach((instr) => {
         const help = instr.getHelp();
@@ -113,11 +130,11 @@ export function mapHelpToExamples(desc: string): string {
                 longName: help.longName,
                 params: mapParamsToExamples([instr.params.join(", ")]),
                 description: mapHelpToExamples(help.desc),
+                meta: "pseudo",
             });
     });
-    res.sort((a, b) => a.symbol.localeCompare(b.symbol));
     return res;
-};
+}
 
 (window as any).getSyscallHelp = function (): SyscallHelp[] {
     const res: SyscallHelp[] = [];
