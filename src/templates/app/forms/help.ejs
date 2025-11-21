@@ -4,6 +4,7 @@
     {title: "Instructions", kind: "instr"},
     {title: "Syscalls", kind: "syscalls"},
     {title: "Directives", kind: "directives"},
+    {title: "Registers", kind: "registers"},
     {title: "ASCII", kind: "ascii"}
   ];
   let activeSection = getActiveHelpTab() || 0;
@@ -85,6 +86,31 @@
               <div class="col code"><%=syscallHelp.code%></div>
               <div class="col name"><%=syscallHelp.name%></div>
               <div class="col desc"><p><%-syscallHelp.description%></p></div>
+            </div>
+          <%});%>
+        </div>
+      </div>
+    <%} else if (help.kind==="registers") {%>
+      <div class="table">
+        <div class="cols-names">
+          <div class="col num">Num</div>
+          <div class="col name">Name</div>
+          <div class="col longName">Long name</div>
+          <div class="col desc">Description</div>
+        </div>
+        <div class="rows">
+          <%getRegistersHelp().forEach((regHelp, i) => {%>
+            <div class="row <%=i%2==0 ? "even" : ""%>">
+              <div class="regs">
+                <%regHelp.regs.forEach(({num, name}) => {%>
+                  <div class="reg-row">
+                    <div class="col num"><%=num%></div>
+                    <div class="col name"><%=name%></div>
+                  </div>
+                <%});%>
+              </div>
+              <div class="col longName"><%=regHelp.longName%></div>
+              <div class="col desc"><p><%-regHelp.description%></p></div>
             </div>
           <%});%>
         </div>

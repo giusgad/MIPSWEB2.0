@@ -34,6 +34,11 @@ type DirectiveHelp = {
     example: string;
     description: string;
 };
+type RegisterHelp = {
+    regs: { num: string; name: string }[];
+    longName: string;
+    description: string;
+};
 
 export const paramExampleMap: Map<string, string> = new Map([
     ["rd", "$s0"],
@@ -199,3 +204,114 @@ export function getDirectivesHelp(): DirectiveHelp[] {
 }
 
 (window as any).getDirectivesHelp = getDirectivesHelp;
+
+(window as any).getRegistersHelp = function (): RegisterHelp[] {
+    const res: RegisterHelp[] = [];
+    const helps = [
+        {
+            from: 0,
+            to: 0,
+            longName: "ZERO",
+            desc: `<span class="invariant">always set to 0</span>`,
+        },
+        {
+            from: 1,
+            to: 1,
+            longName: "Assembler Temporary",
+            desc: `<span class="invariant">used by the assembler</span> in pseudoinstruction expansions`,
+        },
+        {
+            from: 2,
+            to: 3,
+            longName: "Value",
+            desc: "general purpose registers, conventionally used for procedure return values",
+        },
+        {
+            from: 4,
+            to: 7,
+            longName: "Argument",
+            desc: "general purpose registers, conventionally used for procedure call arguments",
+        },
+        {
+            from: 8,
+            to: 15,
+            longName: "Temporary",
+            desc: "general purpose registers, conventionally procedure calls can overwrite their contents.",
+        },
+        {
+            from: 16,
+            to: 23,
+            longName: "Saved",
+            desc: "general purpose registers, conventionally procedure calls guarantee that the contents of these registers will be unchanged when they return",
+        },
+        {
+            from: 24,
+            to: 25,
+            longName: "Temporary",
+            desc: "See above",
+        },
+        {
+            from: 26,
+            to: 27,
+            longName: "Kernel",
+            desc: "reserved for kernel (OS) use",
+        },
+        {
+            from: 28,
+            to: 28,
+            longName: "Global Pointer",
+            desc: "stores the address of the middle of a 64K block of memory in the heap, which contains constants and global variables",
+        },
+        {
+            from: 29,
+            to: 29,
+            longName: "Stack Pointer",
+            desc: "stores the address of the last (smallest) position in the stack",
+        },
+        {
+            from: 30,
+            to: 30,
+            longName: "Frame Pointer",
+            desc: "stores the address of the base of the current function's stack frame",
+        },
+        {
+            from: 31,
+            to: 31,
+            longName: "Return Address",
+            desc: `stores the address of the caller of the current function, <span class="invariant">automatically set by procedure call instructions (like jump-and-link)</span>`,
+        },
+    ];
+    const registers = vm.cpu.registers.registers;
+    helps.forEach((help) => {
+        const regs = [];
+        for (let i = help.from; i <= help.to; i++) {
+            regs.push({ num: `\$${i}`, name: registers[i].name });
+        }
+        res.push({
+            regs: regs,
+            longName: help.longName,
+            description: help.desc,
+        });
+    });
+    return [
+        ...res,
+        {
+            regs: [{ name: "PC", num: "" }],
+            longName: "Program Counter",
+            description:
+                "contains the memory address for the next instruction that the CPU will execute",
+        },
+        {
+            regs: [{ name: "lo", num: "" }],
+            longName: "LOw part register",
+            description:
+                "stores the lower half of a 64-bit product or quotient of a division",
+        },
+        {
+            regs: [{ name: "hi", num: "" }],
+            longName: "HIgh part register",
+            description:
+                "stores the upper half of a 64-bit product or remainder of a division",
+        },
+    ];
+};

@@ -349,6 +349,9 @@ input {
     }
   }
   .content {
+    p {
+      margin: 2px;
+    }
     height: 100%;
     overflow-y: scroll;
     &.ascii {
@@ -390,17 +393,43 @@ input {
         &.example {
           justify-content: flex-start;
           width: 28ch;
-          p {
-            margin: 2px;
-          }
         }
         &.desc {
           justify-content: flex-start;
           flex: 1;
           p {
-            margin: 2px;
             font-family: @font-family;
           }
+        }
+      }
+    }
+    &.registers {
+      span.invariant {
+        color: var(--rgba-red-80);
+        font-weight: bold;
+      }
+      .regs {
+        display: flex;
+        flex-direction: column;
+        .reg-row {
+          display: flex;
+          flex: 1;
+        }
+      }
+      .col {
+        justify-content: center;
+        &.num {
+          width: 5ch;
+        }
+        &.name {
+          width: 6ch;
+        }
+        &.longName {
+          width: 23ch;
+        }
+        &.desc {
+          flex: 1;
+          justify-content: flex-start;
         }
       }
     }
@@ -433,7 +462,6 @@ input {
           justify-content: flex-start;
           width: 60%;
           p {
-            margin: 2px;
             font-family: @font-family;
           }
         }
