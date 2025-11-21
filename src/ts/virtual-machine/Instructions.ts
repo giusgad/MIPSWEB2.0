@@ -782,7 +782,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "MULTiply word",
+                        longName: "MULTiply",
                         desc: "multiply rs by rt as 32-bit signed integers, producing a 64bit result; set LO to the low-order 32 bits and HI to the high-order 32 bits.",
                     };
                 }
@@ -825,7 +825,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "MULTiply Unsigned word",
+                        longName: "MULTiply Unsigned",
                         desc: "multiply rs by rt as 32-bit unsigned integers, producing a 64bit result; set LO to the low-order 32 bits and HI to the high-order 32 bits.",
                     };
                 }
@@ -870,7 +870,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "DIVide word",
+                        longName: "DIVide",
                         desc: "divide rs by rt, treating operands as signed values; set LO to the quotient and set HI to the remainder",
                     };
                 }
@@ -915,7 +915,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "DIVide Unsigned word",
+                        longName: "DIVide Unsigned",
                         desc: "divide rs by rt, treating operands as unsigned values; set LO to the quotient and set HI to the remainder",
                     };
                 }
@@ -960,7 +960,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "ADD word",
+                        longName: "ADD",
                         desc: "Set rd to rs + rt; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
@@ -993,7 +993,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "ADD Unsigned word",
+                        longName: "ADD Unsigned",
                         desc: "Set rd to rs + rt; doesn't trap on overflow",
                     };
                 }
@@ -1038,7 +1038,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "SUBtract word",
+                        longName: "SUBtract",
                         desc: "Set rd to rs - rt; if the subtraction results in 2's complement arithmetic overflow then trap",
                     };
                 }
@@ -1079,7 +1079,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "SUBtract Unsigned word",
+                        longName: "SUBtract Unsigned",
                         desc: "Set rd to rs - rt; doesn't trap on overflow",
                     };
                 }
@@ -2167,7 +2167,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "ADD Immediate word",
+                        longName: "ADD Immediate",
                         desc: "Set rt to rs + immediate; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
@@ -2200,7 +2200,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "ADD Immediate Unsigned word",
+                        longName: "ADD Immediate Unsigned",
                         desc: "Set rt to rs + immediate; doesn't trap on overflow",
                     };
                 }
@@ -3057,7 +3057,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "NEGate word",
+                        longName: "NEGate",
                         desc: "set rd to the negation of rs ( $zero - rs ); if the subtraction results in 2's complement arithmetic overflow then trap",
                     };
                 }
@@ -3083,7 +3083,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "NEGate Unsigned word",
+                        longName: "NEGate Unsigned",
                         desc: "set rd to the negation of rs ( $zero - rs ); doesn't trap on overflow",
                     };
                 }
@@ -3119,7 +3119,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "ABSolute value of word",
+                        longName: "ABSolute value",
                         desc: "set rd to the absolute value of rs (|rs|)",
                     };
                 }
@@ -3553,7 +3553,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "SUBtract Immediate word",
+                        longName: "SUBtract Immediate",
                         desc: "Set rd to rs - immediate; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
@@ -3592,7 +3592,7 @@ export class Instructions {
                 }
                 getHelp(): { longName: string; desc: string } {
                     return {
-                        longName: "MULtiply Unsigned word",
+                        longName: "MULtiply Unsigned",
                         desc: "set rd to the low-order word of the result of rs x rt as unsigned integers",
                     };
                 }

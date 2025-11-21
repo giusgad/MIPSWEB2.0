@@ -218,42 +218,42 @@ export function getDirectivesHelp(): DirectiveHelp[] {
             from: 1,
             to: 1,
             longName: "Assembler Temporary",
-            desc: `<span class="invariant">used by the assembler</span> in pseudoinstruction expansions`,
+            desc: `used by the assembler for pseudoinstruction expansions`,
         },
         {
             from: 2,
             to: 3,
-            longName: "Value",
-            desc: "general purpose registers, conventionally used for procedure return values",
+            longName: "Value 0..1",
+            desc: "procedure return values",
         },
         {
             from: 4,
             to: 7,
-            longName: "Argument",
-            desc: "general purpose registers, conventionally used for procedure call arguments",
+            longName: "Argument 0..3",
+            desc: "procedure call arguments",
         },
         {
             from: 8,
             to: 15,
-            longName: "Temporary",
-            desc: "general purpose registers, conventionally procedure calls can overwrite their contents.",
+            longName: "Temporary 0..7",
+            desc: "procedure calls can overwrite their contents.",
         },
         {
             from: 16,
             to: 23,
-            longName: "Saved",
-            desc: "general purpose registers, conventionally procedure calls guarantee that the contents of these registers will be unchanged when they return",
+            longName: "Saved 0..7",
+            desc: "procedure calls guarantee that the contents of these registers will be unchanged when they return",
         },
         {
             from: 24,
             to: 25,
-            longName: "Temporary",
+            longName: "Temporary 8..9",
             desc: "See above",
         },
         {
             from: 26,
             to: 27,
-            longName: "Kernel",
+            longName: "Kernel 0..1",
             desc: "reserved for kernel (OS) use",
         },
         {
@@ -298,20 +298,17 @@ export function getDirectivesHelp(): DirectiveHelp[] {
         {
             regs: [{ name: "PC", num: "" }],
             longName: "Program Counter",
-            description:
-                "contains the memory address for the next instruction that the CPU will execute",
+            description: `<span class="invariant">contains the memory address for the next instruction that the CPU will execute</span>`,
         },
         {
             regs: [{ name: "lo", num: "" }],
             longName: "LOw part register",
-            description:
-                "stores the lower half of a 64-bit product or quotient of a division",
+            description: `<span class="invariant">stores the lower half of a 64-bit product or quotient of a division</span>`,
         },
         {
             regs: [{ name: "hi", num: "" }],
             longName: "HIgh part register",
-            description:
-                "stores the upper half of a 64-bit product or remainder of a division",
+            description: `<span class="invariant">stores the upper half of a 64-bit product or remainder of a division</span>`,
         },
     ];
 };

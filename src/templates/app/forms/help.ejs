@@ -59,7 +59,7 @@
     <%} else if (help.kind==="directives") {%>
       <div class="table syscalls">
         <div class="cols-names">
-          <div class="col symbol">Symbol</div>
+          <div class="col symbol">Directive</div>
           <div class="col example">Example</div>
           <div class="col desc">Description</div>
         </div>
@@ -91,11 +91,12 @@
         </div>
       </div>
     <%} else if (help.kind==="registers") {%>
+      <p>Conventional use / <span class="invariant">HW features</span></p>
       <div class="table">
         <div class="cols-names">
           <div class="col num">Num</div>
           <div class="col name">Name</div>
-          <div class="col longName">Long name</div>
+          <div class="col longName">Full name</div>
           <div class="col desc">Description</div>
         </div>
         <div class="rows">
