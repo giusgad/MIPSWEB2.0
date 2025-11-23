@@ -336,6 +336,11 @@ export class Assembler {
         return line.match(/"[^"]*"|'[^']*'|[^,\s]+:|[^,\s]+/g) || [];
     }
 
+    private internalLabelCounter = 0;
+    nextInternalLabel(): string {
+        return `@${this.internalLabelCounter++}`;
+    }
+
     reset() {
         this.cpu.reset();
         this.dataSegmentEnd.set(this.dataSegmentStart.getValue());

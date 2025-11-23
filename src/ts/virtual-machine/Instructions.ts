@@ -944,11 +944,11 @@ export class Instructions {
 
                     const rsValue = rs.getSignedValue();
                     const rtValue = rt.getSignedValue();
-                    const result = rsValue + rtValue;
+                    const result = ((rsValue + rtValue) >> 0) << 0;
 
                     const overflow =
-                        (rsValue > 0 && rtValue > 0 && result < 0) ||
-                        (rsValue < 0 && rtValue < 0 && result > 0);
+                        (rsValue >= 0 && rtValue >= 0 && result < 0) ||
+                        (rsValue < 0 && rtValue < 0 && result >= 0);
 
                     if (overflow) {
                         throw new Error("Integer Overflow");
@@ -986,8 +986,10 @@ export class Instructions {
                     const rd = registers[params.rd!.getValue()].binary;
                     const rs = registers[params.rs!.getValue()].binary;
                     const rt = registers[params.rt!.getValue()].binary;
+                    const result =
+                        ((rs.getSignedValue() + rt.getSignedValue()) << 0) >> 0;
 
-                    rd.set(rs.getSignedValue() + rt.getSignedValue());
+                    rd.set(result, true);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -1025,8 +1027,7 @@ export class Instructions {
                     const result = rsValue - rtValue;
 
                     const overflow =
-                        (rsValue > 0 && rtValue < 0 && result < 0) ||
-                        (rsValue < 0 && rtValue > 0 && result > 0);
+                        ((rsValue ^ rtValue) & (rsValue ^ result)) < 0;
 
                     if (overflow) {
                         throw new Error("Integer Overflow");
@@ -1062,13 +1063,9 @@ export class Instructions {
                 ): Promise<void> {
                     const registers = cpu.getRegisters();
                     const rsValue =
-                        registers[
-                            params.rs.getValue()
-                        ].binary.getUnsignedValue();
+                        registers[params.rs.getValue()].binary.getSignedValue();
                     const rtValue =
-                        registers[
-                            params.rt.getValue()
-                        ].binary.getUnsignedValue();
+                        registers[params.rt.getValue()].binary.getSignedValue();
                     const rd = registers[params.rd.getValue()].binary;
 
                     const result = (rsValue - rtValue) >>> 0;
@@ -2150,7 +2147,7 @@ export class Instructions {
                     const immediate = params.immediate!.getValue();
 
                     const rsValue = rs.getSignedValue();
-                    const result = rsValue + immediate;
+                    const result = ((rsValue + immediate) >> 0) << 0;
 
                     const overflow =
                         (rsValue >= 0 && immediate >= 0 && result < 0) ||
@@ -2193,8 +2190,9 @@ export class Instructions {
                     const rt = registers[params.rt!.getValue()].binary;
                     const rs = registers[params.rs!.getValue()].binary;
                     const immediate = params.immediate!.getValue();
+                    const result = ((rs.getValue() + immediate) << 0) >> 0;
 
-                    rt.set(rs.getValue() + immediate);
+                    rt.set(result);
 
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
@@ -3102,11 +3100,7 @@ export class Instructions {
                     address: Binary,
                 ): string[][] {
                     const params = this.mapParams(tokens);
-                    let skipLabel = "@1";
-                    while (labels.has(skipLabel)) {
-                        let n = Math.floor(Math.random() * 10);
-                        skipLabel = `${skipLabel}${n}`;
-                    }
+                    const skipLabel = assembler.nextInternalLabel();
                     labels.set(skipLabel, new Binary(address.getValue() + 12));
                     return [
                         ["addu", params["rd"], params["rs"], "$zero"],
