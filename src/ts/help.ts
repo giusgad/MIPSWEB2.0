@@ -101,16 +101,7 @@ export function mapHelpToExamples(desc: string): string {
 (window as any).getAllInstructionsHelp = function (): InstructionHelp[] {
     const res = [...getInstructionsHelp(), ...getPseudoInstructionsHelp()];
     res.sort((a, b) => a.symbol.localeCompare(b.symbol));
-    res.map((i) => {
-        i.longName = i.longName
-            .split(/\s+/)
-            .map((word) => `<span style="white-space: nowrap;">${word}</span>`)
-            .join(" ");
-        i.longName = i.longName.replace(
-            /[A-Z]/g,
-            (match) => `<span class="mnemonic">${match}</span>`,
-        );
-    });
+    res.map((help) => (help.longName = wrapUpperWithMnemonics(help.longName)));
     return res;
 };
 
@@ -192,12 +183,12 @@ export function getDirectivesHelp(): DirectiveHelp[] {
         {
             symbol: ".data",
             example: ".data\n0x11223344",
-            description: "begin data section",
+            description: "switch to data section",
         },
         {
             symbol: ".text",
             example: ".text\nli $t0 3",
-            description: "begin text section",
+            description: "switch to text section",
         },
         ...helps,
     ];
@@ -206,7 +197,7 @@ export function getDirectivesHelp(): DirectiveHelp[] {
 (window as any).getDirectivesHelp = getDirectivesHelp;
 
 (window as any).getRegistersHelp = function (): RegisterHelp[] {
-    const res: RegisterHelp[] = [];
+    let res: RegisterHelp[] = [];
     const helps = [
         {
             from: 0,
@@ -293,7 +284,7 @@ export function getDirectivesHelp(): DirectiveHelp[] {
             description: help.desc,
         });
     });
-    return [
+    res = [
         ...res,
         {
             regs: [{ name: "PC", num: "" }],
@@ -311,4 +302,14 @@ export function getDirectivesHelp(): DirectiveHelp[] {
             description: `<span class="invariant">stores the upper half of a 64-bit product or remainder of a division</span>`,
         },
     ];
+    res.map((help) => (help.longName = wrapUpperWithMnemonics(help.longName)));
+    return res;
 };
+
+function wrapUpperWithMnemonics(s: string): string {
+    return s
+        .split(/\s+/)
+        .map((word) => `<span style="white-space: nowrap;">${word}</span>`)
+        .join(" ")
+        .replace(/[A-Z]/g, (match) => `<span class="mnemonic">${match}</span>`);
+}

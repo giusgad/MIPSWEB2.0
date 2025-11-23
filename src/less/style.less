@@ -325,6 +325,9 @@ input {
 }
 
 .form.help {
+  .col {
+    font-family: @font-family;
+  }
   width: 75%;
   height: 60%;
   padding: 1em;
@@ -351,6 +354,12 @@ input {
   .content {
     p {
       margin: 2px;
+    }
+    span.mnemonic {
+      display: inline-block;
+      font-weight: bold;
+      text-transform: lowercase;
+      display: inline-block;
     }
     height: 100%;
     overflow-y: scroll;
@@ -425,6 +434,9 @@ input {
           width: 6ch;
         }
         &.longName {
+          display: block;
+          align-content: center;
+          text-align: left;
           width: 23ch;
         }
         &.desc {
@@ -444,12 +456,6 @@ input {
           align-content: center;
           text-align: left;
           width: 25ch;
-          .mnemonic {
-            display: inline-block;
-            font-weight: bold;
-            text-transform: lowercase;
-            display: inline-block;
-          }
         }
         &.params {
           display: flex;
