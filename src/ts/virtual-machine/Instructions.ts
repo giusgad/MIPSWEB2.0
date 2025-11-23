@@ -855,13 +855,15 @@ export class Instructions {
                     const rtValue = rt.getSignedValue();
 
                     if (rtValue === 0) {
-                        console.warn(
+                        vm.console.addLineWithPos(
                             "DIV instruction: Division by zero. Result undefined.",
+                            vm.cpu.pc.getValue(),
+                            "warn",
                         );
                     }
 
-                    const quotient = Math.floor(rsValue / rtValue);
-                    const remainder = rsValue % rtValue;
+                    const quotient = (Math.floor(rsValue / rtValue) >> 0) << 0;
+                    const remainder = (rsValue % rtValue >> 0) << 0;
 
                     cpu.lo.set(quotient);
                     cpu.hi.set(remainder);
@@ -3443,7 +3445,6 @@ export class Instructions {
                 constructor() {
                     super("DIV", "rd, rs, rt");
                 }
-                //TODO: tlgiere check zero e metter console.warn
 
                 expand(
                     assembler: Assembler,
@@ -3459,14 +3460,10 @@ export class Instructions {
                     )
                         return [
                             ...loadImmediate(params["rt"]),
-                            ["bne", "$at", "$zero", "1"],
-                            ["break"],
                             ["div", params["rs"], "$at"],
                             ["mflo", params["rd"]],
                         ];
                     return [
-                        ["bne", params["rt"], "$zero", "1"],
-                        ["break"],
                         ["div", params["rs"], params["rt"]],
                         ["mflo", params["rd"]],
                     ];

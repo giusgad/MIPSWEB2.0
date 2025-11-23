@@ -37,9 +37,10 @@ export class Console {
      * @param pos if this param is of type number it means it's an address and the position
      * is in memory of the assembled program, otherwise it's of type EditorPosition and it
      * indicates a position in the assembly code*/
-    addErrorWithPos(
+    addLineWithPos(
         errorMsg: string,
         pos: EditorPosition | number | undefined,
+        severity: LineSeverity = "error",
     ) {
         let memoryPos,
             editorPos = undefined;
@@ -51,7 +52,7 @@ export class Console {
         }
         this.lines.push({
             text: `${errorMsg}\n`,
-            type: "error",
+            type: severity,
             isPrintString: false,
             waitingInput: false,
             editorPos: editorPos,

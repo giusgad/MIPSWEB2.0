@@ -62,7 +62,7 @@ export class VirtualMachine {
             const staticDataEnd = Math.max(...this.cpu.memory.get().keys());
             this.cpu.memory.initHeapPointer(staticDataEnd);
         } catch (error) {
-            this.console.addErrorWithPos(
+            this.console.addLineWithPos(
                 `Assemble: ${(error as Error).message}`,
                 this.assembler.currentEditorPosition,
             );
@@ -149,7 +149,7 @@ export class VirtualMachine {
                 this.pause();
             }
         } catch (error) {
-            this.console.addErrorWithPos(
+            this.console.addLineWithPos(
                 `Runtime Error: ${(error as Error).message}`,
                 this.cpu.pc.getValue(),
             );
