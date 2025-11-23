@@ -14,6 +14,7 @@ import {
     renameFile,
     setProjectName,
     getSelectedFile,
+    getFile,
 } from "./files.js";
 import {
     hideFilePopover,
@@ -324,7 +325,14 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 
 (window as any).deleteFileOnClick = async function (stringFileId: string) {
     const fileId = parseInt(stringFileId);
-    await deleteFile(fileId);
+    const file = getFile(fileId);
+    if (
+        file?.content === "" ||
+        confirm(
+            `Are you sure you want to delete "${file?.name || "untitled.asm"}"?`,
+        )
+    )
+        await deleteFile(fileId);
 };
 
 (window as any).exportFileOnClick = async function (stringFileId: string) {
