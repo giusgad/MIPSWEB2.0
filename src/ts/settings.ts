@@ -11,6 +11,12 @@ import { Memory } from "./virtual-machine/Memory.js";
 
 /**How many iterations are to be considered an infinite loop*/
 export const INFINITE_LOOP_TRESHOLD = 10_000;
+/**Hide the $at pointer in the memory panel.
+ * This is now kept as a constant to avoid cluttering the GUI with too many options.
+ * If this has to be made into an option, add it into the possibleOptions constant below and
+ * change the use of this constant in addCellTags[intervals.ts] to look at options
+ * (be mindful to not to read from storage at each iteration for performance).*/
+export const HIDE_AT_POINTER = true;
 
 window
     .matchMedia("(prefers-color-scheme: dark)")

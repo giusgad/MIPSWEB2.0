@@ -1,3 +1,4 @@
+import { HIDE_AT_POINTER } from "./settings.js";
 import { getFromStorage } from "./utils.js";
 import { vm } from "./virtual-machine.js";
 import { Binary } from "./virtual-machine/Utils.js";
@@ -146,6 +147,7 @@ function addCellTags(interval: interval) {
             }
         });
         for (const register of vm.getRegisters()) {
+            if (HIDE_AT_POINTER && register.name === "$at") continue;
             const addressValue = register.binary.getValue();
             if (
                 cell.address === addressValue ||
