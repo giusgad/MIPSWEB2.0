@@ -161,8 +161,11 @@ export class Assembler {
                 continue;
             }
 
-            // parse label if present
-            if (tokens[0].endsWith(":") || tokens[1] === ":") {
+            // parse label(s) if present
+            while (
+                tokens[0] !== undefined &&
+                (tokens[0].endsWith(":") || tokens[1] === ":")
+            ) {
                 // if there are spaces before the : it's counted as a separate token
                 const label =
                     tokens[1] === ":"
@@ -187,8 +190,8 @@ export class Assembler {
                 }
                 if (tokens[1] === ":") tokens.shift();
                 tokens.shift();
-                if (tokens.length === 0) continue;
             }
+            if (tokens.length === 0) continue;
 
             // check if the token is a directive
             if (this.directives.get(tokens[0])) {
