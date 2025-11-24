@@ -30,7 +30,7 @@ export const aceEditorDarkTheme = "ace/theme/one_dark";
 export let editors: editor[] = [];
 
 export function getSelectedInstructionAddresses() {
-    if (editorState === "edit") return [];
+    if (editorState === "edit" || vm.cpu.isHalted()) return [];
     const file = getSelectedFile();
     if (!file) return [];
     const fileId = file.id;
