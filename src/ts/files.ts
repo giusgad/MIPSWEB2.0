@@ -153,18 +153,20 @@ export function importFiles() {
     input.click();
 }
 
-export async function importPublicZip(zipPath: string) {
-    zipPath = zipPath.trim();
-    if (!zipPath.endsWith(".zip")) return;
+export async function importPublicZip(zipUrl: string) {
+    zipUrl = zipUrl.trim();
     try {
-        while (zipPath.startsWith("/")) zipPath = zipPath.slice(1);
-        const res = await fetch(`projects/${zipPath}`); //TODO: change to absolute
+        const url = new URL(zipUrl);
+        if (url.protocol !== "https:" && url.protocol !== "http:")
+            throw new Error("url must use http or https");
+        zipUrl = url.toString();
+        const res = await fetch(zipUrl);
         const arrayBuffer = await res.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
-        await loadProject(zip, zipPath.split("/").pop());
+        await loadProject(zip, zipUrl.split("/").pop());
     } catch (e) {
         alert(
-            "There was a problem loading the project specified in the url string. Please check the path and try again.",
+            "There was a problem loading the project specified in the url string. Retry or see console for more details.",
         );
         console.error(e);
     }
