@@ -792,7 +792,7 @@ export class Syscalls {
                     cpu.pc.set(cpu.pc.getValue() + 4);
                 }
                 getHelp(): string | null {
-                    return "show a dialog with a message set to the null-terminated string at the address in $a0 and with the integer in $a1 as content."
+                    return "show a dialog with a message set to the null-terminated string at the address in $a0 and with the integer in $a1 as content.";
                 }
             })(),
         );

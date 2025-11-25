@@ -142,9 +142,11 @@ function getPseudoInstructionsHelp(): InstructionHelp[] {
     for (const syscall of vm.cpu.syscallsSet.syscalls) {
         const help = syscall.getHelp();
         if (!help) continue;
+        let name = `${syscall.name}`;
+        name = name.replace(/_/g, " ").toLowerCase();
         res.push({
             code: syscall.code,
-            name: syscall.name,
+            name: name,
             description: help.replace(
                 /\$(..)/g,
                 '<span class="code">$$$1</span>',
@@ -287,7 +289,7 @@ export function getDirectivesHelp(): DirectiveHelp[] {
     res = [
         ...res,
         {
-            regs: [{ name: "PC", num: "" }],
+            regs: [{ name: "pc", num: "" }],
             longName: "Program Counter",
             description: `<span class="invariant">contains the memory address for the next instruction that the CPU will execute</span>`,
         },

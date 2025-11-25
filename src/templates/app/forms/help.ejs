@@ -35,10 +35,10 @@
       <p style="margin:0;opacity:0.7;font-style:italic;">Pseudoinstructions are marked in <span style="color:var(--rgb-blue)">blue</span></p>
       <div class="table">
         <div class="cols-names">
-          <div class="col name">Name</div>
-          <div class="col longname">Long name</div>
-          <div class="col params">Params</div>
-          <div class="col desc">Description</div>
+          <div class="col name"><p>Name</p></div>
+          <div class="col longname"><p>Long name</p></div>
+          <div class="col params"><p>Params</p></div>
+          <div class="col desc"><p>Description</p></div>
         </div>
         <div class="rows">
           <%getAllInstructionsHelp().forEach((instrHelp, i) => {%>
@@ -62,11 +62,11 @@
         </div>
       </div>
     <%} else if (help.kind==="directives") {%>
-      <div class="table syscalls">
+      <div class="table directives">
         <div class="cols-names">
-          <div class="col symbol">Directive</div>
-          <div class="col example">Example</div>
-          <div class="col desc">Description</div>
+          <div class="col symbol"><p>Directive</p></div>
+          <div class="col example"><p>Example</p></div>
+          <div class="col desc"><p>Description</p></div>
         </div>
         <div class="rows">
           <%getDirectivesHelp().forEach((dirHelp, i) => {%>
@@ -81,9 +81,9 @@
     <%} else if (help.kind==="syscalls") {%>
       <div class="table syscalls">
         <div class="cols-names">
-          <div class="col code">Code</div>
-          <div class="col name">Name</div>
-          <div class="col desc">Description</div>
+          <div class="col code"><p>Code in <span class="code">$v0</span></p></div>
+          <div class="col name"><p>Name</p></div>
+          <div class="col desc"><p>Description</p></div>
         </div>
         <div class="rows">
           <%getSyscallHelp().forEach((syscallHelp, i) => {%>
@@ -99,10 +99,10 @@
       <p>Conventional use / <span class="invariant">HW features</span></p>
       <div class="table">
         <div class="cols-names">
-          <div class="col num">Num</div>
-          <div class="col name">Name</div>
-          <div class="col longName">Full name</div>
-          <div class="col desc">Description</div>
+          <div class="col num"><p>Num</p></div>
+          <div class="col name"><p>Name</p></div>
+          <div class="col longName"><p>Full name</p></div>
+          <div class="col desc"><p>Description</p></div>
         </div>
         <div class="rows">
           <%getRegistersHelp().forEach((regHelp, i) => {%>
@@ -126,15 +126,15 @@
       for (const col of [1,2,3,4]) {%>
         <div class="table">
           <div class="cols-names">
-            <div class="col dec">Dec</div>
-            <div class="col char">Char</div>
-            <div class="col desc">Desc</div>
+            <div class="col dec"><p>Dec</p></div>
+            <div class="col char"><p>Char</p></div>
+            <div class="col desc"><p>Desc</p></div>
           </div>
           <div class="rows">
             <% for (i = 32*(col-1); i < 32*col; i++) {%>
               <div class="row <%=i%2==0 ? "even" : ""%>">
                 <div class="col dec"><%=i%></div>
-                <div class="col char"><%=asciiTable[i]%></div>
+                <div class="col char <%=asciiTable[i].startsWith('\\') ? "special" : ""%>"><p><%=asciiTable[i]%></p></div>
                 <div class="col desc"><div><%=descriptions[i] ?? ""%></div></div>
               </div>
             <%}%>

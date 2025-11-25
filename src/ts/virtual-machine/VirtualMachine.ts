@@ -134,7 +134,7 @@ export class VirtualMachine {
                                 false,
                             );
                             this.pcCounter.clear();
-                            this.pause();
+                            this.pause(true);
                         }
                     } else {
                         this.pcCounter.set(currPC, (pcCounter ?? 0) + 1);
@@ -143,10 +143,10 @@ export class VirtualMachine {
                     if (
                         this.assembler.breakpointPCs.has(this.cpu.pc.getValue())
                     )
-                        this.pause();
+                        this.pause(true);
                 }
             } else {
-                this.pause();
+                this.pause(true);
             }
         } catch (error) {
             this.console.addLineWithPos(
@@ -154,7 +154,7 @@ export class VirtualMachine {
                 this.cpu.pc.getValue(),
             );
             console.warn(error);
-            this.pause();
+            this.pause(true);
         }
         if (
             this.cpu.pc.getValue() >= this.assembler.textSegmentEnd.getValue()
@@ -186,17 +186,17 @@ export class VirtualMachine {
             await this.step();
             if (timeout > 0) {
                 // update ui if steps are not instant
-                updateUiAfterStep();
+                await updateUiAfterStep();
                 this.pcCounter.clear();
                 await new Promise((resolve) => setTimeout(resolve, timeout));
             }
         }
-        updateUiAfterStep();
+        await updateUiAfterStep();
     }
 
-    pause() {
+    pause(updateUi: boolean = false) {
         this.running = false;
-        updateUiAfterStep();
+        if (updateUi) updateUiAfterStep();
     }
 
     isNextInstructionFunction(): boolean {
@@ -208,9 +208,11 @@ export class VirtualMachine {
 
     async exit() {
         this.cpu.halt();
-        this.pause();
+        this.pause(false);
         this.nextInstructionEditorPosition = undefined;
-        await renderApp("execute");
+        this.lastReadRegisters = undefined;
+        this.lastChangedRegister = undefined;
+        await updateUiAfterStep();
     }
 
     getRegisters() {

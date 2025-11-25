@@ -321,9 +321,6 @@ input {
 }
 
 .form.help {
-  .col {
-    font-family: @font-family;
-  }
   width: 75%;
   height: 60%;
   padding: 1em;
@@ -348,6 +345,35 @@ input {
     }
   }
   .content {
+    .table {
+      .cols-names {
+        p {
+          font-size: inherit;
+          margin: 0;
+          font-weight: bold;
+        }
+        & > * {
+          justify-content: flex-start !important;
+          align-items: normal !important;
+        }
+      }
+      .row {
+        min-height: 20px;
+        &.even {
+          .col {
+            background-color: var(--rgb-gray-9);
+          }
+        }
+      }
+      .col {
+        font-family: @font-family;
+        padding: 2px 5px;
+        border: 0.5px solid var(--rgb-gray-8) !important;
+        &.code {
+          width: 5ch;
+        }
+      }
+    }
     p {
       margin: 2px;
     }
@@ -365,13 +391,11 @@ input {
       overflow-y: scroll;
       .table {
         overflow: visible;
+        .row {
+          height: 20px;
+        }
         .col {
           &.desc {
-            & > * {
-              text-wrap: nowrap;
-              overflow-x: scroll;
-              font-size: calc(@font-size-small - 4px);
-            }
             width: 14ch;
           }
           &.dec {
@@ -380,18 +404,40 @@ input {
           &.char {
             width: 5ch;
           }
+          &.dec,
+          &.char {
+            font-family: monospace;
+          }
         }
-        .rows {
-          .col.char {
+        .rows .col {
+          &.char {
             justify-content: center;
-            font-weight: bold;
-            color: var(--rgb-blue);
+            p {
+              font-weight: bold;
+              color: var(--rgb-blue);
+            }
+            &.special {
+              p {
+                font-weight: normal;
+              }
+            }
+          }
+          &.desc {
+            & > * {
+              text-wrap: nowrap;
+              overflow-x: scroll;
+              font-size: calc(@font-size-small - 2px);
+            }
           }
         }
       }
     }
     &.directives {
       .col {
+        &.symbol,
+        &.example {
+          font-family: monospace;
+        }
         &.symbol {
           width: 12ch;
         }
@@ -422,6 +468,10 @@ input {
         }
       }
       .col {
+        &.num,
+        &.name {
+          font-family: monospace;
+        }
         justify-content: center;
         &.num {
           width: 5ch;
@@ -442,9 +492,18 @@ input {
       }
     }
     &.instr {
+      .row.pseudo {
+        .col.name {
+          color: var(--rgb-blue);
+        }
+      }
       .col {
+        &.name,
+        &.params {
+          font-family: monospace;
+        }
         &.name {
-          width: 7ch;
+          width: 9ch;
           font-weight: bold;
         }
         &.longname {
@@ -458,7 +517,7 @@ input {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          width: 23ch;
+          width: 27ch;
         }
         &.desc {
           justify-content: flex-start;
@@ -495,40 +554,17 @@ input {
       }
     }
     &.syscalls {
-      .col.name {
-        width: 23ch;
-      }
-      .col.desc {
-        justify-content: flex-start;
-        flex: 1;
-      }
-    }
-    .table {
-      .cols-names {
-        font-weight: bold;
-        & > * {
-          justify-content: flex-start !important;
-          align-items: normal !important;
-        }
-      }
-      .row {
-        min-height: 20px;
-        &.even {
-          .col {
-            background-color: var(--rgb-gray-9);
-          }
-        }
-        &.pseudo {
-          .col.name {
-            color: var(--rgb-blue);
-          }
-        }
-      }
       .col {
-        padding: 2px 5px;
-        border: 0.5px solid var(--rgb-gray-8) !important;
         &.code {
-          width: 5ch;
+          font-family: monospace;
+          width: 13ch;
+        }
+        &.name {
+          width: 20ch;
+        }
+        &.desc {
+          justify-content: flex-start;
+          flex: 1;
         }
       }
     }
@@ -1099,4 +1135,5 @@ span.code {
   border-radius: 5px !important;
   padding: 0px 2px;
   font-family: monospace;
+  font-weight: normal;
 }
