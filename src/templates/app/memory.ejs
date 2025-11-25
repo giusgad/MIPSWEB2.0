@@ -63,16 +63,33 @@
               let valueGranularity = (interval.formats && interval.formats.valueGranularity) || "word";;
               let currentGranularity = granularityValues.indexOf(valueGranularity) || 0;
               %>
-              <button
-                type="button"
-                class="state-btn"
-                id="memory-value-granularity_<%=interval.id%>" 
-                onclick="cycleStateBtn(this, colFormatSelectOnChange)"
-                data-values="<%=granularityValues%>"
-                data-current="<%=currentGranularity%>"
-                data-id="<%=interval.id%>"
-                <%= granularityValues.length<=1 ? "disabled" : "" %>
-              ><%=getStateBtnText(valueGranularity)%></button>
+              <% if (valueFormat !== "asm") {%>
+                <button
+                  type="button"
+                  class="state-btn"
+                  id="memory-value-granularity_<%=interval.id%>" 
+                  onclick="cycleStateBtn(this, colFormatSelectOnChange)"
+                  data-values="<%=granularityValues%>"
+                  data-current="<%=currentGranularity%>"
+                  data-id="<%=interval.id%>"
+                  <%= granularityValues.length<=1 ? "disabled" : "" %>
+                ><%=getStateBtnText(valueGranularity)%></button>
+            <%} else {
+                let literalFormatValues = ["int", "uint", "hex"];
+                let literalFormat = (interval.formats && interval.formats.deassemblyLiteralFormat) || "int";;
+                currentLiteralFormat = literalFormatValues.indexOf(literalFormat) || 0;
+            %>
+                <button
+                  type="button"
+                  class="state-btn"
+                  title="Assembly literals format"
+                  id="memory-deassembly-literal-format_<%=interval.id%>" 
+                  onclick="cycleStateBtn(this, colFormatSelectOnChange)"
+                  data-values="<%=literalFormatValues%>"
+                  data-current="<%=currentLiteralFormat%>"
+                  data-id="<%=interval.id%>"
+                ><%=getStateBtnText(literalFormat)%></button>
+            <%}%>
             </div>
           </div>
         </div>

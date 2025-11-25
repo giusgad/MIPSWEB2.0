@@ -75,9 +75,21 @@ export abstract class Instruction {
     }
 
     basic(params: { [key: string]: Binary }, registers: Registers): string {
-        const registersFormat = getFromStorage("local", "settings").colsFormats[
-            "registers-name-format"
-        ];
+        const settings = getFromStorage("local", "settings");
+        const registersFormat = settings.colsFormats["registers-name-format"];
+        const literalFormat =
+            settings.colsFormats["memory-deassembly-literal-format"];
+        const intToStr = (n: number): string => {
+            switch (literalFormat) {
+                case "uint":
+                    return new Binary(n).getUnsignedValue().toString();
+                case "hex":
+                    return `0x${new Binary(n).getUnsignedValue().toString(16)}`;
+                case "int":
+                default:
+                    return n.toString();
+            }
+        };
 
         const paramsNames = this.params[0].split(",").map((p) => p.trim());
         const paramValues: string[] = [];
@@ -106,13 +118,13 @@ export abstract class Instruction {
                 const immediateValue = params["immediate"]?.getValue();
                 paramValues.push(
                     immediateValue !== undefined
-                        ? immediateValue.toString()
+                        ? intToStr(immediateValue)
                         : "0",
                 );
             } else if (name === "target") {
-                const targetValue = params[name]?.getValue();
+                const targetValue = params[name]?.getValue() * 4;
                 paramValues.push(
-                    targetValue !== undefined ? targetValue.toString() : "0",
+                    targetValue !== undefined ? intToStr(targetValue) : "0",
                 );
             } else if (name === "SYSCALL" || name === "") {
                 return this.symbol.toLowerCase();
@@ -120,7 +132,7 @@ export abstract class Instruction {
                 const shamtValue = params["shamt"]?.getValue();
                 paramValues.push(
                     shamtValue !== undefined
-                        ? shamtValue.toString()
+                        ? intToStr(shamtValue)
                         : "undefined",
                 );
             } else {
@@ -128,7 +140,7 @@ export abstract class Instruction {
                 const paramValue = params[name]?.getValue();
                 paramValues.push(
                     paramValue !== undefined
-                        ? paramValue.toString()
+                        ? intToStr(paramValue)
                         : "undefined",
                 );
             }

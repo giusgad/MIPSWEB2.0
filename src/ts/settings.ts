@@ -282,6 +282,7 @@ export const default_settings = {
         "memory-address-format": "hexadecimal",
         "memory-value-format": "int",
         "memory-value-granularity": "word",
+        "memory-deassembly-literal-format": "int",
     },
 };
 
@@ -291,7 +292,8 @@ export function clearMemorySelectedFormats() {
         for (const key in settings.colsFormats) {
             if (
                 key.startsWith("memory-value-format_") ||
-                key.startsWith("memory-value-granularity_")
+                key.startsWith("memory-value-granularity_") ||
+                key.startsWith("memory-deassembly-literal-format_")
             ) {
                 delete settings.colsFormats[key];
             }
@@ -310,7 +312,11 @@ export async function colFormatSelect(
     } else if (!settings.colsFormats) {
         settings.colsFormats = default_settings.colsFormats;
     }
-    settings.colsFormats[element.id] = value;
+    if (element.id.startsWith("memory-deassembly-literal-format_")) {
+        settings.colsFormats["memory-deassembly-literal-format"] = value;
+    } else {
+        settings.colsFormats[element.id] = value;
+    }
     // memory and asm can only be visualized with word granularity, ascii can only be visualized by bytes
     if (element.id.startsWith("memory-value-format")) {
         const granularity_id = `memory-value-granularity_${element.dataset["id"]}`;
@@ -321,13 +327,17 @@ export async function colFormatSelect(
         }
     }
     setIntoStorage("local", "settings", settings);
+    // need to update the assembly format in the deassembled memory
+    // since it's cached, the cache needs to be cleared (minor performance loss on play if it was mid execution)
+    if (
+        element.id === "registers-name-format" ||
+        element.id.startsWith("memory-deassembly-literal-format")
+    )
+        vm.cpu.decodingCache.clear();
     if (element.id.startsWith("memory"))
         await render("memory", "/app/memory.ejs", undefined, false);
     if (element.id.startsWith("register")) {
         if (element.id === "registers-name-format") {
-            // need to update the assembly format in the deassembled memory
-            // since it's cached, the cache needs to be cleared (minor performance loss on play if it was mid execution)
-            vm.cpu.decodingCache.clear();
             await render("memory", "/app/memory.ejs", undefined, false);
         }
         await render("registers", "/app/registers.ejs", undefined, false);
