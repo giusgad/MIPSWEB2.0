@@ -24,8 +24,13 @@
   </div>
   <div class="content <%=help.kind%>">
     <%if (help.kind==="about") {%>
-      <p>MIPSWEB is a web-based IDE, assembler, and virtual machine for MIPS-32. <span class="WIP">THIS IS A WORK IN PROGRESS</span>.<br/>
-       The project is developed by <a class="name">Giuseppe Gadola</a>, <a class="name">Mattia Mendicino</a> and <a class="name" href="https://tarini.di.unimi.it/">Marco Tarini</a> from <a class="name" href="https://www.unimi.it/en">University of Milan</a>.</p>
+      <div class="app-name">MIPSWEB</div>
+      <p class="by">By [<a>Giuseppe Gadola</a>, <a>Mattia Mendicino</a>, <a href="https://tarini.di.unimi.it/">Marco Tarini</a>] - <a href="https://www.unimi.it/en">University of Milan</a></p>
+      <p class="ver">ver 2.0</p>
+      <p class="WIP">THIS IS A WORK IN PROGRESS</p>
+      <p>MIPSWEB is a web-based IDE, assembler, and virtual machine for MIPS-32.</p>
+<!--TODO: license-->
+      <a>MIT</a>
     <%} else if (help.kind==="instr") {%>
       <p style="margin:0;opacity:0.7;font-style:italic;">Pseudoinstructions are marked in <span style="color:var(--rgb-blue)">blue</span></p>
       <div class="table">

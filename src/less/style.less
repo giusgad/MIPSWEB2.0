@@ -105,10 +105,6 @@ input {
   font-weight: bold;
   padding: 0 12px;
   color: var(--rgb-app-color);
-  .version {
-    font-weight: normal;
-    font-size: @font-size;
-  }
 }
 
 .body {
@@ -474,11 +470,21 @@ input {
       }
     }
     &.about {
-      span.WIP {
+      .app-name {
+        padding: 10px 0;
+        font-size: calc(@font-size-big + 5px);
+        line-height: calc(@font-size-big + 5px);
+        color: var(--rgb-gray-1);
+      }
+      .ver {
+        margin: 5px 0;
+        opacity: 0.8;
+      }
+      .WIP {
         font-weight: bold;
         color: var(--rgba-red-80);
       }
-      a.name {
+      a {
         color: var(--rgb-gray-3);
         &:visited {
           color: var(--rgb-gray-5);
