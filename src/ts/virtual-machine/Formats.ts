@@ -275,14 +275,35 @@ export class J_Format implements Format {
         }
         for (const param of possible_params) {
             if (param === "target") {
-                const targetAddress = assembler.resolveLabel(
-                    tokens[1],
-                    globals,
-                    labels,
-                    address,
-                    true,
-                );
-                target.set(targetAddress);
+                let literalAddr;
+                try {
+                    literalAddr = intFromStr(tokens[1]);
+                } catch {}
+                // NOTE: Address specified as literal is divided by 4 (since CPU multiplies it by 4 at runtime)
+                // so that a literal address is effectively the jump target, without having to account for the multiplication
+                if (literalAddr) {
+                    if (literalAddr % 4 !== 0) {
+                        throw new Error(
+                            "Literal address must be divisible by 4",
+                        );
+                    }
+                    literalAddr = literalAddr / 4;
+                    if (literalAddr >= 67108863) {
+                        throw new Error(
+                            `Out of range jump, address must be representable in 26 bits [0, 2^28)`,
+                        );
+                    }
+                    target.set(literalAddr);
+                } else {
+                    const targetAddress = assembler.resolveLabel(
+                        tokens[1],
+                        globals,
+                        labels,
+                        address,
+                        true,
+                    );
+                    target.set(targetAddress);
+                }
             } else {
                 console.error(
                     `Unhandled J-format instruction: ${instruction.symbol} ${instruction.params}`,
