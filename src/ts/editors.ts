@@ -15,7 +15,7 @@ import {
     renderApp,
 } from "./app.js";
 import { getCurrentFontSize } from "./style.js";
-import { vm } from "./virtual-machine.js";
+import { consoleShown, vm } from "./virtual-machine.js";
 import { MipsCompleter } from "./lib/Autocompletion.js";
 
 export type editor = {
@@ -179,6 +179,11 @@ export function resizeEditors() {
         addClass("execute", "editors");
     } else {
         removeClass("execute", "editors");
+    }
+    if (consoleShown) {
+        addClass("console-shown", "editors");
+    } else {
+        removeClass("console-shown", "editors");
     }
     for (const editor of editors) {
         editor.aceEditor.resize();

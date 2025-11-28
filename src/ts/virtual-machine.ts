@@ -4,6 +4,7 @@ import { CPU } from "./virtual-machine/CPU.js";
 import { renderApp } from "./app.js";
 import {
     moveCursorToNextInstruction,
+    resizeEditors,
     selectNextInstruction,
 } from "./editors.js";
 import { Binary } from "./virtual-machine/Utils.js";
@@ -47,6 +48,7 @@ export async function setConsoleShown(val: boolean) {
     classAction("console-shown", "console");
 
     setTimeout(async () => {
+        resizeEditors();
         await render("console", "/app/console.ejs", undefined, false);
     }, 200);
 }

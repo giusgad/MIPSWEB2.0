@@ -35,7 +35,10 @@
   top: calc(@toolbar-h * 2);
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: @toolbar-h;
+  &.console-shown {
+    bottom: calc(@height-console + @toolbar-h);
+  }
 }
 
 #components-container {
