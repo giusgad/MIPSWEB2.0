@@ -975,7 +975,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ADD",
-                        desc: "Set rd to rs + rt; if the addition results in 2's complement arithmetic overflow then trap",
+                        desc: "set rd to rs + rt; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
             })(),
@@ -1010,7 +1010,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ADD Unsigned",
-                        desc: "Set rd to rs + rt; doesn't trap on overflow",
+                        desc: "set rd to rs + rt; doesn't trap on overflow",
                     };
                 }
             })(),
@@ -1054,7 +1054,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "SUBtract",
-                        desc: "Set rd to rs - rt; if the subtraction results in 2's complement arithmetic overflow then trap",
+                        desc: "set rd to rs - rt; if the subtraction results in 2's complement arithmetic overflow then trap",
                     };
                 }
             })(),
@@ -1091,7 +1091,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "SUBtract Unsigned",
-                        desc: "Set rd to rs - rt; doesn't trap on overflow",
+                        desc: "set rd to rs - rt; doesn't trap on overflow",
                     };
                 }
             })(),
@@ -2179,7 +2179,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ADD Immediate",
-                        desc: "Set rt to rs + immediate; if the addition results in 2's complement arithmetic overflow then trap",
+                        desc: "set rt to rs + immediate; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
             })(),
@@ -2213,7 +2213,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ADD Immediate Unsigned",
-                        desc: "Set rt to rs + immediate; doesn't trap on overflow",
+                        desc: "set rt to rs + immediate; doesn't trap on overflow",
                     };
                 }
             })(),
@@ -3128,7 +3128,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "ABSolute value",
-                        desc: "set rd to the absolute value of rs (|rs|)",
+                        desc: "set rd to the absolute value of rs",
                     };
                 }
             })(),
@@ -3557,7 +3557,7 @@ export class Instructions {
                 getHelp(): { longName: string; desc: string } {
                     return {
                         longName: "SUBtract Immediate",
-                        desc: "Set rd to rs - immediate; if the addition results in 2's complement arithmetic overflow then trap",
+                        desc: "set rd to rs - immediate; if the addition results in 2's complement arithmetic overflow then trap",
                     };
                 }
             })(),

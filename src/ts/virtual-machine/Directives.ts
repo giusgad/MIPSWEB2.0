@@ -286,7 +286,7 @@ export class asciiDirective extends Directive {
     getHelp(): DirectiveHelp {
         return {
             desc: "read and store the following data as strings, without adding null terminator",
-            example: '.ascii "string"',
+            example: '.ascii "foo"',
         };
     }
 }
@@ -321,7 +321,7 @@ export class asciizDirective extends Directive {
     getHelp(): DirectiveHelp {
         return {
             desc: "read and store the following data as strings, adding a null terminator byte after each",
-            example: '.asciiz "string"',
+            example: '.asciiz "foo"',
         };
     }
 }

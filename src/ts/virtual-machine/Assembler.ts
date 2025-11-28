@@ -226,7 +226,8 @@ export class Assembler {
                         this.currentEditorPosition,
                     );
                 }
-            }
+            } else if (tokens[0].startsWith("."))
+                throw new Error(`Unknown directive: ${tokens[0]}`);
 
             if (withLabels) {
                 if (!(directive instanceof globlDirective)) {

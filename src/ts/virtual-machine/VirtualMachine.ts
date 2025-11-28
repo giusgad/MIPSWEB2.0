@@ -101,7 +101,10 @@ export class VirtualMachine {
     }
 
     async stepOut() {
-        if (this.stepOutStack.length <= 0) return;
+        if (this.stepOutStack.length <= 0) {
+            await this.step();
+            return;
+        }
         const targetPc = this.stepOutStack.pop()!;
         while (this.cpu.pc.getValue() !== targetPc) {
             await this.step();
