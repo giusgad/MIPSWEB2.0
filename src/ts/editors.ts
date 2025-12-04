@@ -8,15 +8,11 @@ import {
 } from "./files.js";
 import { Colors } from "./lib/Colors.js";
 import { addClass, removeClass } from "./utils.js";
-import {
-    editorState,
-    interfaceState,
-    pauseEditorUpdates,
-    renderApp,
-} from "./app.js";
-import { getCurrentFontSize } from "./style.js";
-import { consoleShown, vm } from "./virtual-machine.js";
+import { editorState, interfaceState, pauseEditorUpdates } from "./app.js";
+import { getCurrentFontSize, highlightElementAnimation } from "./style.js";
+import { consoleShown, memoryShown, stop, vm } from "./virtual-machine.js";
 import { MipsCompleter } from "./lib/Autocompletion.js";
+import { render } from "./rendering.js";
 
 export type editor = {
     fileId: number;
@@ -65,35 +61,24 @@ export function renderEditors() {
     resizeEditors();
     const aceEditor = getAceEditor();
     if (aceEditor) {
-        const cursors = document.getElementsByClassName("ace_cursor-layer");
         aceEditor.setFontSize(`${getCurrentFontSize()}px`);
         if (editorState === "edit") {
             ace.require("ace/ext/language_tools");
             aceEditor.setOptions({
-                readOnly: false,
                 highlightActiveLine: true,
                 scrollPastEnd: 0.5,
                 printMarginColumn: -1,
                 enableLiveAutocompletion: [MipsCompleter],
             });
 
-            for (let i = 0; i < cursors.length; i++) {
-                (cursors[i] as HTMLElement).style.display = "block";
-            }
-
             clearNextInstructionMarkers(aceEditor);
             aceEditor.focus();
         } else if (editorState === "execute") {
             aceEditor.setOptions({
-                readOnly: true,
                 highlightActiveLine: true,
                 scrollPastEnd: 0.5,
                 printMarginColumn: -1,
             });
-
-            for (let i = 0; i < cursors.length; i++) {
-                (cursors[i] as HTMLElement).style.display = "none";
-            }
 
             let markers = aceEditor.session.getMarkers(false);
             for (let i in markers) {
@@ -208,6 +193,14 @@ export function removeEditor(fileId: number) {
     editors = editors.filter((editor) => editor.fileId !== fileId);
 }
 
+async function quickRerender() {
+    if (memoryShown)
+        await render("memory", "/app/memory.ejs", undefined, false);
+    await render("registers", "/app/registers.ejs", undefined, false);
+    if (consoleShown)
+        await render("console", "/app/console.ejs", undefined, false);
+    await render("vm-buttons", "/app/vm-buttons.ejs", undefined, false);
+}
 export function addEditor(file: file) {
     const editorHTMLDivElement = document.createElement("div");
     editorHTMLDivElement.id = `editor-${file.id}`;
@@ -241,10 +234,14 @@ export function addEditor(file: file) {
     // The extra guard for `pauseEditorUpdates` is needed because the event sometimes fires on subsequent rerenders and that causes
     // the last line duplicating. The `silent` guard is neeeded to prevent infinite onchange recursion since setValue triggers the event itself.
     let silent = false;
-    aceEditor.session.on("change", () => {
+    aceEditor.session.on("change", async () => {
         if (silent) return;
         if (!pauseEditorUpdates) {
-            updateFile(file.id, aceEditor.getValue());
+            const newValue = aceEditor.getValue();
+            updateFile(file.id, newValue);
+            if (interfaceState === "execute" && newValue !== file.content) {
+                setTimeout(() => stop(), 100);
+            }
         } else {
             silent = true;
             aceEditor.setValue(file.content);
@@ -253,26 +250,23 @@ export function addEditor(file: file) {
         }
     });
 
-    aceEditor.getSession().selection.on("changeCursor", async () => {
+    aceEditor.session.selection.on("changeCursor", async () => {
         if (interfaceState === "execute") {
-            const session = getAceEditor()?.getSession();
-            if (session) {
-                const markers = session.getMarkers(false);
-                let first = true;
-                for (const i in markers) {
-                    if (first) {
-                        first = false;
-                        continue;
-                    }
-                    session.removeMarker(markers[i].id);
-                }
-            }
+            const session = aceEditor.session;
+            const line = aceEditor.getCursorPosition().row;
+            selectCorrespondingAssembled([line], file, session);
         }
     });
-
-    aceEditor.on("dblclick", async () => {
+    aceEditor.on("changeSelection", () => {
         if (interfaceState === "execute") {
-            await renderApp("execute", "edit");
+            const sel = aceEditor.getSelectionRange();
+            const start = sel.start.row;
+            const end = sel.end.row;
+            const lines = Array.from(
+                { length: end - start + 1 },
+                (_, i) => start + i,
+            );
+            selectCorrespondingAssembled(lines, file, aceEditor.session);
         }
     });
 
@@ -340,5 +334,44 @@ export function initEditors() {
             }
             showEditor(getSelectedFileId());
         }
+    }
+}
+
+/**Selects in the memory visualizations the line(s) of assembled corresponding to the code in the specified lines*/
+function selectCorrespondingAssembled(
+    lines: number[],
+    file: file,
+    session: AceAjax.IEditSession,
+) {
+    // clear old selection
+    const oldSelection = Array.from(
+        document.getElementsByClassName("selected-instruction"),
+    );
+    for (const old of oldSelection)
+        old.classList.remove("selected-instruction");
+
+    // highlight the assembly corresponding to the code in the current cursor line
+    for (const line of lines) {
+        const assembled = Array.from(
+            vm.assembler.addressEditorsPositions.entries(),
+        )
+            .filter(
+                ([_, editorPos]) =>
+                    editorPos.fileId === file.id &&
+                    editorPos.lineNumber - 1 === line,
+            )
+            .map(([addr, _]) => addr);
+
+        let first = true;
+        assembled.forEach((addr) => {
+            const elem = document.getElementById(`${addr}`);
+            if (!elem) return;
+            if (first) {
+                //scroll to the first of the addresses
+                first = false;
+                highlightElementAnimation(`${addr}`, true, 0);
+            }
+            elem.classList.add("selected-instruction");
+        });
     }
 }

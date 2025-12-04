@@ -79,17 +79,10 @@ window.addEventListener("resize", () => {
 });
 
 // clicking editor while executing goes back to edit state
-document.getElementById("editors")?.addEventListener("click", () => {
-    if (editorState === "execute") {
-        stop();
-    }
-});
-
 /* window.addEventListener("focus", async () => {
     initEditors();
     await renderApp();
 }); */
-// TODO: removed only while developing
 
 async function renderErrorPage(errorMessage: string) {
     document.getElementById("editors")!.style.display = "none";

@@ -97,6 +97,7 @@ window.addEventListener("resize", adjustEditorsTop);
 export function highlightElementAnimation(
     elem: HTMLElement | string,
     scroll = false,
+    highlightDuration = 1500,
 ) {
     if (typeof elem === "string") {
         const found = document.getElementById(elem);
@@ -104,10 +105,10 @@ export function highlightElementAnimation(
         elem = found;
     }
     if (scroll) {
-        elem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        elem.scrollIntoView({ behavior: "smooth", block: "center" });
     }
     elem.classList.add("highlighted");
-    setTimeout(() => elem.classList.remove("highlighted"), 1500);
+    setTimeout(() => elem.classList.remove("highlighted"), highlightDuration);
 }
 
 export function updateTagsOverflowClasses() {
