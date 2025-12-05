@@ -79,11 +79,9 @@ export class InstructionPreprocessor {
                     const split = tokens[2]
                         .split(hasPlus ? "+" : "-")
                         .map((part) => part.trim());
-                    const labelAddr = getLabelAddress(
-                        split[0],
-                        labels,
-                        globals,
-                    );
+                    const labelAddr = withLabels
+                        ? getLabelAddress(split[0], labels, globals)
+                        : 0x1001000; // doesn't matter the value if we're not in the withLabels pass, just make it use the correct loadImmediate
                     if (labelAddr === undefined) {
                         if (withLabels)
                             throw new Error(`Undefined label: "${split[0]}"`);
@@ -99,7 +97,9 @@ export class InstructionPreprocessor {
                     ];
                 }
                 // label
-                const labelAddr = getLabelAddress(tokens[2], labels, globals);
+                const labelAddr = withLabels
+                    ? getLabelAddress(tokens[2], labels, globals)
+                    : 0x1001000;
                 if (labelAddr !== undefined) {
                     return [
                         ...loadImmediate(labelAddr, "$at"),
