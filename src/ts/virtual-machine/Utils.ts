@@ -166,7 +166,6 @@ export class Binary {
 
     equals(binary: Binary): boolean {
         if (this.length !== binary.length) return false;
-        if (this.signed !== binary.signed) return false;
         return this.binary === binary.binary;
     }
 }
