@@ -240,7 +240,7 @@ export function addEditor(file: file) {
             const newValue = aceEditor.getValue();
             updateFile(file.id, newValue);
             if (interfaceState === "execute" && newValue !== file.content) {
-                setTimeout(() => stop(), 100);
+                setTimeout(() => stop(), 10);
             }
         } else {
             silent = true;

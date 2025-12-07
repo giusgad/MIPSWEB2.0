@@ -31,6 +31,10 @@ export class InstructionPreprocessor {
         const paramMap: { [key: string]: string } = {};
 
         for (let i = 0; i < formatParts.length; i++) {
+            if (tokens[i + 1] === undefined)
+                throw new Error(
+                    `Incorrect number of params for "${tokens.join(" ")}", expected "${paramsFormat}"`,
+                );
             paramMap[formatParts[i].trim()] = tokens[i + 1];
         }
 
