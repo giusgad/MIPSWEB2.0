@@ -2,6 +2,7 @@ import { render } from "./rendering.js";
 import { hideFilePopover } from "./popovers.js";
 
 let escHandler: ((ev: KeyboardEvent) => void) | null = null;
+let onCloseCallback: (() => void) | null = null;
 
 export async function showForm(
     form: string,
@@ -35,12 +36,12 @@ export async function showForm(
     if (bindEsc) {
         escHandler = (ev) => {
             if (ev.key === "Escape") {
-                if (onClose !== undefined) onClose();
                 hideForm();
             }
         };
         document.addEventListener("keyup", escHandler);
     }
+    onCloseCallback = onClose ? onClose : null;
 }
 
 export async function hideForm() {
@@ -52,6 +53,10 @@ export async function hideForm() {
     if (escHandler) {
         document.removeEventListener("keyup", escHandler);
         escHandler = null;
+    }
+    if (onCloseCallback) {
+        onCloseCallback();
+        onCloseCallback = null;
     }
 }
 

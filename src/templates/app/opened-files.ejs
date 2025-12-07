@@ -4,13 +4,13 @@
         <div class="file-tab <%if((ctx.selectedFile) && (ctx.selectedFile.id === file.id)){%>selected<%}%>" onclick="changeFileOnClick('<%=file.id%>', this)">
             <div class="file-name"><span ondblclick="enableFileNameEdit(this)" data-fileid="<%=file.id%>"><%=file.name%></span>.<%=file.type%></div>
             <div class="buttons">
-              <div class="button <%=(ctx.interfaceState !== 'edit') ? "disabled" : ""%>" onclick="event.stopPropagation();showFileActionsOnClick(<%=file.id%>, this)">
+              <div class="button" onclick="event.stopPropagation();showFileActionsOnClick(<%=file.id%>, this)">
                   <div class="icon gray-4"><%-Icons.render('verticalDots')%></div>
               </div>
             </div>
         </div>
         <%});%>
-        <div class="file-tab new-file not-draggable <%=(ctx.interfaceState !== 'edit') ? "disabled" : ""%>" onclick="newFileOnClick();">
+        <div class="file-tab new-file not-draggable" onclick="newFileOnClick();">
           <div class="icon"><%-Icons.render('plus')%></div>
         </div>
     </div>

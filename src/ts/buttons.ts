@@ -15,6 +15,8 @@ import {
     setProjectName,
     getSelectedFile,
     getFile,
+    getProjectName,
+    defaultProjectName,
 } from "./files.js";
 import {
     hideFilePopover,
@@ -47,7 +49,7 @@ import {
 import { render } from "./rendering.js";
 import { highlightElementAnimation } from "./style.js";
 import { clearErrorMarkers, moveCursorToPos } from "./editors.js";
-import { renderApp } from "./app.js";
+import { interfaceState, renderApp } from "./app.js";
 import { blinkConsole } from "./console.js";
 import { getFromStorage, setIntoStorage } from "./utils.js";
 
@@ -262,6 +264,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).newFileOnClick = async function () {
+    if (interfaceState === "execute") await stop();
     await newFile();
 };
 
@@ -323,6 +326,7 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 };
 
 (window as any).deleteFileOnClick = async function (stringFileId: string) {
+    if (interfaceState === "execute") await stop();
     const fileId = parseInt(stringFileId);
     const file = getFile(fileId);
     if (
@@ -336,12 +340,47 @@ const getStateBtnText = function (val: string, long: boolean = false): string {
 
 (window as any).exportFileOnClick = async function (stringFileId: string) {
     const fileId = parseInt(stringFileId);
-    await exportFile(fileId);
-    hideFilePopover();
+    const exportFileCallback = async () => {
+        await exportFile(fileId);
+        hideFilePopover();
+    };
+    const file = getFile(fileId);
+    if (!file) return;
+    // if the file was untitled rename it first and export it after
+    if (file.name.startsWith("untitled")) {
+        showToast(
+            "This file has a default name, you can rename it before exporting",
+            3000,
+        );
+        showForm(
+            "rename-file-form",
+            {
+                fileId: stringFileId,
+                fileName: file.name,
+                fileType: file.type,
+            },
+            true,
+            exportFileCallback,
+            true,
+        );
+    } else {
+        exportFileCallback();
+    }
 };
 
 (window as any).exportZipOnClick = async function () {
-    exportZip();
+    const exportCallback = () => {
+        exportZip();
+    };
+    if (getProjectName() === defaultProjectName) {
+        showToast(
+            "The project has the default name, you can rename it before exporting",
+            3000,
+        );
+        showForm("rename-project", {}, true, exportCallback, true);
+    } else {
+        exportCallback();
+    }
 };
 
 /**Ask confirmation from the user on whether it's safe to remove the current project's files.
@@ -370,6 +409,7 @@ Save your current project before proceeding.`,
 };
 
 (window as any).renameFileOnClick = async function (stringFileId: string) {
+    if (interfaceState === "execute") await stop();
     const fileId = parseInt(stringFileId);
     const newFileName = (
         document.getElementById("new-file-name") as HTMLInputElement

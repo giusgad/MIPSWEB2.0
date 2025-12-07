@@ -6,7 +6,7 @@ import { confirmClearProject } from "./buttons.js";
 import { showToast } from "./forms.js";
 
 declare const JSZip: any;
-const defaultProjectName = "MIPS_project";
+export const defaultProjectName = "MIPS_project";
 
 export type file = {
     id: number;
