@@ -185,8 +185,6 @@ function extendInterval(cells: cell[]): interval {
         formats: {
             value: settings.colsFormats["memory-value-format"],
             valueGranularity: settings.colsFormats["memory-value-granularity"],
-            deassemblyLiteralFormat:
-                settings.colsFormats["memory-deassembly-literal-format"],
         },
     };
     if (
