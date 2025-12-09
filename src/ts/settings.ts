@@ -375,7 +375,7 @@ export function getOptionsFromForm(formData: FormData): OptionsObject {
     const formData = new FormData(event.currentTarget as HTMLFormElement);
     const newOpts = getOptionsFromForm(formData);
     updateOpts(newOpts);
-    await hideForm();
+    await hideForm(false);
     await renderApp();
 };
 

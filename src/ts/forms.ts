@@ -44,7 +44,7 @@ export async function showForm(
     onCloseCallback = onClose ? onClose : null;
 }
 
-export async function hideForm() {
+export async function hideForm(runOnCloseCallback: boolean = true) {
     const formsBg = document.getElementById("forms-bg");
     if (formsBg) {
         formsBg.style.display = "none";
@@ -54,7 +54,7 @@ export async function hideForm() {
         document.removeEventListener("keyup", escHandler);
         escHandler = null;
     }
-    if (onCloseCallback) {
+    if (runOnCloseCallback && onCloseCallback) {
         onCloseCallback();
         onCloseCallback = null;
     }
