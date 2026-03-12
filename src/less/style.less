@@ -449,7 +449,6 @@ input {
     &.registers {
       span.invariant {
         color: var(--rgba-red-80);
-        font-weight: bold;
       }
       .regs {
         display: flex;
@@ -497,6 +496,7 @@ input {
         &.name {
           width: 9ch;
           font-weight: bold;
+          justify-content: flex-start;
         }
         &.longname {
           display: block;
@@ -507,7 +507,8 @@ input {
         &.params {
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: stretch;
+          // div {text-align:left;}
           justify-content: center;
           width: 27ch;
         }

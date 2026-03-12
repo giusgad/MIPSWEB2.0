@@ -159,7 +159,7 @@ function getPseudoInstructionsHelp(): InstructionHelp[] {
 
 (window as any).getAsciiTableHelp = function (): string[] {
     const help = Array(128).fill("");
-    help[0] = "terminator byte";
+    help[0] = "string terminator";
     help[8] = "backspace";
     help[9] = "horizontal tab";
     help[10] = "newline";
@@ -216,37 +216,37 @@ export function getDirectivesHelp(): DirectiveHelp[] {
         {
             from: 2,
             to: 3,
-            longName: "Value 0..1",
+            longName: "Value 0…1",
             desc: "procedure return values",
         },
         {
             from: 4,
             to: 7,
-            longName: "Argument 0..3",
+            longName: "Argument 0…3",
             desc: "procedure call arguments",
         },
         {
             from: 8,
             to: 15,
-            longName: "Temporary 0..7",
+            longName: "Temporary 0…7",
             desc: "procedure calls can overwrite their contents.",
         },
         {
             from: 16,
             to: 23,
-            longName: "Saved 0..7",
+            longName: "Saved 0…7",
             desc: "procedure calls guarantee that the contents of these registers will be unchanged when they return",
         },
         {
             from: 24,
             to: 25,
-            longName: "Temporary 8..9",
+            longName: "Temporary 8…9",
             desc: "See above",
         },
         {
             from: 26,
             to: 27,
-            longName: "Kernel 0..1",
+            longName: "Kernel 0…1",
             desc: "reserved for kernel (OS) use",
         },
         {
@@ -265,13 +265,13 @@ export function getDirectivesHelp(): DirectiveHelp[] {
             from: 30,
             to: 30,
             longName: "Frame Pointer",
-            desc: "stores the address of the base of the current function's stack frame",
+            desc: "stores the address of the base of the stack frame of the current function",
         },
         {
             from: 31,
             to: 31,
             longName: "Return Address",
-            desc: `stores the address of the caller of the current function, <span class="invariant">automatically set by procedure call instructions (like jump-and-link)</span>`,
+            desc: `stores the address of the caller of the current function; <span class="invariant">automatically set to the next PC by linking instructions (such as jump-and-link)</span>`,
         },
     ];
     const registers = vm.cpu.registers.registers;

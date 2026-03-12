@@ -37,7 +37,7 @@
         <div class="cols-names">
           <div class="col name"><p>Name</p></div>
           <div class="col longname"><p>Long name</p></div>
-          <div class="col params"><p>Params</p></div>
+          <div class="col params"><p>Syntax</p></div>
           <div class="col desc"><p>Description</p></div>
         </div>
         <div class="rows">
@@ -96,13 +96,12 @@
         </div>
       </div>
     <%} else if (help.kind==="registers") {%>
-      <p>Conventional use / <span class="invariant">HW features</span></p>
       <div class="table">
         <div class="cols-names">
           <div class="col num"><p>Num</p></div>
           <div class="col name"><p>Name</p></div>
           <div class="col longName"><p>Full name</p></div>
-          <div class="col desc"><p>Description</p></div>
+          <div class="col desc"><p>Conventional use and <span class="invariant">HW features</span></p></div>
         </div>
         <div class="rows">
           <%getRegistersHelp().forEach((regHelp, i) => {%>
@@ -128,7 +127,7 @@
           <div class="cols-names">
             <div class="col dec"><p>Dec</p></div>
             <div class="col char"><p>Char</p></div>
-            <div class="col desc"><p>Desc</p></div>
+            <div class="col desc"><p>Description</p></div>
           </div>
           <div class="rows">
             <% for (i = 32*(col-1); i < 32*col; i++) {%>
