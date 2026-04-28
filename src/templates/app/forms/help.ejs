@@ -1,11 +1,11 @@
 <div class="form help">
   <%const helps = [
-    {title: "About", kind: "about"},
     {title: "Instructions", kind: "instr"},
     {title: "Syscalls", kind: "syscalls"},
     {title: "Directives", kind: "directives"},
     {title: "Registers", kind: "registers"},
-    {title: "ASCII", kind: "ascii"}
+    {title: "ASCII", kind: "ascii"},
+    {title: "About", kind: "about"}
   ];
   let activeSection = getActiveHelpTab() || 0;
   let help = helps[activeSection];
