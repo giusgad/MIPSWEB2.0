@@ -8,7 +8,7 @@
     "watch:ts": "npx tsc --watch",
     "dev": "concurrently \"npm run watch:less\" \"npm run watch:ts\" \"node server.js\"",
     "build:less": "npx lessc src/less/style.less css/style.css",
-    "copy:static": "rm -r build; mkdir build && cp -r -t build index.html css/ js/ projects/ && cp -r src/templates build/templates",
+    "copy:static": "rm -r build; mkdir build && cp -r -t build index.html css/ js/ projects/ fonts/ fonts.css && cp -r src/templates build/templates && cp -r vendor/ build/js/",
     "build": "npm run build:less && npx tsc && npm run copy:static"
   },
   "repository": {

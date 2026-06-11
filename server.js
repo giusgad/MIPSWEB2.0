@@ -9,6 +9,9 @@ app.use("/css", express.static(path.join(__dirname, "css")));
 app.use("/js", express.static(path.join(__dirname, "js")));
 app.use("/templates", express.static(path.join(__dirname, "src/templates")));
 app.use("/projects", express.static(path.join(__dirname, "projects")));
+app.use("/js/vendor", express.static(path.join(__dirname, "vendor")));
+app.use("/fonts.css", express.static(path.join(__dirname, "fonts.css")));
+app.use("/fonts", express.static(path.join(__dirname, "fonts")));
 
 app.get("/", (_, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
